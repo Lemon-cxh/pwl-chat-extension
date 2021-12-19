@@ -1,4 +1,4 @@
-export const defaultType = 'specify'
+export const defaultType = 'random'
 
 export const redPacketTypeArray = [
   { label: '手气红包', value: 'random' },
@@ -10,7 +10,6 @@ export const redPacketTypeArray = [
 export const redPacketTypeMap = new Map([
   ['random', { label: '手气红包', count: 2, msg: '摸鱼者，事竟成!' }],
   ['heartbeat', { label: '心跳红包', count: 2, msg: '玩的就是心跳!' }],
-  ['specify', { label: '专属红包', count: 1, msg: '调试BUG' }],
-  // 试试看，这是给你的红包吗?
+  ['specify', { label: '专属红包', count: 1, msg: '试试看，这是给你的红包吗?' }],
   ['average', { label: '平分红包', count: 2, msg: '平分红包，人人有份!' }],
 ])
