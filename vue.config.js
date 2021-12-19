@@ -8,11 +8,6 @@ module.exports = {
       entry: './src/popup/main.js',
       title: 'Popup'
     },
-    options: {
-      template: 'public/browser-extension.html',
-      entry: './src/options/main.js',
-      title: 'Options'
-    },
     background: {
       template: 'public/browser-extension.html',
       entry: './src/background/main.js',

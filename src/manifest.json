@@ -34,9 +34,5 @@
 			"js": ["js/content-script.js"],
 			"run_at": "document_start"
 		}
-	],
-  "options_ui": {
-    "page": "options.html",
-    "browser_style": true
-  }
+	]
 }
