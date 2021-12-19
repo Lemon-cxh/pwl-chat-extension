@@ -91,7 +91,7 @@ export default {
         count: redPacketTypeMap.get(defaultType).count,
         msg: redPacketTypeMap.get(defaultType).msg,
         type: defaultType,
-        recivers: 'Lemon',
+        recivers: '',
       },
       redPacketDialogVisible: false,
       redPacketTypeMap: redPacketTypeMap,
