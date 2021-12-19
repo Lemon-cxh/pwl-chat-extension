@@ -1,3 +1,4 @@
+const { resolve } = require('core-js/fn/promise');
 const ExtensionReloader  = require('webpack-extension-reloader');
 
 module.exports = {
@@ -48,5 +49,16 @@ module.exports = {
         }
       })
     ]
+  },
+  chainWebpack: config => {
+    const svgRule = config.module.rule("svg");
+    svgRule.uses.clear();
+    svgRule
+      .use("svg-sprite-loader")
+      .loader("svg-sprite-loader")
+      .options({
+        symbolId: "icon-[name]",
+        include: ["./src/svg"]
+      });
   }
 }

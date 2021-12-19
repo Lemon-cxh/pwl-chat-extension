@@ -1,89 +1,86 @@
 <template>
-  <div>
-    <el-progress :percentage="percentage" :show-text="false"/>
-    <el-row type="flex" class="box">
-      <el-row class="avatar" @click.native="logout">
+  <el-row class="avatar">
+    <el-dropdown trigger="click">
+      <el-badge :value="unreadCount"
+                :hidden="unreadCount == 0">
         <el-avatar :src="userInfo.userAvatarURL"></el-avatar>
-      </el-row>
-      <send class="send"></send>
-    </el-row>
-  </div>
+      </el-badge>
+      <el-dropdown-menu slot="dropdown">
+        <el-dropdown-item @click.native="openNotifications">
+          通知
+          <el-badge :value="unreadCount"
+                    :hidden="unreadCount == 0" />
+        </el-dropdown-item>
+        <el-dropdown-item @click.native="logout">
+          登出
+        </el-dropdown-item>
+      </el-dropdown-menu>
+    </el-dropdown>
+  </el-row>
 </template>
 
 <script>
-
-import Send from "../components/Send.vue";
 import { mapGetters, mapMutations } from "vuex";
-import { liveness, isCollectedLiveness, getLivenessReward } from "../api/user";
-import { closeSocket } from "../utils/chromeUtil"
+import { countNotifications, makeReadAtNotifications } from "../api/user";
+import { STORAGE } from "../constant/Constant";
+import { setLocal } from "../utils/chromeUtil";
 
 export default {
   name: "userInfo",
   data() {
     return {
-      percentage: 0,
-      interval: null
-    }
+      unreadCount: 0,
+    };
   },
-  components: { Send },
   computed: {
-    ...mapGetters(['userInfo', 'key']),
+    ...mapGetters(["userInfo", "key"]),
     apiKey() {
-      return {apiKey: this.key};
+      return { apiKey: this.key };
     },
   },
   created() {
-    this.getLiveness()
-    this.interval = window.setInterval(() => {
-      this.getLiveness()
-    }, 6000);
-    this.getLivenessReward()
-  },
-  destroyed(){
-    if (this.interval) {
-      window.clearInterval(this.interval)
-    }
+    this.countNotifications();
   },
   methods: {
-    ...mapMutations(['clearMessage']),
-    getLiveness() {
-      liveness(this.apiKey).then(res => {
-        this.percentage = res.liveness
-      })
+    ...mapMutations(["clearMessage"]),
+    countNotifications() {
+      countNotifications(this.apiKey).then((res) => {
+        if (0 !== res.code) {
+          return;
+        }
+        this.unreadCount = res.unreadNotificationCnt - res.unreadAtNotificationCnt;
+        if (res.unreadAtNotificationCnt > 0) {
+          makeReadAtNotifications(this.apiKey).then()
+        }
+      });
+    },
+    openNotifications() {
+      window.open(process.env.VUE_APP_BASE_URL + "/notifications/commented");
     },
     logout() {
-      closeSocket();
-      this.clearMessage()
-      this.$router.push({name: 'Login'})
+      chrome.extension.getBackgroundPage().closeSocket();
+      setLocal({ [STORAGE.key]: "" });
+      this.clearMessage();
+      this.$router.push({ name: "Login" });
     },
-    getLivenessReward() {
-      chrome.storage.local.get(['isCollectedYesterdayLivenessReward'], function (result) {
-        if (result.isCollectedYesterdayLivenessReward) {
-          return
-        }
-        isCollectedLiveness(this.apiKey).then(res => {
-          if (!res.isCollectedYesterdayLivenessReward) {
-            getLivenessReward(this.apiKey).then(r => {
-              chrome.storage.local.set({ isCollectedYesterdayLivenessReward: true })
-              this.$message.success('领取昨日活跃积分:' + r.sum)
-            })
-          }
-        })
-      })
-    }
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
-.box {
-  padding: 5px;
-}
 .avatar {
-  width: 40px;
-  margin-right: 5px
+  width: 60px;
+  height: 40px;
+  margin-right: 5px;
 }
-.send {
-  width: 350px;
+</style>
+<style>
+.el-dropdown-menu {
+  background-color: #333333;
+  color: white;
+}
+.el-dropdown-menu__item:focus,
+.el-dropdown-menu__item:not(.is-disabled):hover {
+  background-color: #8f8f8f;
 }
 </style>

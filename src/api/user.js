@@ -31,3 +31,27 @@ export function getUserInfo(name, data) {
     params: data
   })
 }
+
+export function getUserName(data) {
+  return request({
+    url: '/users/names',
+    method: 'post',
+    data: data
+  })
+}
+
+export function countNotifications(data) {
+  return request({
+    url: '/notifications/unread/count',
+    method: 'get',
+    params: data
+  })
+}
+
+export function makeReadAtNotifications(data) {
+  return request({
+    url: '/notifications/make-read/at',
+    method: 'get',
+    params: data
+  })
+}

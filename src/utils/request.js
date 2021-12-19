@@ -21,7 +21,6 @@ service.interceptors.response.use(
   },
   error => {
     console.log(error)
-    Vue.prototype.$message.error(error.message)
     return Promise.reject(error)
   })
 

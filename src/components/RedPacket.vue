@@ -1,83 +1,184 @@
 <template>
-  <div>
-    <el-row type="flex"
-            :class="'red-packet' + (redPacket.count === redPacket.got ? ' red-packet-mask' : '')"
-            @click.native="openRedPacket">
-      <div class="cover"></div>
-      <el-row class="msg">{{redPacket.msg}}</el-row>
-    </el-row>
-
-    <red-packet-info :info="info"
-                     v-if="dialogVisible"
-                     @close='close'></red-packet-info>
-  </div>
+  <el-popover placement="left-start"
+                  width="220"
+                  trigger="click"
+                  v-model="redPacketDialogVisible"
+                  @show="redPacketHandler">
+        <el-form ref="form"
+                 :rules="rules"
+                 :model="redPacketForm"
+                 size="mini"
+                 class="form">
+          <el-form-item label="类型"
+                        prop="type">
+            <el-select v-model="redPacketForm.type"
+                       class="option"
+                       @change="redPacketTypeChange">
+              <el-option v-for="item in redPacketTypeArray"
+                         :key="item.value"
+                         :label="item.label"
+                         :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="积分"
+                        prop="money">
+            <el-input-number v-model="redPacketForm.money"
+                             :min="32"></el-input-number>
+          </el-form-item>
+          <el-form-item label="个数"
+                        v-if="'specify' !== redPacketForm.type"
+                        prop="count">
+            <el-input-number v-model="redPacketForm.count"
+                             :min="1"></el-input-number>
+          </el-form-item>
+          <el-form-item label="专属"
+                        v-else
+                        prop="recivers">
+            <el-select v-model="redPacketForm.recivers"
+                       class="option"
+                       filterable
+                       remote
+                       placeholder="请输入关键词"
+                       :remote-method="remoteMethod"
+                       :loading="userListLoading">
+              <el-option v-for="item in userList"
+                         :key="item.userName"
+                         :label="item.userName"
+                         :value="item.userName">
+                <el-row class="option" type="flex">
+                  <img class="option-image" :src="item.userAvatarURL"/>
+                  <span class="option-text">{{item.userName}}</span>
+                </el-row>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="内容"
+                        prop="msg">
+            <el-input class="option"
+                      type="textarea"
+                      :autosize="{ minRows: 1, maxRows: 4}"
+                      v-model.trim="redPacketForm.msg"></el-input>
+          </el-form-item>
+          <el-form-item label-width="80px">
+            <el-button type="primary"
+                       @click="sendRedPacket">确 定</el-button>
+          </el-form-item>
+        </el-form>
+        <icon-svg slot="reference"
+                  icon-class="redPacketBtn" />
+      </el-popover>
 </template>
 
 <script>
-import { openRedPacket } from "../api/chat";
+import { send } from "../api/chat";
+import { getUserName } from "../api/user";
 import { mapGetters } from "vuex";
-import RedPacketInfo from "../components/RedPacketInfo.vue";
+import {
+  redPacketTypeMap,
+  redPacketTypeArray,
+  defaultType,
+} from "../constant/RedPacketConstant";
+import { inputRule, selectRule, numberRule, arrayRule } from "../constant/RuleConstant"
+
 
 export default {
   name: "redPacket",
-  props: {
-    oId: String,
-    content: String,
-  },
   data() {
     return {
-      dialogVisible: false,
-      info: "",
-      redPacket: JSON.parse(this.content)
+      redPacketForm: {
+        money: 32,
+        count: redPacketTypeMap.get(defaultType).count,
+        msg: redPacketTypeMap.get(defaultType).msg,
+        type: defaultType,
+        recivers: 'Lemon',
+      },
+      redPacketDialogVisible: false,
+      redPacketTypeMap: redPacketTypeMap,
+      redPacketTypeArray: redPacketTypeArray,
+      userList: [],
+      userListLoading: false,
+      rules: {
+          money: numberRule('积分'),
+          count: numberRule('个数'),
+          msg: inputRule('内容'),
+          type: selectRule('类型'),
+          recivers: selectRule('你的偏爱')
+      }
     };
   },
-  components: { RedPacketInfo },
   computed: {
     ...mapGetters(["key"]),
-    form() {
-      return { oId: this.oId, apiKey: this.key };
+    apiKey() {
+      return { apiKey: this.key };
+    },
+    redPacketContent() {
+      let redPacketForm = this.redPacketForm
+      redPacketForm.recivers = [redPacketForm.recivers]
+      return {
+        content:
+          "[redpacket]" + JSON.stringify(redPacketForm) + "[/redpacket]",
+        apiKey: this.key,
+      };
     },
   },
   methods: {
-    openRedPacket() {
-      openRedPacket(this.form).then((res) => {
-        this.dialogVisible = true;
-        this.info = res;
-        this.redPacket.got = res.info.got;
-      });
+    redPacketHandler() {
+      if (this.$refs["form"]) {
+        this.$refs["form"].resetFields();
+      }
     },
-    close() {
-      this.dialogVisible = false;
+    sendRedPacket() {
+      this.$refs['form'].validate(valid => {
+        if (!valid) {
+          return;
+        }
+        send(this.redPacketContent).then(() => {
+          this.redPacketDialogVisible = false;
+        });
+      })
+    },
+    remoteMethod(query) {
+      if (query === '') {
+        return
+      }
+      this.userListLoading = true;
+      getUserName({name: query}).then(res => {
+        this.userList = res.data
+        this.userListLoading = false;
+      })
+    },
+    redPacketTypeChange(value) {
+      let map = redPacketTypeMap.get(value);
+      this.redPacketForm.count = map.count;
+      this.redPacketForm.msg = map.msg;
     },
   },
 };
 </script>
 
 <style scoped>
-.red-packet {
-  background-color: #b90a00;
-  width: 200px;
-  height: 60px;
-  border-radius: 10px;
+.form {
+  padding: 20px;
 }
-.red-packet-mask {
-  background: rgba(122, 3, 3, 0.3);
+.option {
+  width: 130px;
+  color: white;
+  align-items: center;
 }
-.cover {
-  position: absolute;
-  left: 5px;
-  border-left: 95px solid transparent;
-  border-right: 95px solid transparent;
-  border-top: 35px solid #ff848444;
+.option-image {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
 }
-.msg {
-  color: #ebce96;
-  font-size: 16px;
-  line-height: 20px;
-  margin: auto;
-  text-align: center;
-  width: 200px;
-  z-index: 10;
-  overflow: hidden;
+</style>
+<style>
+.el-select-dropdown {
+  background-color: #333333;
+}
+.el-select-dropdown__item.hover, .el-select-dropdown__item.is-disabled:hover,
+.el-select-dropdown__item:hover, .el-select-dropdown.is-multiple .el-select-dropdown__item.selected.hover,
+.el-select-dropdown.is-multiple .el-select-dropdown__item.selected {
+  background-color: #8f8f8f;
 }
 </style>

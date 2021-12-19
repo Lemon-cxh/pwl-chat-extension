@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getUserInfo } from '../api/login'
-import { mapMutations } from 'vuex'
+import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
+import { setLocal, getLocal } from "../utils/chromeUtil"
 
 Vue.use(Vuex)
 
@@ -28,8 +29,11 @@ export default new Vuex.Store({
       userURL: ''
     },
     message: [],
-    page: 1,
-    limit: 0
+    messageTotal: 0,
+    online: {
+      onlineChatCnt: 0,
+      users: []
+    }
   },
   getters: {
     key: state => {
@@ -41,15 +45,16 @@ export default new Vuex.Store({
     message: state => {
       return state.message
     },
-    messageSize: state => {
-      return state.message.length
+    messageTotal: state => {
+      return state.messageTotal
     },
-    page: state => {
-      return state.page
+    pageParams: state => {
+      let page = parseInt(state.messageTotal / MESSAGE_LIMIT) + 1
+      return { page: page, length: page * MESSAGE_LIMIT - state.messageTotal}
     },
-    limit: state => {
-      return state.limit
-    },
+    online: state => {
+      return state.online
+    }
   },
   mutations: {
     setKey(state, key) {
@@ -58,41 +63,66 @@ export default new Vuex.Store({
     setUserInfo(state, userInfo) {
       state.userInfo = userInfo
     },
-    setMessage(state, message) {
-      state.message = message
+    popMessage(state) {
+      let m = state.message.pop()
+      if (!m.type || m.type === MESSAGE_TYPE.msg) {
+        state.messageTotal -= 1
+      }
     },
     addMessage(state, message) {
-      state.message.unshift(message)
+      state.message.unshift(message.message)
+      if (message.isMsg) {
+        state.messageTotal += 1
+      }
     },
     concatMessage(state, message) {
       state.message = state.message.concat(message);
+      state.messageTotal += message.length
     },
     clearMessage(state) {
-      state.message = []
-      state.page = 1;
+      state.message = [],
+      state.messageTotal = 0
     },
-    pagePlus(state) {
-      state.page += 1;
+    setOnline(state, online) {
+      state.online = {
+        onlineChatCnt: online.onlineChatCnt,
+        users: online.users
+      }
     },
-    setPage(state, page) {
-      state.page = page;
+    markRedPacket(state, oId) {
+      let msg
+      state.message.some(e => {
+        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
+          msg = JSON.parse(e.content)
+          msg.got += 1
+          e.content = JSON.stringify(msg)
+          return true;
+        }
+        return false;
+      })
     },
-    setLimit(state, limit) {
-      state.limit = limit;
-    },
+    revoke(state, oId) {
+      state.message.some(e => {
+        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
+          e.revoke = true;
+          return true;
+        }
+        return false;
+      })
+    }
   },
   actions: {
     getUser(context) {
       return new Promise((resolve, reject) => {
-        chrome.storage.local.get(['key'], function (result) {
-          if (result.key) {
-            getUserInfo({ apiKey: result.key }).then((res) => {
+        getLocal([STORAGE.key], function (result) {
+          if (result && result[STORAGE.key]) {
+            getUserInfo({ apiKey: result[STORAGE.key] }).then((res) => {
               if (res.code !== 0) {
-                chrome.storage.local.set({ key: '' })
+                setLocal({ [STORAGE.key]: '' })
                 return
               }
               context.commit('setUserInfo', res.data)
-              context.commit('setKey', result.key)
+              context.commit('setKey', result[STORAGE.key])
               resolve()
             })
           }

@@ -12,7 +12,7 @@ export default {
 </script>
 <style>
 #app {
-  height: 400px;
+  height: 500px;
   width: 400px;
 }
 body {
@@ -34,26 +34,15 @@ body {
 p {
   margin: 0px;
 }
-::-webkit-scrollbar-thumb:horizontal {
-  width: 4px;
-  background-color: #cccccc;
-}
-::-webkit-scrollbar-track-piece {
-  background-color: #fff;
-}
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
 }
-::-webkit-scrollbar-thumb:vertical {
-  height: 50px;
-  background-color: #999;
-  outline: 2px solid #fff;
-  outline-offset: -2px;
-  border: 2px solid #fff;
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: rgb(252, 197, 142);
 }
 ::-webkit-scrollbar-thumb:hover {
-  height: 50px;
-  background-color: #9f9f9f;
+  background-color: rgb(247, 149, 51);
 }
 </style>

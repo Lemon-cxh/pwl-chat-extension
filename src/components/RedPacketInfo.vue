@@ -3,7 +3,7 @@
                :visible.sync="dialogVisible"
                width="60%"
                :show-close="false"
-               @close="close"
+               :before-close="close"
                center>
       <el-row type="flex"
               class="flex-column">
@@ -54,7 +54,7 @@ export default {
   align-items: center;
 }
 .item {
-  margin: 2px 0;
+  margin: 5px 0;
   width: 200px;
   justify-content: space-between;
   text-align: center;

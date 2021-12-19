@@ -33,3 +33,27 @@ export function upload(file) {
     data: formData
   })
 }
+
+export function getEmoji(data) {
+  return request({
+    url: '/users/emotions',
+    method: 'get',
+    params: data
+  })
+}
+
+export function getCloudImage(data) {
+  return request({
+    url: '/api/cloud/get',
+    method: 'post',
+    data: data
+  })
+}
+
+export function syncCloudImage(data) {
+  return request({
+    url: '/api/cloud/sync',
+    method: 'post',
+    data: data
+  })
+}

@@ -1,81 +1,97 @@
 import Vue from 'vue'
 import App from './App.vue'
 import store from '../store'
-import { more, openRedPacket } from "../api/chat";
-import {
-  LOAD_MESSAGE_EVENT,
-  MORE_EVENT,
-  GET_MORE_EVENT,
-  MESSAGE_EVENT,
-} from '../constant/ConnectConstant'
+import { more } from '../api/chat'
+import { notifications, getLocal } from '../utils/chromeUtil'
+import { MESSAGE_TYPE, STORAGE, EVENT, MESSAGE_LIMIT } from "../constant/Constant"
 
 Vue.config.productionTip = false
 const URL = 'wss://pwl.icu/chat-room-channel'
-const MAX_MESSAGE = 200;
+const MAX_PAGE = 4
 let port = null
-
 let count = 0
-let popupShow = false
+let pop_message = false
 
 store.dispatch('getUser').then(() => {
   init()
 })
 
-window.openSocket = function() {
+window.openSocket = function () {
   init()
 }
 
 window.closeSocket = function () {
   if (window.mySocket && window.mySocket.readyState !== WebSocket.CLOSED) {
-    window.mySocket.close();
+    window.mySocket.close()
   }
   store.commit('clearMessage')
 }
 
 function init() {
-  if (window.mySocket && (window.mySocket.readyState === WebSocket.OPEN || window.mySocket.readyState === WebSocket.CONNECTING)) {
-    return
-  }
-  window.mySocket = new WebSocket(URL);
-  window.mySocket.onmessage = event => messageHandler(event)
-  window.mySocket.onerror = () => {
-    setTimeout(() => {
-      init()
-    }, 5000)
-  }
-  window.mySocket.onclose = () => {
-    setTimeout(() => {
-      init()
-    }, 5000)
-  }
+  getLocal([STORAGE.key], function (result) {
+    if (!result[STORAGE.key]) {
+      return
+    }
+    if (
+      window.mySocket &&
+      (window.mySocket.readyState === WebSocket.OPEN ||
+        window.mySocket.readyState === WebSocket.CONNECTING)
+    ) {
+      return
+    }
+    window.mySocket = new WebSocket(URL)
+    window.mySocket.onmessage = (event) => messageHandler(event)
+    window.mySocket.onerror = () => {
+      setTimeout(() => {
+        init()
+      }, 5000)
+    }
+    window.mySocket.onclose = () => {
+      setTimeout(() => {
+        init()
+      }, 5000)
+    }
+  })
 }
-
 
 function messageHandler(event) {
   let data = JSON.parse(event.data)
   switch (data.type) {
-    case 'msg':
-      messageEvent(data)
-      if (-1 !== data.content.indexOf('"msgType":"redPacket"')) {
-        setTimeout(() => {
-          openRedPacket({oId: data.oId, apiKey: store.getters.key}).then((res) => {
-            console.log(res);
-          });
-        }, 1000)
+    case MESSAGE_TYPE.online:
+      if (port) {
+        port.postMessage({ type: EVENT.online, message: data })
       }
+      store.commit('setOnline', data)
       break
-    case 'online':
+    case MESSAGE_TYPE.revoke:
+      if (port) {
+        port.postMessage({ type: EVENT.revoke, message: data.oId })
+      }
+      store.commit('revoke', data.oId)
       break
+    case MESSAGE_TYPE.redPacketStatus:
+      messageEvent(data, false)
+      if (port) {
+        port.postMessage({ type: EVENT.redPacketStatus, message: data.oId })
+      }
+      store.commit('markRedPacket', data.oId)
+      break
+    default:
+      messageEvent(data, true)
   }
 }
 
 chrome.runtime.onConnect.addListener(function (p) {
   clearBadgeText()
   port = p
-  p.postMessage({type: LOAD_MESSAGE_EVENT, message: store.getters.message})
+  let message = {
+    message: store.getters.message,
+    online: store.getters.online 
+  }
+  p.postMessage({ type: EVENT.loadMessage, message: message})
   p.onMessage.addListener(function (msg) {
     switch (msg.type) {
-      case GET_MORE_EVENT:
+      case EVENT.getMore:
         getMoreEvent()
         break
       default:
@@ -83,61 +99,49 @@ chrome.runtime.onConnect.addListener(function (p) {
     }
   })
   p.onDisconnect.addListener(function () {
-    popupShow = false
     port.disconnect()
-    port = null;
+    port = null
+    if (pop_message) {
+      return
+    }
+    pop_message = true
+    while (store.getters.messageTotal > MAX_PAGE * MESSAGE_LIMIT) {
+      store.commit('popMessage')
+    }
+    pop_message = false
   })
 })
 
-function messageEvent(message) {
+function messageEvent(message, isMsg) {
+  store.commit('addMessage', { message: message, isMsg: isMsg })
   if (port) {
-    port.postMessage({type: MESSAGE_EVENT, message: message});
+    port.postMessage({ type: EVENT.message, message: message })
   } else {
-    if (message.type === 'msg' && -1 !== message.md.indexOf('@' + store.getters.userInfo.userName)) {
-      chrome.notifications.create({
-        type: 'basic',
-        iconUrl: 'icons/128.png',
-        title: message.userName + '@了你',
-        message: message.md
-      });
+    if (
+      message.type === MESSAGE_TYPE.msg &&
+      message.md &&
+      -1 !== message.md.indexOf('@' + store.getters.userInfo.userName)
+    ) {
+      notifications(message.userName + '@了你', message.md)
     }
-  }
-  store.commit('addMessage', message)
-  if (!popupShow) {
-    count++
-    chrome.browserAction.setBadgeText({ text: '' + count })
-  }
-  if (store.getters.messageSize > MAX_MESSAGE) {
-    let message = store.getters.message.slice(0, MAX_MESSAGE)
-    store.commit('setMessage', message)
-    store.commit('setPage', MAX_MESSAGE / store.getters.limit + 1)
-    if (port) {
-      port.postMessage({type: LOAD_MESSAGE_EVENT, message: message})
-    }
+    chrome.browserAction.setBadgeText({ text: '' + ++count })
   }
 }
 
 function getMoreEvent() {
-  getMore(res => {
-    if (port) {
-      port.postMessage({type: MORE_EVENT, message: res.data});
+  let pageParams = store.getters.pageParams
+  more({ page: pageParams.page, apiKey: store.getters.key }).then((res) => {
+    if (res.code === 0) {
+      let data = res.data.slice(res.data.length - pageParams.length)
+      store.commit('concatMessage', data)
+      if (port) {
+        port.postMessage({ type: EVENT.more, message: data })
+      }
     }
-    store.commit('concatMessage', res.data);
-    store.commit('pagePlus')
   })
 }
 
-function getMore(fun) {
-  more({page: store.getters.page, apiKey: store.getters.key}).then((res) => {
-    if (res.code === 0) {
-      store.commit('setLimit', res.data.length)
-      fun(res)
-    }
-  });
-}
-
 function clearBadgeText() {
-  popupShow = true
   count = 0
   chrome.browserAction.setBadgeText({ text: '' })
 }

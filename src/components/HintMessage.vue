@@ -1,50 +1,45 @@
 <template>
   <div>
-    <el-row class="message">
-      <a class="text">{{message.whoGot}}</a>
+    <el-row class="message hint" v-if="message.revoke">
+      有人尝试撤回下条消息
+    </el-row>
+    <el-row v-else class="message">
+      <span class="text" @click="showUserCard(message.whoGot)">{{message.whoGot}}</span>
       <span> 抢到了 </span> 
-      <a class="text">{{message.whoGive}}</a>的
-      <a class="number" @click="openRedPacket">红包</a>
-      <span>({{message.got}}/{{message.count}})</span></el-row>
-    <red-packet-info :info="info"
-                     v-if="dialogVisible"
-                     @close='close'></red-packet-info>
+      <span class="text" @click="showUserCard(message.whoGive)">{{message.whoGive}} </span>的
+      <a class="number" @click="openRedPacket"> 红包 </a>
+      <span>({{message.got}}/{{message.count}})</span>
+    </el-row>
   </div>
 </template>
 
 <script>
 import { openRedPacket } from "../api/chat";
 import { mapGetters } from "vuex";
-import RedPacketInfo from "../components/RedPacketInfo.vue";
 
 export default {
   name: "hintMessage",
   props: {
     message: Object,
   },
-  data() {
-    return {
-      dialogVisible: false,
-      info: "",
-    };
-  },
-  components: { RedPacketInfo },
   computed: {
     ...mapGetters(["key"]),
     form() {
-      return { oId: this.info.oId, apiKey: this.key };
+      return { oId: this.message.oId, apiKey: this.key };
     },
   },
   methods: {
     openRedPacket() {
       openRedPacket(this.form).then((res) => {
-        this.dialogVisible = true;
-        this.info = res;
+        this.$emit('showRedpacketInfo', res)
       });
     },
     close() {
       this.dialogVisible = false;
     },
+    showUserCard(userName) {
+      this.$emit('showUserCard', userName)
+    }
   },
 };
 </script>
@@ -52,11 +47,15 @@ export default {
 <style scoped>
 .message {
   text-align: center;
+  font-size: 14px;
 }
 .text {
   color: #4183c4;
 }
 .number {
   color: #c7254e;
+}
+.hint {
+  color: white;
 }
 </style>

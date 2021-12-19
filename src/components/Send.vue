@@ -1,54 +1,35 @@
 <template>
-  <div>
-    <el-input placeholder="说点什么吧!"
-              v-model="content"
-              class="input-with-select"
-              @paste.native.capture.prevent="handlePaste"
-              @keyup.enter.native="send">
-      <el-dropdown slot="append"
-                   split-button
-                   type="primary"
-                   @command="handleCommand"
-                   @click="send">
-        <i class="el-icon-s-promotion"></i>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item icon="el-icon-s-finance" command="redPacketHandler"></el-dropdown-item>
-          <!-- <el-dropdown-item icon="el-icon-star-on" command="emojiHandler"></el-dropdown-item> -->
-        </el-dropdown-menu>
-      </el-dropdown>
-    </el-input>
-
-    <el-dialog :visible.sync="redPacketDialogVisible"
-               width="60%"
-               center>
-      <el-form ref="form"
-               :model="redPacketForm"
-               size="mini"
-               class="form">
-        <el-form-item label="积分"
-                      prop="money">
-          <el-input-number v-model="redPacketForm.money"
-                           :min="32"></el-input-number>
-        </el-form-item>
-        <el-form-item label="个数"
-                      prop="count">
-          <el-input-number v-model="redPacketForm.count"
-                           :min="1"></el-input-number>
-        </el-form-item>
-        <el-form-item label="内容"
-                      prop="msg">
-          <el-input style="width:80%"
-                    v-model.trim="redPacketForm.msg"></el-input>
-        </el-form-item>
-        <el-form-item label-width="80px"><el-button type="primary"
-                 @click="sendRedPacket">确 定</el-button></el-form-item>
-      </el-form>
-    </el-dialog>
+  <div class="send">
+    <div>
+      <el-input placeholder="说点什么吧!"
+                v-model="content"
+                ref="contentInput"
+                class="input-with-select"
+                @paste.native.capture.prevent="pasteHandler"
+                @keyup.enter.native="sendHandler">
+        <el-button slot="append"
+                   icon="el-icon-s-promotion"
+                   @click="sendHandler"></el-button>
+      </el-input>
+    </div>
+    <el-popover popper-class="quote-popover"
+                placement="bottom-start"
+                trigger="manual"
+                v-model="quoteVisible">
+      <div id="quote-content" class="quote-content">
+        <el-row type="flex" class="quote-user">
+          <div>引用 @{{quoteForm.userName}}</div>
+          <i class="el-icon-circle-close quote-close" @click="closeQuote"/>
+          </el-row>
+        <el-row>{{quoteForm.content}}</el-row>
+      </div>
+      <div style="width:1px" slot="reference"></div>
+    </el-popover>
   </div>
 </template>
 
 <script>
-import { openRedPacket, send, upload } from "../api/chat";
+import { send, upload } from "../api/chat";
 import { mapGetters } from "vuex";
 
 export default {
@@ -56,14 +37,11 @@ export default {
   data() {
     return {
       content: "",
-      redPacketForm: {
-        money: 32,
-        count: 2,
-        msg: "摸鱼者，事竟成!",
-        type: "random",
-        recivers: [],
+      quoteVisible: false,
+      quoteForm: {
+        userName: "",
+        content: "",
       },
-      redPacketDialogVisible: false,
     };
   },
   computed: {
@@ -71,18 +49,9 @@ export default {
     form() {
       return { content: this.content, apiKey: this.key };
     },
-    redPacketContent() {
-      return {
-        content:
-          "[redpacket]" +
-          JSON.stringify(this.redPacketForm) +
-          "[/redpacket]",
-        apiKey: this.key,
-      };
-    },
   },
   methods: {
-    handlePaste(e) {
+    pasteHandler(e) {
       if (e.clipboardData.types.some((e) => e === "Files")) {
         upload(e.clipboardData.files[0]).then((res) => {
           let succMap = res.data.succMap;
@@ -94,47 +63,75 @@ export default {
         this.content += e.clipboardData.getData("Text");
       }
     },
-    send(event) {
+    sendHandler(event) {
+      if (this.content === "") {
+        return;
+      }
       if (event.ctrlKey) {
-        this.content += '<br/>';
-        return
+        this.content += "<br/>";
+        return;
+      }
+      this.send();
+    },
+    addContent(content) {
+      this.content += content;
+    },
+    quote(quoteForm) {
+      if (quoteForm.userName) {
+        this.quoteForm = quoteForm;
+        this.$refs.contentInput.focus()
+        this.quoteVisible = true;
+      }
+    },
+    closeQuote() {
+      this.quoteForm = {};
+      this.quoteVisible = false;
+    },
+    sendMessage(content) {
+      send({ content: content, apiKey: this.key }).then();
+    },
+    send() {
+      let form = this.form;
+      if (this.quoteVisible) {
+        let quoteForm = this.quoteForm;
+        form.content +=
+          "\n##### 引用 @" + quoteForm.userName + "\n> " + quoteForm.content;
       }
       send(this.form).then(() => {
+        this.quoteVisible = false;
         this.content = "";
       });
     },
-    handleCommand(command) {
-      switch(command) {
-        case 'redPacketHandler':
-          this.redPacketHandler()
-          break;
-        case 'emojiHandler':
-          this.emojiHandler()
-          break;
-        default:
-      }
-    },
-    redPacketHandler() {
-      this.redPacketDialogVisible = true;
-      if (this.$refs['form']) {
-        this.$refs['form'].resetFields()
-      }
-    },
-    emojiHandler() {
-
-    },
-    sendRedPacket() {
-      send(this.redPacketContent).then(() => {
-        this.redPacketDialogVisible = false
-      });
-    },
-    emoji() {},
   },
 };
 </script>
-
 <style scoped>
-.form {
-  padding: 20px;
+.send {
+  flex-grow: 1;
+}
+.quote-content {
+  color: black;
+  max-width: 230px;
+  max-height: 100px;
+  overflow: auto;
+}
+.quote-user {
+  height: 20px;
+  line-height: 20px;
+  font-weight: bold;
+  justify-content: space-between;
+}
+.quote-close {
+  margin-left: 10px;
+  font-size: 20px;
+}
+</style>
+<style>
+.el-popover {
+  padding: 5px;
+  background-color: #333333;
+}
+.quote-popover {
+  background-color: #a3db92;
 }
 </style>
