@@ -21,7 +21,8 @@ export const EVENT = {
   message: 4,
   redPacketStatus: 5,
   revoke: 6,
-  online: 7
+  online: 7,
+  syncUserInfo: 8
 }
 
 export const MESSAGE_LIMIT = 25;

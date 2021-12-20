@@ -54,7 +54,7 @@
              v-if="loading"></i></div>
       </div>
     </div>
-    <user-card :userInfo="userInfo"
+    <user-card :userInfo="userCardInfo"
                :dialogVisible="dialogVisible"
                @closeDialog="closeDialog" />
     <red-packet-info :info="redPacketInfo"
@@ -89,7 +89,7 @@ export default {
       message: [],
       date: getDate(),
       dialogVisible: false,
-      userInfo: {},
+      userCardInfo: {},
       redPacketInfo: {},
       online: {},
       redPacketVisible: false,
@@ -97,7 +97,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["key"]),
+    ...mapGetters(["userInfo", "key"]),
     apiKey() {
       return { apiKey: this.key };
     },
@@ -118,6 +118,7 @@ export default {
   created() {
     let that = this;
     let port = chrome.runtime.connect();
+    port.postMessage({ type: EVENT.syncUserInfo, message: that.userInfo })
     port.onMessage.addListener(function (msg) {
       switch (msg.type) {
         case EVENT.loadMessage:
@@ -163,11 +164,11 @@ export default {
     },
     showUserCard(name) {
       getUserInfo(name, this.apiKey).then((res) => {
-        let userInfo = res;
-        if (userInfo.sysMetal) {
-          userInfo.sysMetal = JSON.parse(userInfo.sysMetal);
+        let userCardInfo = res;
+        if (userCardInfo.sysMetal) {
+          userCardInfo.sysMetal = JSON.parse(userCardInfo.sysMetal);
         }
-        this.userInfo = userInfo;
+        this.userCardInfo = userCardInfo;
         this.dialogVisible = true;
       });
     },

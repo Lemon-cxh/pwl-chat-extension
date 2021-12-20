@@ -56,7 +56,7 @@ export default {
 }
 .avatar-box {
   flex-wrap: wrap;
-  max-height: 143px;
+  max-height: 144px;
   overflow: auto
 }
 .avatar {

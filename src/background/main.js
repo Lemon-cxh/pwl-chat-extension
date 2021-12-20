@@ -94,6 +94,9 @@ chrome.runtime.onConnect.addListener(function (p) {
       case EVENT.getMore:
         getMoreEvent()
         break
+      case EVENT.syncUserInfo:
+        store.commit('setUserInfo', msg.message)
+        break;
       default:
         break
     }

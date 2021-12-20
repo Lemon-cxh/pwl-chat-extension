@@ -40,7 +40,7 @@ module.exports = {
         reloadPage: true,
         entries: {
           background: 'background',
-          extensionPage: ['popup', 'options'],
+          extensionPage: ['popup'],
         }
       })
     ]
