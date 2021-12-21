@@ -85,7 +85,7 @@ import RedPacketInfo from '../components/RedPacketInfo.vue'
 import Emoji from '../components/Emoji.vue'
 import Images from '../components/Images.vue'
 import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
-import { getDate } from '../utils/util'
+import { getDate, isRedPacket } from '../utils/util'
 import { getUserInfo } from '../api/user'
 import { mapGetters } from 'vuex'
 
@@ -187,7 +187,7 @@ export default {
         return
       }
       let last = this.message[0]
-      if (message.md !== last.md) {
+      if (message.md !== last.md || isRedPacket(message)) {
         this.message.unshift(message)
         return
       }

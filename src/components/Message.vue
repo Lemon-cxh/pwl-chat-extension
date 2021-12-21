@@ -66,7 +66,7 @@
         :key="index"
         :src="item.userAvatarURL"
         :size="20"
-        class="plus-opne-avatar"
+        class="plus-one-avatar"
       />
       <el-row :class="isOwn ? 'plus-one-text own-plus-one-text ' : 'plus-one-text'">{{message.users.length}} 人+1 </el-row>
     </el-row>
@@ -76,6 +76,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import RedPacketMessage from './RedPacketMessage.vue'
+import { isRedPacket } from '../utils/util'
 
 export default {
   name: 'message',
@@ -100,10 +101,7 @@ export default {
       return this.userInfo.userName === this.message.userName
     },
     isRedPacket() {
-      return (
-        this.message.content &&
-        -1 !== this.message.content.indexOf('msgType":"redPacket')
-      )
+      return isRedPacket(this.message)
     },
   },
   components: { RedPacketMessage },
@@ -217,8 +215,9 @@ export default {
 .own-plus-one-box {
   flex-direction: row-reverse;
 }
-.plus-opne-avatar {
+.plus-one-avatar {
   margin-left: -2px;
+  box-shadow: -3px 3px 5px 1px rgb(0 0 0 / 40%);
   order: 10;
 }
 .plus-one-text {

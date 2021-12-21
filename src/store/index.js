@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import { getUserInfo } from '../api/login'
 import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
 import { setLocal, getLocal } from "../utils/chromeUtil"
+import { isRedPacket } from '../utils/util'
 
 Vue.use(Vuex)
 
@@ -65,17 +66,17 @@ export default new Vuex.Store({
     },
     popMessage(state) {
       let m = state.message.pop()
-      if (!m.type || m.type !== MESSAGE_TYPE.msg) {
-        state.messageTotal -= 1
+      if (m.type && m.type !== MESSAGE_TYPE.msg) {
+        state.messageTotal -= (1 + m.users ? m.users.length : 0) 
         return
       }
-      state.messageTotal -= (1 + m.users ? m.users.length : 0) 
+      state.messageTotal -= 1
     },
     addMessage(state, message) {
       if (message.isMsg) {
         state.messageTotal += 1
         let last = state.message[0]
-        if (message.message.md === last.md) {
+        if (last.md && message.message.md === last.md && !isRedPacket(message.message)) {
           let users = last.users ? last.users : []
           users.unshift({ userName: message.message.userName, userAvatarURL: message.message.userAvatarURL })
           state.message[0].users = users

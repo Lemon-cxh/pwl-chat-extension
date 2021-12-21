@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "摸鱼派聊天室",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "homepage_url": "https://github.com/Lemon-cxh/pwl-chat-extension",
   "description": "摸鱼派聊天室插件",
   "permissions": [
