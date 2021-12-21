@@ -50,7 +50,7 @@ export default new Vuex.Store({
     },
     pageParams: state => {
       let page = parseInt(state.messageTotal / MESSAGE_LIMIT) + 1
-      return { page: page, length: page * MESSAGE_LIMIT - state.messageTotal}
+      return { page: page, length: page * MESSAGE_LIMIT - state.messageTotal }
     },
     online: state => {
       return state.online
@@ -65,15 +65,24 @@ export default new Vuex.Store({
     },
     popMessage(state) {
       let m = state.message.pop()
-      if (!m.type || m.type === MESSAGE_TYPE.msg) {
+      if (!m.type || m.type !== MESSAGE_TYPE.msg) {
         state.messageTotal -= 1
+        return
       }
+      state.messageTotal -= (1 + m.users ? m.users.length : 0) 
     },
     addMessage(state, message) {
-      state.message.unshift(message.message)
       if (message.isMsg) {
         state.messageTotal += 1
+        let last = state.message[0]
+        if (message.message.md === last.md) {
+          let users = last.users ? last.users : []
+          users.unshift({ userName: message.message.userName, userAvatarURL: message.message.userAvatarURL })
+          state.message[0].users = users
+          return
+        }
       }
+      state.message.unshift(message.message)
     },
     concatMessage(state, message) {
       state.message = state.message.concat(message);
@@ -81,7 +90,7 @@ export default new Vuex.Store({
     },
     clearMessage(state) {
       state.message = [],
-      state.messageTotal = 0
+        state.messageTotal = 0
     },
     setOnline(state, online) {
       state.online = {

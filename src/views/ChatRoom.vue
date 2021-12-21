@@ -2,86 +2,95 @@
   <div id="chatRoom">
     <!-- 活跃度，头像，输入框 -->
     <liveness />
-    <el-row type="flex"
-            class="user-box">
-      <user-info/>
+    <el-row type="flex" class="user-box">
+      <user-info />
       <send ref="messageInput" />
     </el-row>
     <!-- 菜单按钮 -->
     <el-row type="flex" class="menu-row">
-      <online :online="online"
-              @showUserCard="showUserCard"/>
-      <el-row type="flex"
-            class="menu">
+      <online :online="online" @showUserCard="showUserCard" />
+      <el-row type="flex" class="menu">
         <red-packet class="menu-item" />
-        <emoji class="menu-item"
-              @selectEmoji="selectEmoji" />
-        <images ref="cloudImages"
-                class="menu-item"
-                @selectImage="selectImage" />
-      </el-row> 
+        <emoji class="menu-item" @addContent="addContent" />
+        <images
+          ref="cloudImages"
+          class="menu-item"
+          @sendMessage="sendMessage"
+        />
+      </el-row>
     </el-row>
     <!-- 消息列表 -->
-    <div class="infinite-list-wrapper"
-         style="overflow: auto; height: 420px">
-      <div id="messageList"
-           class="list"
-           v-infinite-scroll="load"
-           :infinite-scroll-disabled="loading">
-        <div ref="inner"
-             v-for="(item, index) in message"
-             v-bind:key="index"
-             class="infinite-list-item">
-          <hint-message v-if="item.type && type.redPacketStatus === item.type"
-                        :message="item"
-                        @showUserCard="showUserCard"
-                        @showRedpacketInfo="showRedpacketInfo" />
+    <div class="infinite-list-wrapper" style="overflow: auto; height: 420px">
+      <div
+        id="messageList"
+        class="list"
+        v-infinite-scroll="load"
+        :infinite-scroll-disabled="loading"
+      >
+        <div
+          ref="inner"
+          v-for="(item, index) in message"
+          v-bind:key="index"
+          class="infinite-list-item"
+        >
+          <hint-message
+            v-if="item.type && type.redPacketStatus === item.type"
+            :message="item"
+            @showUserCard="showUserCard"
+            @showRedpacketInfo="showRedpacketInfo"
+          />
           <div v-else-if="!item.type || type.msg === item.type">
-            <hint-message v-if="item.revoke"
-                        :message="item" />
-            <message :ref="'message_' + item.oId"
-                   :message="item"
-                   :date="date"
-                   @showUserCard="showUserCard"
-                   @collectImages="collectImages"
-                   @talkToHe="talkToHe"
-                   @quote="quote"
-                   @showRedpacketInfo="showRedpacketInfo" />
+            <hint-message v-if="item.revoke" :message="item" />
+            <message
+              :ref="'message_' + item.oId"
+              :message="item"
+              :date="date"
+              @showUserCard="showUserCard"
+              @collectImages="collectImages"
+              @addContent="addContent"
+              @sendMessage="sendMessage"
+              @quote="quote"
+              @showRedpacketInfo="showRedpacketInfo"
+            />
           </div>
-          
         </div>
-        <div class="icon-box"><i class="el-icon-loading icon"
-             v-if="loading"></i></div>
+        <div class="icon-box">
+          <i class="el-icon-loading icon" v-if="loading"></i>
+        </div>
       </div>
     </div>
-    <user-card :userInfo="userCardInfo"
-               :dialogVisible="dialogVisible"
-               @closeDialog="closeDialog" />
-    <red-packet-info :info="redPacketInfo"
-                     v-if="redPacketVisible"
-                     @close='closeRedapcket'></red-packet-info>
+    <user-card
+      :userInfo="userCardInfo"
+      :dialogVisible="dialogVisible"
+      @closeDialog="dialogVisible = false"
+    />
+    <red-packet-info
+      :info="redPacketInfo"
+      :dialogVisible="redPacketVisible"
+      @close="redPacketVisible = false"
+    ></red-packet-info>
   </div>
 </template>
 
 <script>
-import Message from "../components/Message.vue";
-import Liveness from "../components/Liveness.vue";
-import UserInfo from "../components/UserInfo.vue";
-import Online from "../components/Online.vue";
-import Send from "../components/Send.vue";
-import UserCard from "../components/UserCard.vue";
-import HintMessage from "../components/HintMessage.vue";
-import RedPacket from "../components/RedPacket.vue";
-import RedPacketInfo from "../components/RedPacketInfo.vue";
-import Emoji from "../components/Emoji.vue";
-import Images from "../components/Images.vue";
-import { EVENT, MESSAGE_TYPE } from "../constant/Constant"
-import { getDate } from "../utils/util";
-import { getUserInfo } from "../api/user";
-import { mapGetters } from "vuex";
+import Message from '../components/Message.vue'
+import Liveness from '../components/Liveness.vue'
+import UserInfo from '../components/UserInfo.vue'
+import Online from '../components/Online.vue'
+import Send from '../components/Send.vue'
+import UserCard from '../components/UserCard.vue'
+import HintMessage from '../components/HintMessage.vue'
+import RedPacket from '../components/RedPacket.vue'
+import RedPacketInfo from '../components/RedPacketInfo.vue'
+import Emoji from '../components/Emoji.vue'
+import Images from '../components/Images.vue'
+import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
+import { getDate } from '../utils/util'
+import { getUserInfo } from '../api/user'
+import { mapGetters } from 'vuex'
 
 export default {
-  name: "chatRoom",
+  name: 'chatRoom',
   data() {
     return {
       port: null,
@@ -90,16 +99,18 @@ export default {
       date: getDate(),
       dialogVisible: false,
       userCardInfo: {},
-      redPacketInfo: {},
+      redPacketInfo: {
+        info: {},
+      },
       online: {},
       redPacketVisible: false,
-      type: MESSAGE_TYPE
-    };
+      type: MESSAGE_TYPE,
+    }
   },
   computed: {
-    ...mapGetters(["userInfo", "key"]),
+    ...mapGetters(['userInfo', 'key']),
     apiKey() {
-      return { apiKey: this.key };
+      return { apiKey: this.key }
     },
   },
   components: {
@@ -116,61 +127,130 @@ export default {
     Send,
   },
   created() {
-    let that = this;
-    let port = chrome.runtime.connect();
+    let that = this
+    let port = chrome.runtime.connect()
     port.postMessage({ type: EVENT.syncUserInfo, message: that.userInfo })
     port.onMessage.addListener(function (msg) {
       switch (msg.type) {
         case EVENT.loadMessage:
-          that.message = msg.message.message;
-          that.online = msg.message.online;
+          that.message = msg.message.message
+          that.online = msg.message.online
           if (msg.message.length === 0) {
-            that.load();
+            that.load()
           } else {
-            that.loading = false;
+            that.loading = false
           }
-          break;
+          break
         case EVENT.message:
-          that.message.unshift(msg.message);
-          break;
+          that.addMessage(msg.message)
+          break
         case EVENT.more:
-          that.message = that.message.concat(msg.message);
-          that.loading = false;
-          break;
+          that.message = that.message.concat(msg.message)
+          that.loading = false
+          break
         case EVENT.redPacketStatus:
           that.markRedPacket(msg.message)
-          break;
+          break
         case EVENT.revoke:
           that.revoke(msg.message)
-          break;
+          break
         case EVENT.online:
           that.online = msg.message
-          break;
+          break
         default:
-          break;
+          break
       }
-    });
-    this.port = port;
+    })
+    this.port = port
+  },
+  mounted() {
+    document.getElementById('messageList').oncontextmenu = () => {
+      this.showMessageMenu(event)
+      return false
+    }
+    document
+      .getElementById('messageList')
+      .addEventListener('click', (event) => {
+        let dom = event.target
+        if (dom.tagName === 'IMG' && dom.className !== 'emoji') {
+          this.showImage(dom, event)
+        }
+        if (dom.tagName === 'A') {
+          this.clickA(dom)
+        }
+      })
   },
   methods: {
+    addMessage(message) {
+      if (message.type !== this.type.msg){
+        this.message.unshift(message)
+        return
+      }
+      let last = this.message[0]
+      if (message.md !== last.md) {
+        this.message.unshift(message)
+        return
+      }
+      let users = last.users ? last.users : []
+      users.unshift({userName: message.userName, userAvatarURL: message.userAvatarURL})
+      this.$set(this.message[0], 'users', users)
+    },
     load() {
-      this.loading = true;
+      this.loading = true
       setTimeout(() => {
-        this.more();
-      }, 300);
+        this.more()
+      }, 300)
     },
     more() {
-      this.port.postMessage({ type: EVENT.getMore });
+      this.port.postMessage({ type: EVENT.getMore })
+    },
+    showMessageMenu(event) {
+      let dom = event.path.find((e) => e.id && -1 !== e.id.indexOf('message_'))
+      if (dom) {
+        let isImage =
+          event.path[0].nodeName === 'IMG' &&
+          event.path[0].className !== 'emoji'
+        this.$refs[dom.id][0].showMessageMenu(
+          isImage ? event.path[0].currentSrc : ''
+        )
+      }
+    },
+    showImage(dom, event) {
+      let message = event.path.find(
+        (e) => e.id && -1 !== e.id.indexOf('message_')
+      )
+      if (!message) {
+        return false
+      }
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        let message = {
+          src: dom.src,
+          width: dom.naturalWidth,
+          height: dom.naturalHeight,
+        }
+        chrome.tabs.sendMessage(tabs[0].id, message)
+      })
+    },
+    clickA(dom) {
+      if (dom.className === 'name-at') {
+        this.showUserCard(dom.innerText)
+      } else {
+        let href = dom.href.replace(
+          process.env.VUE_APP_BASE_URL + '/forward?goto=',
+          ''
+        )
+        window.open(decodeURIComponent(href))
+      }
     },
     showUserCard(name) {
       getUserInfo(name, this.apiKey).then((res) => {
-        let userCardInfo = res;
+        let userCardInfo = res
         if (userCardInfo.sysMetal) {
-          userCardInfo.sysMetal = JSON.parse(userCardInfo.sysMetal);
+          userCardInfo.sysMetal = JSON.parse(userCardInfo.sysMetal)
         }
-        this.userCardInfo = userCardInfo;
-        this.dialogVisible = true;
-      });
+        this.userCardInfo = userCardInfo
+        this.dialogVisible = true
+      })
     },
     markRedPacket(oId) {
       let msg
@@ -180,47 +260,41 @@ export default {
           msg = JSON.parse(e.content)
           msg.got += 1
           that.$set(that.message[index], 'content', JSON.stringify(msg))
-          return true;
+          return true
         }
-        return false;
+        return false
       })
     },
     revoke(oId) {
       this.message.some((e, index) => {
         if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
           this.$set(this.message[index], 'revoke', true)
-          return true;
+          return true
         }
-        return false;
+        return false
       })
     },
     showRedpacketInfo(info) {
-        this.redPacketVisible = true;
-        this.redPacketInfo = info;
+      this.redPacketVisible = true
+      this.redPacketInfo = info
+    },
+    sendMessage(content) {
+      this.$refs.messageInput.sendMessage(content)  
     },
     quote(quoteForm) {
-      this.$refs.messageInput.quote(quoteForm);
+      this.$refs.messageInput.quote(quoteForm)
     },
-    talkToHe(userName) {
-      this.$refs.messageInput.addContent(userName);
+    addContent(content) {
+      this.$refs.messageInput.addContent(content)
     },
     collectImages(url) {
-      this.$refs.cloudImages.syncCloudImage(url);
-    },
-    selectEmoji(name) {
-      this.$refs.messageInput.addContent(name);
-    },
-    selectImage(image) {
-      this.$refs.messageInput.sendMessage("![image.png](" + image + ")");
-    },
-    closeDialog() {
-      this.dialogVisible = false;
+      this.$refs.cloudImages.syncCloudImage(url)
     },
     closeRedapcket() {
-      this.redPacketVisible = false;
-    }
+      this.redPacketVisible = false
+    },
   },
-};
+}
 </script>
 <style scoped>
 .user-box {

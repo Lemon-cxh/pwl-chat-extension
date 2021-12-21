@@ -7,7 +7,7 @@
       <span class="text" @click="showUserCard(message.whoGot)">{{message.whoGot}}</span>
       <span> 抢到了 </span> 
       <span class="text" @click="showUserCard(message.whoGive)">{{message.whoGive}} </span>的
-      <a class="number" @click="openRedPacket"> 红包 </a>
+      <span class="number" @click="openRedPacket"> 红包 </span>
       <span>({{message.got}}/{{message.count}})</span>
     </el-row>
   </div>

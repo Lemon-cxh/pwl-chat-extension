@@ -125,6 +125,7 @@ function messageEvent(message, isMsg) {
       message.md &&
       -1 !== message.md.indexOf('@' + store.getters.userInfo.userName)
     ) {
+      console.log(store.getters.userInfo)
       notifications(message.userName + '@了你', message.md)
     }
     chrome.browserAction.setBadgeText({ text: '' + ++count })

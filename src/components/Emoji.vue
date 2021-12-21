@@ -55,7 +55,7 @@ export default {
       });
     },
     selectEmoji(name) {
-      this.$emit("selectEmoji", ':' + name + ':');
+      this.$emit("addContent", ':' + name + ':');
     },
     judgeEmojiIsImage(value) {
       return value.startsWith("http");

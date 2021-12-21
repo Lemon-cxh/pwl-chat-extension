@@ -40,7 +40,7 @@ export default {
       });
     },
     selectImage(image) {
-      this.$emit("selectImage", image);
+      this.$emit("sendMessage", '![image.png](' + image + ')');
       this.visible = false;
     },
     syncCloudImage(url) {
