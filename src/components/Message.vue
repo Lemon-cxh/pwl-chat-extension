@@ -67,6 +67,7 @@
         :src="item.userAvatarURL"
         :size="20"
         class="plus-one-avatar"
+        @click.native="$emit('showUserCard', item.userName)"
       />
       <el-row :class="isOwn ? 'plus-one-text own-plus-one-text ' : 'plus-one-text'">{{message.users.length}} 人+1 </el-row>
     </el-row>
@@ -122,7 +123,8 @@ export default {
       this.userName = '@' + message.userName + ' '
       this.quoteForm = {
         userName: message.userName,
-        content: message.md ? message.md : message.content,
+        md: message.md,
+        content: message.content,
       }
       this.imageUrl = imageUrl
       setTimeout(() => {
@@ -240,7 +242,7 @@ export default {
 .el-popover {
   min-width: 0px;
 }
-iframe {
+.content * {
   max-width: 255px;
 }
 </style>

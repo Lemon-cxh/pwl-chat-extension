@@ -1,20 +1,45 @@
 <template>
   <div class="send">
     <div>
-      <el-input
-        placeholder="说点什么吧!"
-        v-model="content"
-        ref="contentInput"
-        class="input-with-select"
-        @paste.native.capture.prevent="pasteHandler"
-        @keyup.enter.native="sendHandler"
+      <el-popover
+        placement="bottom-start"
+        width="150"
+        trigger="manual"
+        v-model="visible"
       >
-        <el-button
-          slot="append"
-          icon="el-icon-s-promotion"
-          @click="sendHandler"
-        ></el-button>
-      </el-input>
+        <div class="at-box">
+          <el-row
+            v-for="item in userList"
+            :key="item.userName"
+            :label="item.userName"
+            :value="item.userName"
+          >
+            <el-row
+              class="at-item"
+              type="flex"
+              @click.native="selectAt(item.userName)"
+            >
+              <img class="at-image" :src="item.userAvatarURL" />
+              <span class="at-text">{{ item.userName }}</span>
+            </el-row>
+          </el-row>
+        </div>
+        <el-input
+          slot="reference"
+          placeholder="说点什么吧!"
+          v-model="content"
+          ref="contentInput"
+          class="input-with-select"
+          @paste.native.capture.prevent="pasteHandler"
+          @keyup.enter.native="sendHandler"
+        >
+          <el-button
+            slot="append"
+            icon="el-icon-s-promotion"
+            @click="sendHandler"
+          ></el-button>
+        </el-input>
+      </el-popover>
     </div>
     <el-popover
       popper-class="quote-popover"
@@ -27,7 +52,8 @@
           <div>引用 @{{ quoteForm.userName }}</div>
           <i class="el-icon-circle-close quote-close" @click="closeQuote" />
         </el-row>
-        <el-row>{{ quoteForm.content }}</el-row>
+        <span v-if="quoteForm.content" v-html="quoteForm.content"></span>
+        <el-row v-else>{{ quoteForm.md }}</el-row>
       </div>
       <div style="width: 1px" slot="reference"></div>
     </el-popover>
@@ -36,6 +62,7 @@
 
 <script>
 import { send, upload } from '../api/chat'
+import { getUserName } from '../api/user'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -43,12 +70,30 @@ export default {
   data() {
     return {
       content: '',
+      visible: false,
+      userList: [],
       quoteVisible: false,
       quoteForm: {
         userName: '',
+        md: '',
         content: '',
       },
     }
+  },
+  watch: {
+    content(val) {
+      let matAt = val.match(/@([^\s]+?)$/)
+      if (!matAt) {
+        this.visible = false
+        return
+      }
+      getUserName({ name: matAt[1] }).then((res) => {
+        if (0 === res.code) {
+          this.userList = res.data
+          this.visible = true
+        }
+      })
+    },
   },
   computed: {
     ...mapGetters(['key']),
@@ -73,6 +118,13 @@ export default {
       } else {
         this.content += e.clipboardData.getData('Text')
       }
+    },
+    selectAt(userName) {
+      let content = this.content
+      let index = content.lastIndexOf('@')
+      this.content = content.substr(0, index + 1) + userName + ' '
+      this.visible = false
+      this.$refs.contentInput.focus()
     },
     sendHandler(event) {
       if (this.content === '') {
@@ -107,9 +159,12 @@ export default {
       if (this.quoteVisible) {
         let quoteForm = this.quoteForm
         form.content +=
-          '\n##### 引用 @' + quoteForm.userName + '\n> ' + quoteForm.content
+          '\n##### 引用 @' +
+          quoteForm.userName +
+          '\n> ' +
+          (quoteForm.md ? quoteForm.md : quoteForm.content)
       }
-      send(this.form).then(() => {
+      send(form).then(() => {
         this.quoteVisible = false
         this.content = ''
       })
@@ -121,10 +176,24 @@ export default {
 .send {
   flex-grow: 1;
 }
+.at-box {
+  max-height: 200px;
+  overflow: auto;
+}
+.at-item {
+  width: 130px;
+  color: white;
+  align-items: center;
+}
+.at-image {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+}
 .quote-content {
   color: black;
   max-width: 230px;
-  max-height: 100px;
+  max-height: 120px;
   overflow: auto;
 }
 .quote-user {
@@ -145,5 +214,8 @@ export default {
 }
 .quote-popover {
   background-color: #a3db92;
+}
+.quote-content * {
+  max-width: 220px;
 }
 </style>

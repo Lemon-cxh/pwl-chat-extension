@@ -9,6 +9,9 @@
               class="flex-column">
         <el-avatar :src="info.info.userAvatarURL"></el-avatar>
         <el-row class="item">{{info.info.msg}}</el-row>
+        <el-row v-if="isReciver">
+          {{reciverMessage}}
+        </el-row>
         <el-row class="item"
                 type="flex"
                 v-for="(item, index) in info.who"
@@ -36,7 +39,16 @@ export default {
   name: "redPacket",
   props: {
     info: Object,
-    dialogVisible: Boolean
+    dialogVisible: Boolean,
+    userInfo: Object
+  },
+  computed: {
+    isReciver() {
+      return this.info.recivers && this.info.recivers.length > 0
+    },
+    reciverMessage() {
+      return this.info.recivers.some(e => e === this.userInfo.userName) ? '' : '终究还是错付了'
+    },
   },
   methods: {
     close() {
@@ -54,13 +66,13 @@ export default {
 }
 .item {
   margin: 5px 0;
-  width: 230px;
+  width: 240px;
   justify-content: space-between;
   text-align: center;
   height: 35px;
 }
 .user {
-  width: 100px;
+  width: 140px;
 }
 .item-avatar {
   width: 30px;
@@ -76,7 +88,7 @@ export default {
   color: rgb(11, 219, 11);
 }
 .money {
-  width: 80px;
+  width: 70px;
   font-size: 16px;
   font-weight: bolder;
 }

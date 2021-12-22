@@ -66,17 +66,20 @@ export default new Vuex.Store({
     },
     popMessage(state) {
       let m = state.message.pop()
-      if (m.type && m.type !== MESSAGE_TYPE.msg) {
-        state.messageTotal -= (1 + m.users ? m.users.length : 0) 
+      if (!m || m.revoke) {
         return
       }
       state.messageTotal -= 1
+      if (m.type && m.type === MESSAGE_TYPE.msg) {
+        state.messageTotal -= m.users ? m.users.length : 0
+        return
+      }
     },
     addMessage(state, message) {
       if (message.isMsg) {
         state.messageTotal += 1
         let last = state.message[0]
-        if (last.md && message.message.md === last.md && !isRedPacket(message.message)) {
+        if (last && last.md && message.message.md === last.md && !isRedPacket(message.message)) {
           let users = last.users ? last.users : []
           users.unshift({ userName: message.message.userName, userAvatarURL: message.message.userAvatarURL })
           state.message[0].users = users
@@ -112,6 +115,7 @@ export default new Vuex.Store({
       })
     },
     revoke(state, oId) {
+      state.messageTotal -= 1
       state.message.some(e => {
         if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
           e.revoke = true;

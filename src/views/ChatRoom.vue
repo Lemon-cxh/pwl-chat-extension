@@ -65,6 +65,7 @@
       @closeDialog="dialogVisible = false"
     />
     <red-packet-info
+      :userInfo="userInfo"
       :info="redPacketInfo"
       :dialogVisible="redPacketVisible"
       @close="redPacketVisible = false"
@@ -136,6 +137,7 @@ export default {
           that.message = msg.message.message
           that.online = msg.message.online
           if (msg.message.length === 0) {
+            alert('消息为空')
             that.load()
           } else {
             that.loading = false
