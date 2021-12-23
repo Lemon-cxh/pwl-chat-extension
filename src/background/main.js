@@ -39,7 +39,7 @@ function init() {
     ) {
       return
     }
-    window.mySocket = new WebSocket(URL)
+    window.mySocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
     window.mySocket.onmessage = (event) => messageHandler(event)
     window.mySocket.onerror = () => {
       setTimeout(() => {

@@ -1,60 +1,75 @@
 <template>
-  <el-dialog :title="info.info.userName"
-               :visible.sync="dialogVisible"
-               width="60%"
-               :show-close="false"
-               :before-close="close"
-               center>
-      <el-row type="flex"
-              class="flex-column">
-        <el-avatar :src="info.info.userAvatarURL"></el-avatar>
-        <el-row class="item">{{info.info.msg}}</el-row>
-        <el-row v-if="isReciver">
-          {{reciverMessage}}
+  <el-dialog
+    :title="info.info.userName"
+    :visible.sync="dialogVisible"
+    width="60%"
+    :show-close="false"
+    :before-close="close"
+    center
+  >
+    <el-row type="flex" class="flex-column">
+      <el-avatar :src="info.info.userAvatarURL"></el-avatar>
+      <el-row class="item">{{ info.info.msg }}</el-row>
+      <el-row v-if="isReciver">
+        {{ reciverMessage }}
+      </el-row>
+      <div class="who-box">
+      <el-row
+        class="item"
+        type="flex"
+        v-for="(item, index) in info.who"
+        :key="index"
+      >
+        <el-avatar
+          class="item-avatar"
+          :size="35"
+          :src="item.avatar"
+        ></el-avatar>
+        <el-row type="flex" class="flex-column user">
+          <el-row class="text">{{ item.userName }}</el-row>
+          <el-row class="text">{{ item.time.substr(11) }}</el-row>
         </el-row>
-        <el-row class="item"
-                type="flex"
-                v-for="(item, index) in info.who"
-                :key="index">
-          <el-avatar class="item-avatar"
-                     :size="35"
-                     :src="item.avatar"></el-avatar>
-          <el-row type="flex"
-                  class="flex-column user">
-            <el-row class="text">{{item.userName}}</el-row>
-             <el-row class="text">{{item.time.substr(11)}}</el-row>
-          </el-row>
-          <el-row type="flex"
-                  class="flex-column">
-            <el-row :class="'money' + (item.userMoney > 0 ? ' red' : ' green')">{{item.userMoney}}</el-row>
-            <el-row class="text">{{item.userMoney == 0 ? '抢了个寂寞' : (item.userMoney > 0 ? '' : '被反抢了吧')}}</el-row>
-          </el-row>
+        <el-row type="flex" class="flex-column">
+          <el-row :class="'money' + (item.userMoney > 0 ? ' red' : ' green')">{{
+            item.userMoney
+          }}</el-row>
+          <el-row class="text">{{
+            item.userMoney == 0
+              ? '抢了个寂寞'
+              : item.userMoney > 0
+              ? ''
+              : '被反抢了吧'
+          }}</el-row>
         </el-row>
       </el-row>
-    </el-dialog>
+      </div>
+    </el-row>
+  </el-dialog>
 </template>
 
 <script>
 export default {
-  name: "redPacket",
+  name: 'redPacket',
   props: {
     info: Object,
     dialogVisible: Boolean,
-    userInfo: Object
+    userInfo: Object,
   },
   computed: {
     isReciver() {
       return this.info.recivers && this.info.recivers.length > 0
     },
     reciverMessage() {
-      return this.info.recivers.some(e => e === this.userInfo.userName) ? '' : '终究还是错付了'
+      return this.info.recivers.some((e) => e === this.userInfo.userName)
+        ? ''
+        : '终究还是错付了'
     },
   },
   methods: {
     close() {
       this.$emit('close')
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -70,6 +85,10 @@ export default {
   justify-content: space-between;
   text-align: center;
   height: 35px;
+}
+.who-box {
+  max-height: 280px;
+  overflow: auto;
 }
 .user {
   width: 140px;

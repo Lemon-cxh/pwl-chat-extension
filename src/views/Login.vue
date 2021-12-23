@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-form ref="form" :model="form" :rules="rules" label-width="100px" class="form">
-      <img class="center" width="100px" src="icons/128.png"/>
+      <img class="center" width="100px" src="icons/1024.png"/>
       <el-form-item label="用户名" prop="nameOrEmail">
         <el-input class="input" v-model.trim="form.nameOrEmail" ref="nameOrEmail"></el-input>
       </el-form-item>
@@ -92,6 +92,7 @@ export default {
   width: 250px;
 }
 .center {
+  margin-bottom: 50px;
   align-self: center;
 }
 </style>

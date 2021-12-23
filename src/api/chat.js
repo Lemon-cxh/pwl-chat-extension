@@ -34,6 +34,14 @@ export function upload(file) {
   })
 }
 
+export function revoke(oId, data) {
+  return request({
+    url: '/chat-room/revoke/' + oId,
+    method: 'delete',
+    data: data
+  })
+}
+
 export function getEmoji(data) {
   return request({
     url: '/users/emotions',

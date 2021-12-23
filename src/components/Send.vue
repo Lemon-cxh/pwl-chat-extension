@@ -88,7 +88,7 @@ export default {
         return
       }
       getUserName({ name: matAt[1] }).then((res) => {
-        if (0 === res.code) {
+        if (0 === res.code && res.data.length > 0) {
           this.userList = res.data
           this.visible = true
         }
@@ -158,17 +158,22 @@ export default {
       let form = this.form
       if (this.quoteVisible) {
         let quoteForm = this.quoteForm
-        form.content +=
-          '\n##### 引用 @' +
-          quoteForm.userName +
+
+        form.content =
+          '引用 @' + this.buildAtUser(quoteForm.userName) + 
           '\n> ' +
-          (quoteForm.md ? quoteForm.md : quoteForm.content)
+          (quoteForm.md ? quoteForm.md : quoteForm.content) +
+          '\n\n并说:' +
+          form.content
       }
       send(form).then(() => {
         this.quoteVisible = false
         this.content = ''
       })
     },
+    buildAtUser(userName) {
+      return '<a href="' + process.env.VUE_APP_BASE_URL + '/member/' + userName + '" class="name-at" aria-label="' + userName + '" rel="nofollow">' + userName + '</a>'
+    }
   },
 }
 </script>

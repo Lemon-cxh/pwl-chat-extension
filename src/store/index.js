@@ -4,8 +4,13 @@ import { getUserInfo } from '../api/login'
 import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
 import { setLocal, getLocal } from "../utils/chromeUtil"
 import { isRedPacket } from '../utils/util'
+import { send } from '../api/chat'
 
 Vue.use(Vuex)
+
+async function sendMessage(content, key) {
+  send({ content: content, apiKey: key }).then()
+}
 
 export default new Vuex.Store({
   state: {
@@ -80,9 +85,18 @@ export default new Vuex.Store({
         state.messageTotal += 1
         let last = state.message[0]
         if (last && last.md && message.message.md === last.md && !isRedPacket(message.message)) {
-          let users = last.users ? last.users : []
-          users.unshift({ userName: message.message.userName, userAvatarURL: message.message.userAvatarURL })
+          let users = last.users, oIds = last.oIds
+          if (!last.users) {
+            users = []
+            oIds = []
+          }
+          let length = users.push({ userName: message.message.userName, userAvatarURL: message.message.userAvatarURL })
+          oIds.push(message.oId)
           state.message[0].users = users
+          state.message[0].oIds = oIds
+          if (length === 3) {
+            sendMessage(message.message.md, state.key)
+          }
           return
         }
       }
@@ -115,10 +129,10 @@ export default new Vuex.Store({
       })
     },
     revoke(state, oId) {
-      state.messageTotal -= 1
       state.message.some(e => {
-        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
+        if (e.type === MESSAGE_TYPE.msg && (e.oId == oId || (e.oIds && e.oIds.some(e => e === oId)))) {
           e.revoke = true;
+          state.messageTotal -= 1
           return true;
         }
         return false;

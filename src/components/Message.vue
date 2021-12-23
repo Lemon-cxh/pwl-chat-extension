@@ -47,6 +47,12 @@
                 @click.native="collectImages"
                 >收藏表情</el-row
               >
+              <el-row
+                v-show="unlimitedRevoke || isOwn"
+                class="menu-item"
+                @click.native="$emit('revokeMessage', message)"
+                >撤回</el-row
+              >
             </el-row>
             <span
               :id="'message_' + message.oId"
@@ -57,10 +63,19 @@
         </div>
         <el-row class="time">{{ getTime(message.time) }}</el-row>
       </el-row>
-      <icon-svg v-if="message.users" class="plus-one" icon-class="plusOne" @click.native="plusOne"/>
+      <icon-svg
+        v-if="message.users"
+        class="plus-one"
+        icon-class="plusOne"
+        @click.native="plusOne"
+      />
     </el-row>
     <!-- 多少人+1显示 -->
-    <el-row v-if="message.users" type="flex" :class="isOwn ? 'own-plus-one-box plus-one-box': 'plus-one-box'">
+    <el-row
+      v-if="message.users"
+      type="flex"
+      :class="isOwn ? 'own-plus-one-box plus-one-box' : 'plus-one-box'"
+    >
       <el-avatar
         v-for="(item, index) in message.users"
         :key="index"
@@ -69,7 +84,10 @@
         class="plus-one-avatar"
         @click.native="$emit('showUserCard', item.userName)"
       />
-      <el-row :class="isOwn ? 'plus-one-text own-plus-one-text ' : 'plus-one-text'">{{message.users.length}} 人+1 </el-row>
+      <el-row
+        :class="isOwn ? 'plus-one-text own-plus-one-text ' : 'plus-one-text'"
+        >{{ message.users.length }} 人+1
+      </el-row>
     </el-row>
   </div>
 </template>
@@ -84,6 +102,7 @@ export default {
   props: {
     message: Object,
     date: String,
+    unlimitedRevoke: Boolean,
   },
   data() {
     return {

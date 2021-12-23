@@ -25,7 +25,8 @@
             </template>
           </el-row>
           <el-row type="flex"
-                  class="column">
+                  class="column user-info">
+            <span><i class="el-icon-medal"></i>{{userInfo.userNo}}号 {{userInfo.userAppRole == 0 ? '黑客' : '画家'}}</span>
             <span><i class="el-icon-user-solid"></i>{{userInfo.userRole}}</span>
             <span><i class="el-icon-s-finance"></i>{{userInfo.userPoint}}</span>
             <span><i class="el-icon-location"></i>{{userInfo.userCity}}</span>
@@ -96,6 +97,9 @@ export default {
 }
 .info .column {
   padding: 0 20px;
+}
+.user-info {
+  padding: 0 5px !important;
 }
 .intro {
   height: 40px;

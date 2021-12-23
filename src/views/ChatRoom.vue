@@ -21,6 +21,7 @@
     </el-row>
     <!-- 消息列表 -->
     <div class="infinite-list-wrapper" style="overflow: auto; height: 420px">
+      <el-backtop target=".infinite-list-wrapper" :bottom="20" :right="20" :visibility-height="100"></el-backtop>
       <div
         id="messageList"
         class="list"
@@ -45,6 +46,8 @@
               :ref="'message_' + item.oId"
               :message="item"
               :date="date"
+              :unlimitedRevoke="unlimitedRevoke"
+              @revokeMessage="revokeMessage"
               @showUserCard="showUserCard"
               @collectImages="collectImages"
               @addContent="addContent"
@@ -89,6 +92,7 @@ import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
 import { getUserInfo } from '../api/user'
 import { mapGetters } from 'vuex'
+import { revoke } from '../api/chat'
 
 export default {
   name: 'chatRoom',
@@ -113,6 +117,9 @@ export default {
     apiKey() {
       return { apiKey: this.key }
     },
+    unlimitedRevoke() {
+      return ['协警', 'OP', '管理员'].some(e => e === this.userInfo.userRole)
+    }
   },
   components: {
     Message,
@@ -276,6 +283,20 @@ export default {
         return false
       })
     },
+    revokeMessage(message) {
+      if (message.oIds) {
+        message.oIds.push(message.oId)
+        let count = 0
+        message.oIds.forEach(oId => {
+          revoke(oId).then(res => count += (res.code === 0 ? 1 : 0))
+        });
+        this.$message.success('批量撤回' + count + '条消息')
+        return
+      }
+      revoke(message.oId).then(res => {
+        0 === res.code ? this.$message.success(res.msg) : this.$message.info(res.msg)
+      })
+    },
     showRedpacketInfo(info) {
       this.redPacketVisible = true
       this.redPacketInfo = info
@@ -322,5 +343,10 @@ export default {
 }
 .menu-item {
   margin: 0 3px;
+}
+</style>
+<style>
+.el-backtop, .el-backtop:hover {
+  background-color: #565656;
 }
 </style>
