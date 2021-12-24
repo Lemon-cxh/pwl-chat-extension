@@ -18,7 +18,9 @@ module.exports = {
     browserExtension: {
       components: {
         background: true,
+        contentScripts: true
       },
+      manifestSync: ['version'],
       componentOptions: {
         background: {
           entry: './src/background/main.js'

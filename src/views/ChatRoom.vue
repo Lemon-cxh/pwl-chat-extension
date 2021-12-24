@@ -47,6 +47,7 @@
               :message="item"
               :date="date"
               :unlimitedRevoke="unlimitedRevoke"
+              :avatarPendant="avatarPendant"
               @revokeMessage="revokeMessage"
               @showUserCard="showUserCard"
               @collectImages="collectImages"
@@ -110,6 +111,7 @@ export default {
       online: {},
       redPacketVisible: false,
       type: MESSAGE_TYPE,
+      avatarPendant: {}
     }
   },
   computed: {
@@ -171,6 +173,7 @@ export default {
       }
     })
     this.port = port
+    this.avatarPendant.isChristmas = this.date.endsWith('12-24') || this.date.endsWith('12-25')
   },
   mounted() {
     document.getElementById('messageList').oncontextmenu = () => {
@@ -248,7 +251,7 @@ export default {
           process.env.VUE_APP_BASE_URL + '/forward?goto=',
           ''
         )
-        window.open(decodeURIComponent(href))
+        dom.href = decodeURIComponent(href)
       }
     },
     showUserCard(name) {

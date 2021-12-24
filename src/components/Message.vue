@@ -7,6 +7,7 @@
           :src="message.userAvatarURL"
           @click.native="$emit('showUserCard', message.userName)"
         ></el-avatar>
+        <img v-if="avatarPendant && avatarPendant.isChristmas" class="avatar-pendant" src="../../public/image/Christmas.png"/>
       </el-row>
       <el-row :class="(isOwn ? 'own-chat ' : '') + 'flex-column'" type="flex">
         <el-row class="name">
@@ -103,6 +104,7 @@ export default {
     message: Object,
     date: String,
     unlimitedRevoke: Boolean,
+    avatarPendant: Object
   },
   data() {
     return {
@@ -185,6 +187,13 @@ export default {
 .avatar {
   padding: 5px;
   width: 60px;
+}
+.avatar-pendant {
+  position: absolute;
+  top: -7px;
+  right: 9px;
+  width: 30px;
+  height: 30px;
 }
 .flex-column {
   flex-direction: column;

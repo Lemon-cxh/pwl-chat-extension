@@ -160,8 +160,8 @@ export default {
         let quoteForm = this.quoteForm
 
         form.content =
-          '引用 @' + this.buildAtUser(quoteForm.userName) + 
-          '\n> ' +
+          '**引用** **@' + this.buildAtUser(quoteForm.userName) + 
+          '**\n> ' +
           (quoteForm.md ? quoteForm.md : quoteForm.content) +
           '\n\n并说:' +
           form.content
