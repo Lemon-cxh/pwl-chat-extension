@@ -1,0 +1,54 @@
+.pwl-extension-img {
+  position: fixed;
+  z-index: 1111111111;
+  max-height: 700px;
+  max-width: 600px;
+  overflow: auto;
+  top: 50px;
+  left: 50px;
+}
+.pwl-message-fixed-box {
+  position: fixed;
+  z-index: 2147483647;
+  pointer-events: none;
+  top: 50px;
+  width: 100%;
+  height: 250px;
+}
+.pwl-message-box {
+  position: relative;
+  width: 100%;
+  height: 250px;
+}
+.pwl-message-child{
+  position: absolute;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: bold;
+  width: fit-content;
+  margin-right: 50px;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.pwl-message-input {
+  position: fixed;
+  bottom: 40px;
+  left: 50px;
+  height: 30px;
+  line-height: 30px;
+  width: 160px;
+}
+.pwl-button {
+  position: fixed;
+  bottom: 40px;
+  left: 210px;
+  width: 60px;
+  height: 30px;
+  line-height: 30px;
+}
+
+@keyframes move {
+  0% {
+    left: 100%;
+    -webkit-transform: translate(100%);
+  }
+}

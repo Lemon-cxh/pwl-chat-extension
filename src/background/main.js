@@ -1,9 +1,15 @@
 import Vue from 'vue'
 import App from './App.vue'
 import store from '../store'
-import { more } from '../api/chat'
-import { notifications, getLocal } from '../utils/chromeUtil'
-import { MESSAGE_TYPE, STORAGE, EVENT, MESSAGE_LIMIT } from "../constant/Constant"
+import { more, send } from '../api/chat'
+import { notifications, getLocal, sendTabsMessage } from '../utils/chromeUtil'
+import {
+  MESSAGE_TYPE,
+  STORAGE,
+  EVENT,
+  MESSAGE_LIMIT,
+  TABS_EVENT,
+} from '../constant/Constant'
 
 Vue.config.productionTip = false
 const URL = 'wss://pwl.icu/chat-room-channel'
@@ -11,6 +17,11 @@ const MAX_PAGE = 4
 let port = null
 let count = 0
 let pop_message = false
+let options = {
+  atNotification: true,
+  barrageMessage: true,
+  plusOne: true,
+}
 
 store.dispatch('getUser').then(() => {
   init()
@@ -59,20 +70,20 @@ function messageHandler(event) {
   switch (data.type) {
     case MESSAGE_TYPE.online:
       if (port) {
-        port.postMessage({ type: EVENT.online, message: data })
+        port.postMessage({ type: EVENT.online, data: data })
       }
       store.commit('setOnline', data)
       break
     case MESSAGE_TYPE.revoke:
       if (port) {
-        port.postMessage({ type: EVENT.revoke, message: data.oId })
+        port.postMessage({ type: EVENT.revoke, data: data.oId })
       }
       store.commit('revoke', data.oId)
       break
     case MESSAGE_TYPE.redPacketStatus:
       messageEvent(data, false)
       if (port) {
-        port.postMessage({ type: EVENT.redPacketStatus, message: data.oId })
+        port.postMessage({ type: EVENT.redPacketStatus, data: data.oId })
       }
       store.commit('markRedPacket', data.oId)
       break
@@ -86,17 +97,20 @@ chrome.runtime.onConnect.addListener(function (p) {
   port = p
   let message = {
     message: store.getters.message,
-    online: store.getters.online 
+    online: store.getters.online,
   }
-  p.postMessage({ type: EVENT.loadMessage, message: message})
+  p.postMessage({ type: EVENT.loadMessage, data: message })
   p.onMessage.addListener(function (msg) {
     switch (msg.type) {
       case EVENT.getMore:
         getMoreEvent()
         break
       case EVENT.syncUserInfo:
-        store.commit('setUserInfo', msg.message)
-        break;
+        store.commit('setUserInfo', msg.data)
+        break
+      case EVENT.syncOptions:
+        options = msg.data
+        break
       default:
         break
     }
@@ -115,21 +129,43 @@ chrome.runtime.onConnect.addListener(function (p) {
   })
 })
 
-function messageEvent(message, isMsg) {
-  store.commit('addMessage', { message: message, isMsg: isMsg })
-  if (port) {
-    port.postMessage({ type: EVENT.message, message: message })
-  } else {
-    if (
-      message.type === MESSAGE_TYPE.msg &&
-      message.md &&
-      -1 !== message.md.indexOf('@' + store.getters.userInfo.userName)
-    ) {
-      console.log(store.getters.userInfo)
-      notifications(message.userName + '@了你', message.md)
-    }
-    chrome.browserAction.setBadgeText({ text: '' + ++count })
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (TABS_EVENT.sendMessage === request.type) {
+    send({ content: request.data, apiKey: store.getters.key }).then()
+    return
   }
+})
+
+function messageEvent(message, isMsg) {
+  store.commit('addMessage', { message: message, isMsg: isMsg, plusOne: options.plusOne })
+  if (port) {
+    port.postMessage({ type: EVENT.message, data: message })
+    return
+  }
+  if (!isMsg) {
+    return
+  }
+  if (options.barrageMessage) {
+    sendTabsMessage({ type: TABS_EVENT.message, data: message }, (res) => {
+      if (!res || res.hidden) {
+        atNotifications(message)
+      }
+    })
+    return
+  }
+  atNotifications(message)
+}
+
+function atNotifications(message) {
+  if (
+    options.atNotification &&
+    message.type === MESSAGE_TYPE.msg &&
+    message.md &&
+    -1 !== message.md.indexOf('@' + store.getters.userInfo.userName)
+  ) {
+    notifications(message.userName + '@了你', message.md)
+  }
+  chrome.browserAction.setBadgeText({ text: '' + ++count })
 }
 
 function getMoreEvent() {
@@ -139,7 +175,7 @@ function getMoreEvent() {
       let data = res.data.slice(res.data.length - pageParams.length)
       store.commit('concatMessage', data)
       if (port) {
-        port.postMessage({ type: EVENT.more, message: data })
+        port.postMessage({ type: EVENT.more, data: data })
       }
     }
   })

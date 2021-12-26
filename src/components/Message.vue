@@ -1,13 +1,19 @@
 <template>
   <div>
     <el-row type="flex" :class="(isOwn ? 'own-chat-item ' : '') + 'chat-item'">
-      <el-row class="avatar">
+      <el-row
+        :class="(isOwn ? 'own-avatar ' : '') + 'avatar'"
+        @click.native="$emit('showUserCard', message.userName)"
+      >
         <el-avatar
           :id="'avatar_' + message.oId"
           :src="message.userAvatarURL"
-          @click.native="$emit('showUserCard', message.userName)"
         ></el-avatar>
-        <img v-if="avatarPendant && avatarPendant.isChristmas" class="avatar-pendant" src="../../public/image/Christmas.png"/>
+        <img
+          v-if="avatarPendant && avatarPendant.isChristmas"
+          class="avatar-pendant"
+          src="../../public/image/Christmas.png"
+        />
       </el-row>
       <el-row :class="(isOwn ? 'own-chat ' : '') + 'flex-column'" type="flex">
         <el-row class="name">
@@ -41,7 +47,7 @@
             <el-row type="flex" class="flex-column menu">
               <el-row class="menu-item" @click.native="talkToHe">@他</el-row>
               <el-row class="menu-item" @click.native="quote">引用</el-row>
-              <el-row class="menu-item" @click.native="plusOne">+1</el-row>
+              <el-row v-if="message.md" class="menu-item" @click.native="$emit('sendMessage', message.md)">+1</el-row>
               <el-row
                 class="menu-item"
                 v-show="imageUrl"
@@ -104,7 +110,7 @@ export default {
     message: Object,
     date: String,
     unlimitedRevoke: Boolean,
-    avatarPendant: Object
+    avatarPendant: Object,
   },
   data() {
     return {
@@ -152,9 +158,6 @@ export default {
         this.visible = false
       }, 2000)
     },
-    plusOne() {
-      this.$emit('sendMessage', this.message.md)
-    },
     quote() {
       this.$emit('quote', this.quoteForm)
       this.closePopover()
@@ -187,6 +190,9 @@ export default {
 .avatar {
   padding: 5px;
   width: 60px;
+}
+.own-avatar {
+  padding-left: 15px;
 }
 .avatar-pendant {
   position: absolute;
@@ -222,8 +228,28 @@ export default {
 .content-background {
   background-color: #a3db92;
 }
+.content-background::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: -14px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-right: 8px solid #a3db92;
+}
 .own-content-background {
   background-color: white;
+}
+.own-content-background::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  right: -14px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-left: 8px solid white;
 }
 .time {
   padding: 0 5px;

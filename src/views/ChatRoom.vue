@@ -3,7 +3,7 @@
     <!-- 活跃度，头像，输入框 -->
     <liveness />
     <el-row type="flex" class="user-box">
-      <user-info />
+      <user-info @syncOptions="syncOptions"/>
       <send ref="messageInput" />
     </el-row>
     <!-- 菜单按钮 -->
@@ -89,8 +89,9 @@ import RedPacket from '../components/RedPacket.vue'
 import RedPacketInfo from '../components/RedPacketInfo.vue'
 import Emoji from '../components/Emoji.vue'
 import Images from '../components/Images.vue'
-import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
+import { EVENT, MESSAGE_TYPE, TABS_EVENT } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
+import { sendTabsMessage } from '../utils/chromeUtil'
 import { getUserInfo } from '../api/user'
 import { mapGetters } from 'vuex'
 import { revoke } from '../api/chat'
@@ -139,13 +140,13 @@ export default {
   created() {
     let that = this
     let port = chrome.runtime.connect()
-    port.postMessage({ type: EVENT.syncUserInfo, message: that.userInfo })
+    port.postMessage({ type: EVENT.syncUserInfo, data: that.userInfo })
     port.onMessage.addListener(function (msg) {
       switch (msg.type) {
         case EVENT.loadMessage:
-          that.message = msg.message.message
-          that.online = msg.message.online
-          if (msg.message.length === 0) {
+          that.message = msg.data.message
+          that.online = msg.data.online
+          if (msg.data.length === 0) {
             alert('消息为空')
             that.load()
           } else {
@@ -153,20 +154,20 @@ export default {
           }
           break
         case EVENT.message:
-          that.addMessage(msg.message)
+          that.addMessage(msg.data)
           break
         case EVENT.more:
-          that.message = that.message.concat(msg.message)
+          that.message = that.message.concat(msg.data)
           that.loading = false
           break
         case EVENT.redPacketStatus:
-          that.markRedPacket(msg.message)
+          that.markRedPacket(msg.data)
           break
         case EVENT.revoke:
-          that.revoke(msg.message)
+          that.revoke(msg.data)
           break
         case EVENT.online:
-          that.online = msg.message
+          that.online = msg.data
           break
         default:
           break
@@ -234,14 +235,11 @@ export default {
       if (!message) {
         return false
       }
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        let message = {
-          src: dom.src,
-          width: dom.naturalWidth,
-          height: dom.naturalHeight,
-        }
-        chrome.tabs.sendMessage(tabs[0].id, message)
-      })
+      sendTabsMessage({type: TABS_EVENT.showImage, data:{
+        src: dom.src,
+        width: dom.naturalWidth,
+        height: dom.naturalHeight,
+      }})
     },
     clickA(dom) {
       if (dom.className === 'name-at') {
@@ -319,6 +317,9 @@ export default {
     closeRedapcket() {
       this.redPacketVisible = false
     },
+    syncOptions(options) {
+      this.port.postMessage({ type: EVENT.syncOptions, data: options })
+    }
   },
 }
 </script>
