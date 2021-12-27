@@ -30,25 +30,11 @@
   background-color: rgba(0, 0, 0, 0.4);
 }
 .pwl-message-input {
+  z-index: 2147483647;
   position: fixed;
   bottom: 40px;
   left: 50px;
   height: 30px;
   line-height: 30px;
   width: 160px;
-}
-.pwl-button {
-  position: fixed;
-  bottom: 40px;
-  left: 210px;
-  width: 60px;
-  height: 30px;
-  line-height: 30px;
-}
-
-@keyframes move {
-  0% {
-    left: 100%;
-    -webkit-transform: translate(100%);
-  }
 }

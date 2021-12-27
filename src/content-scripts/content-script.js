@@ -1,5 +1,7 @@
 import { TABS_EVENT, STORAGE, defaultOptions } from '../constant/Constant'
 import { getSync } from '../utils/chromeUtil'
+import { isRedPacket } from '../utils/util'
+
 const height = 25
 // 屏幕宽 / 时间
 const speed = 76
@@ -44,12 +46,6 @@ function createBarrage() {
       sendMessage(input)
     }
   })
-  let button = document.createElement('button')
-  button.setAttribute('id', 'pwl-button')
-  button.setAttribute('class', 'pwl-button')
-  button.innerText = '发 送'
-  document.body.appendChild(button)
-  button.addEventListener('click', () => sendMessage(input))
 }
 
 function sendMessage(input) {
@@ -70,7 +66,7 @@ function insetMessage(data) {
   let name = data.userNickname
     ? data.userNickname + '(' + data.userName + ')'
     : data.userName
-  child.innerText = name + ':' + data.md
+  child.innerText = name + ':' + (isRedPacket(data) ? '[🧧有红包，请在扩展中查看]' : data.md)
   index = ++index % 10
   let top = index * height
   child.setAttribute('class', 'pwl-message-child')
@@ -80,11 +76,9 @@ function insetMessage(data) {
     'style',
     'top:' +
       top +
-      'px;left:-' +
-      child.offsetWidth +
-      'px;animation: move cubic-bezier(1, 1.01, 1, 1.71) ' +
+      'px;right:-' + child.offsetWidth + 'px;transform: translateX(calc(-100vw - ' + child.offsetWidth + 'px));transition: transform ' +
       second +
-      's infinite;'
+      's linear;'
   )
   setTimeout(() => {
     box.removeChild(child)
