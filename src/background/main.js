@@ -28,7 +28,9 @@ store.dispatch('getUser').then(() => {
 })
 
 window.openSocket = function () {
-  init()
+  store.dispatch('getUser').then(() => {
+    init()
+  })
 }
 
 window.closeSocket = function () {

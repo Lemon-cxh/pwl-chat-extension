@@ -8,6 +8,13 @@ export function more(data) {
   })
 }
 
+export function getMd(oId) {
+  return request({
+    url: '/cr/raw/' + oId,
+    method: 'get',
+  })
+}
+
 export function send(data) {
   return request({
     url: '/chat-room/send',

@@ -18,6 +18,7 @@
 
 <script>
 import { getCloudImage, syncCloudImage } from '../api/chat'
+import { mapGetters } from "vuex";
 
 export default {
   name: 'images',
@@ -27,12 +28,18 @@ export default {
       images: [],
     }
   },
+  computed: {
+    ...mapGetters(["key"]),
+    form() {
+      return { gameId: 'emojis', apiKey: this.key };
+    },
+  },
   created() {
     this.getCloudImage()
   },
   methods: {
     getCloudImage() {
-      getCloudImage({ gameId: 'emojis' }).then((res) => {
+      getCloudImage(this.form).then((res) => {
         if (0 === res.code) {
           this.images = JSON.parse(res.data)
         }
@@ -63,7 +70,7 @@ export default {
       })
     },
     getCloud(fun) {
-      getCloudImage({ gameId: 'emojis' }).then((res) => {
+      getCloudImage(this.form).then((res) => {
         if (0 === res.code) {
           let images = JSON.parse(res.data)
           images = fun(images)
@@ -71,7 +78,8 @@ export default {
       })
     },
     syncCloud(images) {
-      let form = { gameId: 'emojis', data: JSON.stringify(images) }
+      let form = this.form
+      form.data = JSON.stringify(images)
       syncCloudImage(form).then((r) => {
         if (0 === r.code) {
           this.$message.success('表情包同步成功')

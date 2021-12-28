@@ -103,6 +103,7 @@
 import { mapGetters } from 'vuex'
 import RedPacketMessage from './RedPacketMessage.vue'
 import { isRedPacket } from '../utils/util'
+import { getMd } from '../api/chat'
 
 export default {
   name: 'message',
@@ -118,7 +119,9 @@ export default {
       imageUrl: '',
       userName: '',
       quoteForm: {
+        oId: '',
         userName: '',
+        md: '',
         content: '',
       },
     }
@@ -149,6 +152,7 @@ export default {
       let message = this.message
       this.userName = '@' + message.userName + ' '
       this.quoteForm = {
+        oId: message.oId,
         userName: message.userName,
         md: message.md,
         content: message.content,
@@ -159,8 +163,17 @@ export default {
       }, 2000)
     },
     quote() {
-      this.$emit('quote', this.quoteForm)
-      this.closePopover()
+      let form = this.quoteForm
+      if (form.md) {
+        this.$emit('quote', this.quoteForm)
+        this.closePopover()
+        return
+      }
+      getMd(form.oId).then(res => {
+        form.md = res.replace(/<!--.*?-->/g, '')
+        this.$emit('quote', form)
+        this.closePopover()
+      })
     },
     talkToHe() {
       this.$emit('addContent', this.userName)
