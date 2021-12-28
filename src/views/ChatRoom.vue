@@ -30,17 +30,18 @@
       >
         <div
           ref="inner"
-          v-for="(item, index) in message"
-          v-bind:key="index"
+          v-for="item in message"
+          v-bind:key="type.msg === item.type ? item.oId : 1"
           class="infinite-list-item"
         >
           <hint-message
+          v-bind:key="item.oId + '_' + item.whoGot"
             v-if="item.type && type.redPacketStatus === item.type"
             :message="item"
             @showUserCard="showUserCard"
             @showRedpacketInfo="showRedpacketInfo"
           />
-          <div v-else-if="!item.type || type.msg === item.type">
+          <div v-bind:key="item.oId" v-else-if="!item.type || type.msg === item.type">
             <hint-message v-if="item.revoke" :message="item" />
             <message
               :ref="'message_' + item.oId"
