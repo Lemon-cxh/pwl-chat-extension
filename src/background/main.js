@@ -19,8 +19,10 @@ let count = 0
 let pop_message = false
 let options = {
   atNotification: true,
-  barrageMessage: true,
   plusOne: true,
+  barrageOptions: {
+    enable: false
+  }
 }
 
 store.dispatch('getUser').then(() => {
@@ -43,6 +45,7 @@ window.closeSocket = function () {
 function init() {
   getLocal([STORAGE.key], function (result) {
     if (!result[STORAGE.key]) {
+      window.closeSocket()
       return
     }
     if (
@@ -112,6 +115,7 @@ chrome.runtime.onConnect.addListener(function (p) {
         break
       case EVENT.syncOptions:
         options = msg.data
+        sendTabsMessage({ type: TABS_EVENT.syncOptions, data: msg.data })
         break
       default:
         break
@@ -147,7 +151,7 @@ function messageEvent(message, isMsg) {
   if (!isMsg) {
     return
   }
-  if (options.barrageMessage) {
+  if (options.barrageOptions.enable) {
     sendTabsMessage({ type: TABS_EVENT.message, data: message }, (res) => {
       if (!res || res.hidden) {
         atNotifications(message)

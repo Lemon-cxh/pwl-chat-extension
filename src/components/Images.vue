@@ -1,5 +1,5 @@
 <template>
-  <el-popover placement="left-start" width="206" v-model="visible">
+  <el-popover placement="left-start" width="208" v-model="visible">
     <el-row type="flex" class="image-box">
       <div class="image" v-for="(item, index) in images" :key="index">
         <div class="image-item">

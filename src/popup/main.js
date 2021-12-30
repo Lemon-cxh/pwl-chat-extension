@@ -27,8 +27,11 @@ getLocal([STORAGE.key], function (result) {
       router.push({ name: 'ChatRoom' })
       return
     }
+    chrome.extension.getBackgroundPage().closeSocket()
     setLocal({ [STORAGE.key]: '' })
     router.push({ name: 'Login' })
+  }).catch(e => {
+    router.push({ name: 'Error' })
   })
 })
 

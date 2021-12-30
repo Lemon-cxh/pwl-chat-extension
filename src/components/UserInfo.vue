@@ -26,35 +26,75 @@
       title="设置"
       :visible.sync="drawer"
       direction="ttb"
-      :size="60"
       :with-header="false"
+      size="auto"
     >
-      <el-row type="flex" justify="space-around">
-        <el-row type="flex" class="option-item">
-          <el-switch
-            v-model="options.atNotification"
-            active-color="#13ce66"
-            @change="optionsChange"
-          />
-          <span class="option-text">后台@通知</span>
-        </el-row>
-        <el-row type="flex" class="option-item">
-          <el-switch
-            v-model="options.barrageMessage"
-            active-color="#13ce66"
-            @change="optionsChange"
-          />
-          <span class="option-text">弹幕消息</span>
-        </el-row>
-        <el-row type="flex" class="option-item">
-          <el-switch
-            v-model="options.plusOne"
-            active-color="#13ce66"
-            @change="optionsChange"
-          />
-          <span class="option-text">自动+1</span>
-        </el-row>
-      </el-row>
+      <el-tabs>
+        <el-tab-pane label="基础设置">
+          <el-row type="flex" justify="space-around">
+            <el-row type="flex" class="option-item">
+              <el-switch
+                v-model="options.atNotification"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">被@通知</span>
+            </el-row>
+            <el-row type="flex" class="option-item">
+              <el-switch
+                v-model="options.barrageOptions.enable"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">弹幕消息</span>
+            </el-row>
+            <el-row type="flex" class="option-item">
+              <el-switch
+                v-model="options.plusOne"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">自动+1</span>
+            </el-row>
+          </el-row>
+        </el-tab-pane>
+        <el-tab-pane label="弹幕设置">
+          <el-row type="flex" justify="space-between" class="option-row">
+            <el-row type="flex" class="option-item">
+              <el-input-number
+                v-model="options.barrageOptions.fontSize"
+                @change="optionsChange"
+                size="mini"
+                :min="6"
+                :max="30"
+              ></el-input-number>
+              <span class="option-text">字体大小</span>
+            </el-row>
+            <el-row type="flex" class="option-item">
+              <el-input-number
+                v-model="options.barrageOptions.opacity"
+                @change="optionsChange"
+                :precision="1"
+                :step="0.1"
+                :min="0.1"
+                :max="1"
+                size="mini"
+              ></el-input-number>
+              <span class="option-text">透明度</span>
+            </el-row>
+          </el-row>
+          <el-row type="flex" class="option-row">
+            <el-row type="flex" class="option-item">
+              <el-color-picker
+                v-model="options.barrageOptions.color"
+                @change="optionsChange"
+                size="mini"
+              ></el-color-picker>
+              <span class="option-text">字体颜色</span>
+            </el-row>
+          </el-row>
+        </el-tab-pane>
+      </el-tabs>
     </el-drawer>
   </el-row>
 </template>
@@ -81,8 +121,8 @@ export default {
     },
   },
   created() {
-    getSync({[STORAGE.options]: defaultOptions}, result => {
-      this.options = result.options;
+    getSync({ [STORAGE.options]: defaultOptions }, (result) => {
+      this.options = result.options
       this.$emit('syncOptions', result.options)
     })
     this.countNotifications()
@@ -111,7 +151,7 @@ export default {
       this.$router.push({ name: 'Login' })
     },
     optionsChange() {
-      setSync({[STORAGE.options]: this.options})
+      setSync({ [STORAGE.options]: this.options })
       this.$emit('syncOptions', this.options)
     },
   },
@@ -124,8 +164,12 @@ export default {
   height: 40px;
   margin-right: 5px;
 }
+.option-row {
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
 .option-item {
-  height: 20px;
+  height: 30px;
   align-items: center;
 }
 .option-text {
@@ -143,6 +187,12 @@ export default {
   background-color: #8f8f8f;
 }
 .el-drawer__body {
-  padding: 20px 0;
+  padding: 20px 10px;
+}
+.el-tabs__item {
+  color: white;
+}
+.el-input-number--mini {
+  width: 100px;
 }
 </style>

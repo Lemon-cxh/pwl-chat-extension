@@ -6,12 +6,18 @@ const height = 25
 // 屏幕宽 / 时间
 const speed = 76
 let index = 0
+let lastMessage = {
+  oId: '',
+  md: '',
+  userName: '',
+  count: 0,
+}
 let options = {}
 
 window.onload = function () {
   getSync({ [STORAGE.options]: defaultOptions }, (result) => {
     options = result.options
-    if (options.barrageMessage) {
+    if (options.barrageOptions.enable) {
       createBarrage()
     }
   })
@@ -26,6 +32,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     insetMessage(request.data)
     sendResponse({ hidden: document.hidden })
     return
+  }
+  if (TABS_EVENT.syncOptions === request.type) {
+    options = request.data
   }
 })
 
@@ -60,26 +69,30 @@ function sendMessage(input) {
 }
 
 function insetMessage(data) {
-  let box = document.getElementById('pwl-message-box')
-  let child = document.createElement('div')
-  child.setAttribute('id', 'pwl-message-' + data.oId)
+  if (lastMessage.md === data.md) {
+    plusOneMessage(data)
+    return
+  }
   let name = data.userNickname
     ? data.userNickname + '(' + data.userName + ')'
     : data.userName
-  child.innerText = name + ':' + (isRedPacket(data) ? '[🧧有红包，请在扩展中查看]' : data.md)
-  index = ++index % 10
-  let top = index * height
+  lastMessage = {
+    md: data.md,
+    oId: data.oId,
+    userName: name,
+    count: 0,
+  }
+  let box = document.getElementById('pwl-message-box')
+  let child = document.createElement('div')
+  child.setAttribute('id', 'pwl-message-' + data.oId)
+  data.content = data.content.substring(3, data.content.length - 4)
+  child.innerHTML = isRedPacket(data)
+    ? '🧧' + name + '的红包来啦，请在扩展中查看'
+    : name + ':' + data.content
   child.setAttribute('class', 'pwl-message-child')
   box.appendChild(child)
-  let second = Math.round((box.offsetWidth + child.offsetWidth) / speed)
-  child.setAttribute(
-    'style',
-    'top:' +
-      top +
-      'px;right:-' + child.offsetWidth + 'px;transform: translateX(calc(-100vw - ' + child.offsetWidth + 'px));transition: transform ' +
-      second +
-      's linear;'
-  )
+  let second = getSecond(box, child)
+  child.setAttribute('style', getSytle(child, second))
   setTimeout(() => {
     box.removeChild(child)
   }, second * 1000)
@@ -98,10 +111,52 @@ function showImage(data) {
   img = document.createElement('img')
   img.setAttribute('id', 'pwl-extension-img')
   img.setAttribute('alt', 'pwl-img')
+  img.setAttribute('style', 'max-width: 60vw;')
   img.setAttribute('onclick', 'this.style.display="none"')
   img.setAttribute('src', data.src)
   let div = document.createElement('div')
   div.setAttribute('class', 'pwl-extension-img')
   document.body.appendChild(div)
   div.appendChild(img)
+}
+
+function plusOneMessage(data) {
+  let plusOne = document.getElementById('pwl-plus-one-' + lastMessage.oId)
+  if (plusOne) {
+    plusOne.innerText = ++lastMessage.count + '人 +1 了' + lastMessage.userName + '的话'
+    return
+  }
+  plusOne = document.createElement('span')
+  plusOne.setAttribute('id', 'pwl-plus-one-' + lastMessage.oId)
+  plusOne.innerText = ++lastMessage.count + '人 +1 了' + lastMessage.userName + '的话'
+  plusOne.setAttribute('class', 'pwl-message-child')
+  let box = document.getElementById('pwl-message-box')
+  box.appendChild(plusOne)
+  plusOne.setAttribute('style', getSytle(plusOne))
+}
+
+function getSecond(box, child) {
+  return Math.round((box.offsetWidth + child.offsetWidth) / speed)
+}
+
+function getSytle(dom, second) {
+  index = ++index % 10
+  let top = index * height
+  return (
+    'font-size:' +
+    options.barrageOptions.fontSize +
+    'px;opacity:' +
+    options.barrageOptions.opacity +
+    ';color:' +
+    options.barrageOptions.color +
+    ';top:' +
+    top +
+    'px;right:-' +
+    dom.offsetWidth +
+    'px;transform: translateX(calc(-100vw - ' +
+    dom.offsetWidth +
+    'px));transition: transform ' +
+    second +
+    's linear;'
+  )
 }

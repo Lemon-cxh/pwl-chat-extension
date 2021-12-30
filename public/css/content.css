@@ -1,8 +1,8 @@
 .pwl-extension-img {
   position: fixed;
   z-index: 1111111111;
-  max-height: 700px;
-  max-width: 600px;
+  max-height: 100vh;
+  max-width: 60vw;
   overflow: auto;
   top: 50px;
   left: 50px;
@@ -20,14 +20,30 @@
   width: 100%;
   height: 250px;
 }
-.pwl-message-child{
+.pwl-message-child {
   position: absolute;
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: bold;
+  display: flex;
+  line-height: 1;
   width: fit-content;
+  max-width: 40vw;
   margin-right: 50px;
   background-color: rgba(0, 0, 0, 0.4);
+}
+.pwl-message-child audio {
+  max-width: 100px;
+  max-height: 20px;
+}
+.pwl-message-child img {
+  max-height: 50px;
+}
+.pwl-message-child img[alt="图片表情"] {
+  max-height: 20px;
+}
+.pwl-message-child img[class="emoji"] {
+  max-height: 20px;
+}
+.pwl-message-child p {
+  margin: 0;
 }
 .pwl-message-input {
   z-index: 2147483647;

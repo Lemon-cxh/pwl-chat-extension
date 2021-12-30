@@ -30,11 +30,17 @@ export const EVENT = {
 export const TABS_EVENT = {
   showImage: 1,
   message: 2,
-  sendMessage: 3
+  sendMessage: 3,
+  syncOptions: 4
 }
 
 export const defaultOptions = {
-  atNotification: true, barrageMessage: false, plusOne: true
+  atNotification: true, plusOne: true, barrageOptions: {
+    enable: false,
+    fontSize: 16,
+    opacity: 0.5,
+    color: '#FFFFFF',
+  }
 }
 
 export const MESSAGE_LIMIT = 25;

@@ -3,7 +3,7 @@
     <!-- 活跃度，头像，输入框 -->
     <liveness />
     <el-row type="flex" class="user-box">
-      <user-info @syncOptions="syncOptions"/>
+      <user-info @syncOptions="syncOptions" />
       <send ref="messageInput" />
     </el-row>
     <!-- 菜单按钮 -->
@@ -21,7 +21,12 @@
     </el-row>
     <!-- 消息列表 -->
     <div class="infinite-list-wrapper" style="overflow: auto; height: 420px">
-      <el-backtop target=".infinite-list-wrapper" :bottom="20" :right="20" :visibility-height="100"></el-backtop>
+      <el-backtop
+        target=".infinite-list-wrapper"
+        :bottom="20"
+        :right="20"
+        :visibility-height="100"
+      ></el-backtop>
       <div
         id="messageList"
         class="list"
@@ -31,17 +36,18 @@
         <div
           ref="inner"
           v-for="item in message"
-          v-bind:key="type.msg === item.type ? item.oId : 1"
+          v-bind:key="
+            type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
+          "
           class="infinite-list-item"
         >
           <hint-message
-          v-bind:key="item.oId + '_' + item.whoGot"
             v-if="item.type && type.redPacketStatus === item.type"
             :message="item"
             @showUserCard="showUserCard"
             @showRedpacketInfo="showRedpacketInfo"
           />
-          <div v-bind:key="item.oId" v-else-if="!item.type || type.msg === item.type">
+          <div v-else-if="!item.type || type.msg === item.type">
             <hint-message v-if="item.revoke" :message="item" />
             <message
               :ref="'message_' + item.oId"
@@ -113,7 +119,7 @@ export default {
       online: {},
       redPacketVisible: false,
       type: MESSAGE_TYPE,
-      avatarPendant: {}
+      avatarPendant: {},
     }
   },
   computed: {
@@ -122,8 +128,8 @@ export default {
       return { apiKey: this.key }
     },
     unlimitedRevoke() {
-      return ['协警', 'OP', '管理员'].some(e => e === this.userInfo.userRole)
-    }
+      return ['协警', 'OP', '管理员'].some((e) => e === this.userInfo.userRole)
+    },
   },
   components: {
     Message,
@@ -175,7 +181,8 @@ export default {
       }
     })
     this.port = port
-    this.avatarPendant.isChristmas = this.date.endsWith('12-24') || this.date.endsWith('12-25')
+    this.avatarPendant.isChristmas =
+      this.date.endsWith('12-24') || this.date.endsWith('12-25')
   },
   mounted() {
     document.getElementById('messageList').oncontextmenu = () => {
@@ -196,7 +203,7 @@ export default {
   },
   methods: {
     addMessage(message) {
-      if (message.type !== this.type.msg){
+      if (message.type !== this.type.msg) {
         this.message.unshift(message)
         return
       }
@@ -206,7 +213,10 @@ export default {
         return
       }
       let users = last.users ? last.users : []
-      users.unshift({userName: message.userName, userAvatarURL: message.userAvatarURL})
+      users.unshift({
+        userName: message.userName,
+        userAvatarURL: message.userAvatarURL,
+      })
       this.$set(this.message[0], 'users', users)
     },
     load() {
@@ -236,11 +246,14 @@ export default {
       if (!message) {
         return false
       }
-      sendTabsMessage({type: TABS_EVENT.showImage, data:{
-        src: dom.src,
-        width: dom.naturalWidth,
-        height: dom.naturalHeight,
-      }})
+      sendTabsMessage({
+        type: TABS_EVENT.showImage,
+        data: {
+          src: dom.src,
+          width: dom.naturalWidth,
+          height: dom.naturalHeight,
+        },
+      })
     },
     clickA(dom) {
       if (dom.className === 'name-at') {
@@ -289,14 +302,16 @@ export default {
       if (message.oIds) {
         message.oIds.push(message.oId)
         let count = 0
-        message.oIds.forEach(oId => {
-          revoke(oId).then(res => count += (res.code === 0 ? 1 : 0))
-        });
+        message.oIds.forEach((oId) => {
+          revoke(oId).then((res) => (count += res.code === 0 ? 1 : 0))
+        })
         this.$message.success('批量撤回' + count + '条消息')
         return
       }
-      revoke(message.oId).then(res => {
-        0 === res.code ? this.$message.success(res.msg) : this.$message.info(res.msg)
+      revoke(message.oId).then((res) => {
+        0 === res.code
+          ? this.$message.success(res.msg)
+          : this.$message.info(res.msg)
       })
     },
     showRedpacketInfo(info) {
@@ -304,7 +319,7 @@ export default {
       this.redPacketInfo = info
     },
     sendMessage(content) {
-      this.$refs.messageInput.sendMessage(content)  
+      this.$refs.messageInput.sendMessage(content)
     },
     quote(quoteForm) {
       this.$refs.messageInput.quote(quoteForm)
@@ -320,7 +335,7 @@ export default {
     },
     syncOptions(options) {
       this.port.postMessage({ type: EVENT.syncOptions, data: options })
-    }
+    },
   },
 }
 </script>
@@ -351,7 +366,8 @@ export default {
 }
 </style>
 <style>
-.el-backtop, .el-backtop:hover {
+.el-backtop,
+.el-backtop:hover {
   background-color: #565656;
 }
 </style>

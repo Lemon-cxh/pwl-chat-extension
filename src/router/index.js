@@ -14,7 +14,11 @@ const routes = [
     name: 'ChatRoom',
     component: () => import('../views/ChatRoom.vue')
   },
-  
+  {
+    path: '/error',
+    name: 'Error',
+    component: () => import('../views/Error.vue')
+  },
 ]
 
 const router = new VueRouter({
