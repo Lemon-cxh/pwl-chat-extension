@@ -29,7 +29,7 @@
   margin-right: 50px;
   background-color: rgba(0, 0, 0, 0.4);
 }
-.pwl-message-child audio {
+.pwl-message-child audio, .pwl-message-child iframe {
   max-width: 100px;
   max-height: 20px;
 }

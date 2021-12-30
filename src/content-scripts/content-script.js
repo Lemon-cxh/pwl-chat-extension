@@ -123,16 +123,20 @@ function showImage(data) {
 function plusOneMessage(data) {
   let plusOne = document.getElementById('pwl-plus-one-' + lastMessage.oId)
   if (plusOne) {
-    plusOne.innerText = ++lastMessage.count + '人 +1 了' + lastMessage.userName + '的话'
+    plusOne.innerText = ++lastMessage.count + '人复读了' + lastMessage.userName + '的话'
     return
   }
   plusOne = document.createElement('span')
   plusOne.setAttribute('id', 'pwl-plus-one-' + lastMessage.oId)
-  plusOne.innerText = ++lastMessage.count + '人 +1 了' + lastMessage.userName + '的话'
+  plusOne.innerText = ++lastMessage.count + '人复读了' + lastMessage.userName + '的话'
   plusOne.setAttribute('class', 'pwl-message-child')
   let box = document.getElementById('pwl-message-box')
   box.appendChild(plusOne)
-  plusOne.setAttribute('style', getSytle(plusOne))
+  let second = getSecond(box, plusOne)
+  plusOne.setAttribute('style', getSytle(plusOne, second))
+  setTimeout(() => {
+    box.removeChild(plusOne)
+  }, second * 1000)
 }
 
 function getSecond(box, child) {
