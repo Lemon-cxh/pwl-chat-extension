@@ -94,7 +94,7 @@ export default new Vuex.Store({
           oIds.push(message.oId)
           state.message[0].users = users
           state.message[0].oIds = oIds
-          if (message.plusOne && length === 3) {
+          if (message.plusOne && length === 3 && last.userName !== state.userInfo.userName) {
             sendMessage(message.message.md, state.key)
           }
           return

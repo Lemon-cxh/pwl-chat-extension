@@ -2,7 +2,8 @@ import { TABS_EVENT, STORAGE, defaultOptions } from '../constant/Constant'
 import { getSync } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
 
-const height = 25
+const ignorePlusOne = '小冰'
+let height = 25
 // 屏幕宽 / 时间
 const speed = 76
 let index = 0
@@ -17,6 +18,7 @@ let options = {}
 window.onload = function () {
   getSync({ [STORAGE.options]: defaultOptions }, (result) => {
     options = result.options
+    height = options.barrageOptions.fontSize
     if (options.barrageOptions.enable) {
       createBarrage()
     }
@@ -35,6 +37,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
   if (TABS_EVENT.syncOptions === request.type) {
     options = request.data
+    height = options.barrageOptions.fontSize
   }
 })
 
@@ -55,6 +58,15 @@ function createBarrage() {
       sendMessage(input)
     }
   })
+
+  var observe = new MutationObserver(function (mutations, observe) {
+    let imgs = box.querySelectorAll('img')
+    imgs.forEach((e) => {
+      e.onmouseover = () => (e.style = 'max-height: 100vh;max-width: 60vw;')
+      e.onmouseout = () => (e.style = '')
+    })
+  })
+  observe.observe(box, { childList: true })
 }
 
 function sendMessage(input) {
@@ -69,8 +81,7 @@ function sendMessage(input) {
 }
 
 function insetMessage(data) {
-  if (lastMessage.md === data.md) {
-    plusOneMessage(data)
+  if (lastMessage.md === data.md && plusOneMessage(data)) {
     return
   }
   let name = data.userNickname
@@ -121,22 +132,23 @@ function showImage(data) {
 }
 
 function plusOneMessage(data) {
+  if (!data.md || data.md.startsWith(ignorePlusOne)) {
+    return false
+  }
+  let box = document.getElementById('pwl-message-' + lastMessage.oId)
+  if (!box) {
+    return false
+  }
   let plusOne = document.getElementById('pwl-plus-one-' + lastMessage.oId)
   if (plusOne) {
-    plusOne.innerText = ++lastMessage.count + '人复读了' + lastMessage.userName + '的话'
-    return
+    plusOne.innerText = ' [' + ++lastMessage.count + '人 +1]'
+    return true
   }
   plusOne = document.createElement('span')
   plusOne.setAttribute('id', 'pwl-plus-one-' + lastMessage.oId)
-  plusOne.innerText = ++lastMessage.count + '人复读了' + lastMessage.userName + '的话'
-  plusOne.setAttribute('class', 'pwl-message-child')
-  let box = document.getElementById('pwl-message-box')
+  plusOne.innerText = ' [' + ++lastMessage.count + '人 +1]'
   box.appendChild(plusOne)
-  let second = getSecond(box, plusOne)
-  plusOne.setAttribute('style', getSytle(plusOne, second))
-  setTimeout(() => {
-    box.removeChild(plusOne)
-  }, second * 1000)
+  return true
 }
 
 function getSecond(box, child) {
@@ -144,7 +156,7 @@ function getSecond(box, child) {
 }
 
 function getSytle(dom, second) {
-  index = ++index % 10
+  index = (index + 3) % 13
   let top = index * height
   return (
     'font-size:' +

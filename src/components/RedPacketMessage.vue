@@ -43,6 +43,7 @@ export default {
   methods: {
     openRedPacket() {
       openRedPacket(this.form).then((res) => {
+        res.oId = this.oId
         this.$emit('showRedpacketInfo', res)
       });
     },

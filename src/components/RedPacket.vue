@@ -129,7 +129,9 @@ export default {
     },
     redPacketContent() {
       let redPacketForm = this.redPacketForm
-      redPacketForm.recivers = [redPacketForm.recivers]
+      redPacketForm.recivers = redPacketForm.recivers
+        ? []
+        : [redPacketForm.recivers]
       return {
         content: '[redpacket]' + JSON.stringify(redPacketForm) + '[/redpacket]',
         apiKey: this.key,
@@ -161,8 +163,12 @@ export default {
       })
     },
     send() {
-      send(this.redPacketContent).then(() => {
-        this.redPacketDialogVisible = false
+      send(this.redPacketContent).then((res) => {
+        if (res.code === 0) {
+          this.redPacketDialogVisible = false
+          return
+        }
+        this.$message.info(res.msg)
       })
     },
     remoteMethod(query) {
@@ -179,6 +185,7 @@ export default {
       let map = redPacketTypeMap.get(value)
       this.redPacketForm.count = map.count
       this.redPacketForm.msg = map.msg
+      this.recivers = ''
     },
   },
 }
