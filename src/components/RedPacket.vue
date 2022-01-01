@@ -106,7 +106,7 @@ export default {
         count: redPacketTypeMap.get(defaultType).count,
         msg: redPacketTypeMap.get(defaultType).msg,
         type: defaultType,
-        recivers: '',
+        recivers: undefined,
       },
       redPacketDialogVisible: false,
       redPacketTypeMap: redPacketTypeMap,
@@ -130,8 +130,8 @@ export default {
     redPacketContent() {
       let redPacketForm = this.redPacketForm
       redPacketForm.recivers = redPacketForm.recivers
-        ? []
-        : [redPacketForm.recivers]
+        ? [redPacketForm.recivers]
+        : redPacketForm.recivers
       return {
         content: '[redpacket]' + JSON.stringify(redPacketForm) + '[/redpacket]',
         apiKey: this.key,
@@ -185,7 +185,7 @@ export default {
       let map = redPacketTypeMap.get(value)
       this.redPacketForm.count = map.count
       this.redPacketForm.msg = map.msg
-      this.recivers = ''
+      this.redPacketForm.recivers = undefined
     },
   },
 }

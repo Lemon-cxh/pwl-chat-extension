@@ -2,7 +2,6 @@ import { TABS_EVENT, STORAGE, defaultOptions } from '../constant/Constant'
 import { getSync } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
 
-const ignorePlusOne = '小冰'
 let height = 25
 // 屏幕宽 / 时间
 const speed = 76
@@ -132,9 +131,6 @@ function showImage(data) {
 }
 
 function plusOneMessage(data) {
-  if (!data.md || data.md.startsWith(ignorePlusOne)) {
-    return false
-  }
   let box = document.getElementById('pwl-message-' + lastMessage.oId)
   if (!box) {
     return false

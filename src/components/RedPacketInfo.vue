@@ -2,7 +2,7 @@
   <el-dialog
     :title="info.info.userName"
     :visible.sync="dialogVisible"
-    width="60%"
+    width="70%"
     :show-close="false"
     :before-close="close"
     center
@@ -10,38 +10,43 @@
     <el-row type="flex" class="flex-column">
       <el-avatar :src="info.info.userAvatarURL"></el-avatar>
       <el-row class="item">{{ info.info.msg }}</el-row>
-      <el-row v-if="isReciver">
+      <el-row class="count">{{
+        (info.info.count === info.info.got ? '总计: ' : '已抢: ') + count
+      }}</el-row>
+      <el-row v-if="reciverMessage">
         {{ reciverMessage }}
       </el-row>
       <div class="who-box">
-      <el-row
-        class="item"
-        type="flex"
-        v-for="(item, index) in info.who"
-        :key="index"
-      >
-        <el-avatar
-          class="item-avatar"
-          :size="35"
-          :src="item.avatar"
-        ></el-avatar>
-        <el-row type="flex" class="flex-column user">
-          <el-row class="text">{{ item.userName }}</el-row>
-          <el-row class="text">{{ item.time.substr(11) }}</el-row>
+        <el-row
+          class="item"
+          type="flex"
+          v-for="(item, index) in info.who"
+          :key="index"
+        >
+          <el-row type="flex">
+            <el-avatar
+              class="item-avatar"
+              :size="35"
+              :src="item.avatar"
+            ></el-avatar>
+            <el-row type="flex" class="flex-column user">
+              <el-row class="text">{{ item.userName }}</el-row>
+              <el-row class="time">{{ item.time }}</el-row>
+            </el-row>
+          </el-row>
+
+          <el-row type="flex" class="flex-column">
+            <el-row
+              :class="'money' + (item.userMoney > 0 ? ' red' : ' green')"
+              >{{ item.userMoney }}</el-row
+            >
+            <el-row
+              v-if="item.showMessage || item.userMoney === max"
+              class="text"
+              >{{ item.showMessage ? item.showMessage : '手气最佳' }}</el-row
+            >
+          </el-row>
         </el-row>
-        <el-row type="flex" class="flex-column">
-          <el-row :class="'money' + (item.userMoney > 0 ? ' red' : ' green')">{{
-            item.userMoney
-          }}</el-row>
-          <el-row class="text">{{
-            item.userMoney == 0
-              ? '抢了个寂寞'
-              : item.userMoney > 0
-              ? ''
-              : '被反抢了吧'
-          }}</el-row>
-        </el-row>
-      </el-row>
       </div>
     </el-row>
   </el-dialog>
@@ -55,17 +60,36 @@ export default {
     dialogVisible: Boolean,
     userInfo: Object,
   },
-  computed: {
-    isReciver() {
-      return this.info.recivers && this.info.recivers.length > 0
-    },
-    reciverMessage() {
-      return this.info.recivers.some((e) => e === this.userInfo.userName)
-        ? ''
-        : '终究还是错付了'
+  data() {
+    return {
+      reciverMessage: '',
+      max: 0,
+      count: 0,
+    }
+  },
+  watch: {
+    info(val) {
+      if (
+        val.recivers &&
+        val.recivers.some((e) => e === this.userInfo.userName)
+      ) {
+        this.reciverMessage = '终究还是错付了'
+      }
+      let max = 0
+      let count = 0
+      val.who.forEach((e) => {
+        max = Math.max(max, e.userMoney)
+        count += e.userMoney
+        e.showMessage = this.showMessage(e.userMoney)
+      })
+      this.max = max
+      this.count = count
     },
   },
   methods: {
+    showMessage(userMoney) {
+      return userMoney > 0 ? null : userMoney === 0 ? '抢个寂寞' : '破财消灾'
+    },
     close() {
       this.$emit('close')
     },
@@ -81,24 +105,27 @@ export default {
 }
 .item {
   margin: 5px 0;
-  width: 240px;
-  justify-content: space-between;
   text-align: center;
-  height: 35px;
+  max-width: 80%;
+}
+.count {
+  font-size: 16px;
 }
 .who-box {
   max-height: 280px;
   overflow: auto;
 }
 .user {
-  width: 140px;
+  width: 150px;
 }
 .item-avatar {
-  width: 30px;
-  height: 30px;
+  align-self: center;
 }
 .text {
   font-size: 14px;
+}
+.time {
+  font-size: 12px;
 }
 .red {
   color: rgb(236, 55, 55);
@@ -107,8 +134,8 @@ export default {
   color: rgb(11, 219, 11);
 }
 .money {
-  width: 70px;
-  font-size: 16px;
+  width: 80px;
+  font-size: 18px;
   font-weight: bolder;
 }
 </style>

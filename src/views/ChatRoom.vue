@@ -319,7 +319,7 @@ export default {
       this.redPacketInfo = info
       let msg
       this.message.some((e, index) => {
-        if (e.oId == info.oId && e.type === MESSAGE_TYPE.msg) {
+        if (e.oId == info.oId && (!e.type || e.type === MESSAGE_TYPE.msg)) {
           msg = JSON.parse(e.content)
           msg.got = msg.count
           this.$set(this.message[index], 'content', JSON.stringify(msg))

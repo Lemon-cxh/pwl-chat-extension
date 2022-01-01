@@ -38,9 +38,6 @@
 .pwl-message-child blockquote {
   margin: 0px;
 }
-.pwl-message-child img[alt="图片表情"] {
-  pointer-events: none;
-}
 .pwl-message-child img[class="emoji"] {
   pointer-events: none;
 }

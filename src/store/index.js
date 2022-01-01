@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { getUserInfo } from '../api/login'
 import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
-import { setLocal, getLocal } from "../utils/chromeUtil"
+import { setLocal, getLocal } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
 import { send } from '../api/chat'
 
@@ -10,6 +10,13 @@ Vue.use(Vuex)
 
 async function sendMessage(content, key) {
   send({ content: content, apiKey: key }).then()
+}
+
+function verifyPlusOne(message) {
+  return (
+    !/^(小冰|嘿siri|小爱同学)/.test(message) &&
+    !/^~\s{1}[\u4e00-\u9fa5]{4,}$/.test(message)
+  )
 }
 
 export default new Vuex.Store({
@@ -32,35 +39,35 @@ export default new Vuex.Store({
       sysMetal: '',
       userRole: '',
       followerCount: 0,
-      userURL: ''
+      userURL: '',
     },
     message: [],
     messageTotal: 0,
     online: {
       onlineChatCnt: 0,
-      users: []
-    }
+      users: [],
+    },
   },
   getters: {
-    key: state => {
+    key: (state) => {
       return state.key
     },
-    userInfo: state => {
+    userInfo: (state) => {
       return state.userInfo
     },
-    message: state => {
+    message: (state) => {
       return state.message
     },
-    messageTotal: state => {
+    messageTotal: (state) => {
       return state.messageTotal
     },
-    pageParams: state => {
+    pageParams: (state) => {
       let page = parseInt(state.messageTotal / MESSAGE_LIMIT) + 1
       return { page: page, length: page * MESSAGE_LIMIT - state.messageTotal }
     },
-    online: state => {
+    online: (state) => {
       return state.online
-    }
+    },
   },
   mutations: {
     setKey(state, key) {
@@ -84,17 +91,31 @@ export default new Vuex.Store({
       if (message.isMsg) {
         state.messageTotal += 1
         let last = state.message[0]
-        if (last && last.md && message.message.md === last.md && !isRedPacket(message.message)) {
-          let users = last.users, oIds = last.oIds
+        if (
+          last &&
+          last.md &&
+          message.message.md === last.md &&
+          !isRedPacket(message.message)
+        ) {
+          let users = last.users,
+            oIds = last.oIds
           if (!last.users) {
             users = []
             oIds = []
           }
-          let length = users.push({ userName: message.message.userName, userAvatarURL: message.message.userAvatarURL })
+          let length = users.push({
+            userName: message.message.userName,
+            userAvatarURL: message.message.userAvatarURL,
+          })
           oIds.push(message.oId)
           state.message[0].users = users
           state.message[0].oIds = oIds
-          if (message.plusOne && length === 3 && last.userName !== state.userInfo.userName) {
+          if (
+            message.plusOne &&
+            length === 3 &&
+            last.userName !== state.userInfo.userName &&
+            verifyPlusOne(message.message.md)
+          ) {
             sendMessage(message.message.md, state.key)
           }
           return
@@ -103,41 +124,44 @@ export default new Vuex.Store({
       state.message.unshift(message.message)
     },
     concatMessage(state, message) {
-      state.message = state.message.concat(message);
+      state.message = state.message.concat(message)
       state.messageTotal += message.length
     },
     clearMessage(state) {
-      state.message = [],
-        state.messageTotal = 0
+      state.message = []
+      state.messageTotal = 0
     },
     setOnline(state, online) {
       state.online = {
         onlineChatCnt: online.onlineChatCnt,
-        users: online.users
+        users: online.users,
       }
     },
     markRedPacket(state, oId) {
       let msg
-      state.message.some(e => {
+      state.message.some((e) => {
         if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
           msg = JSON.parse(e.content)
           msg.got += 1
           e.content = JSON.stringify(msg)
-          return true;
+          return true
         }
-        return false;
+        return false
       })
     },
     revoke(state, oId) {
-      state.message.some(e => {
-        if (e.type === MESSAGE_TYPE.msg && (e.oId == oId || (e.oIds && e.oIds.some(e => e === oId)))) {
-          e.revoke = true;
+      state.message.some((e) => {
+        if (
+          e.type === MESSAGE_TYPE.msg &&
+          (e.oId == oId || (e.oIds && e.oIds.some((e) => e === oId)))
+        ) {
+          e.revoke = true
           state.messageTotal -= 1
-          return true;
+          return true
         }
-        return false;
+        return false
       })
-    }
+    },
   },
   actions: {
     getUser(context) {
