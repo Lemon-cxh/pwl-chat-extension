@@ -13,8 +13,8 @@
       <el-row class="count">{{
         (info.info.got >= info.info.count ? '总计: ' : '已抢: ') + count
       }}</el-row>
-      <el-row v-if="reciverMessage">
-        {{ reciverMessage }}
+      <el-row v-if="message">
+        {{ message }}
       </el-row>
       <div class="who-box">
         <el-row
@@ -62,28 +62,30 @@ export default {
   },
   data() {
     return {
-      reciverMessage: '',
+      message: '',
       max: 0,
-      count: 0,
+      count: 0
     }
   },
   watch: {
     info(val) {
-      if (
-        val.recivers &&
-        !val.recivers.some((e) => e === this.userInfo.userName)
-      ) {
-        this.reciverMessage = '终究还是错付了'
-      }
+      let userName = this.userInfo.userName
       let max = 0
       let count = 0
+      let has = false
       val.who.forEach((e) => {
         max = Math.max(max, e.userMoney)
         count += e.userMoney
         e.showMessage = this.showMessage(e.userMoney)
+        has = has ? has : e.userName === userName
       })
       this.max = max
       this.count = count
+      if (has) {
+        return
+      }
+      this.message = val.recivers && val.recivers.length > 0 &&
+        !val.recivers.some((e) => e === userName) ?  '终究还是错付了' : '很遗憾，没有抢到'
     },
   },
   methods: {
