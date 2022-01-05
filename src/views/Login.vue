@@ -58,8 +58,8 @@ export default {
       let data = { ...this.form }
       data.userPassword = md5(data.userPassword)
       getKey(data).then((response) => {
-        if (response.code !== 0) {
-          this.$message.error(response.msg)
+        if (0 !== response.code ) {
+          this.$message.error(response.msg ? response.msg : response)
           return
         }
         getUserInfo({ apiKey: response.Key }).then((res) => {

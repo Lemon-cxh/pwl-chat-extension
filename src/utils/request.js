@@ -20,7 +20,7 @@ service.interceptors.response.use(
     Vue.prototype.$message.error(response.data)
   },
   error => {
-    console.log(error)
+    Vue.prototype.$message.error(error)
     return Promise.reject(error)
   })
 
