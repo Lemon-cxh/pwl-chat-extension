@@ -12,7 +12,7 @@ import {
 } from '../constant/Constant'
 
 Vue.config.productionTip = false
-const URL = 'wss://pwl.icu/chat-room-channel'
+const URL = 'wss://fishpi.cn/chat-room-channel'
 const MAX_PAGE = 4
 let port = null
 let count = 0
