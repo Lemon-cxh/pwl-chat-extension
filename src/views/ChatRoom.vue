@@ -66,7 +66,7 @@
           </div>
         </div>
         <div class="icon-box">
-          <icon-svg icon-class="loading" class="loading" v-show="loading" />
+          <icon-svg icon-class="loading" class="loading" v-if="loading" />
         </div>
       </div>
     </div>
