@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row type="flex"
-            :class="'red-packet' + (redPacket.count === redPacket.got ? ' red-packet-mask' : '')"
+            :class="'red-packet' + (redPacket.got >= redPacket.count ? ' red-packet-mask' : '')"
             @click.native="openRedPacket">
       <el-row type="flex" class="flex-colunmn icon-box">
         <icon-svg class="icon" icon-class="redPacketMessage"/>

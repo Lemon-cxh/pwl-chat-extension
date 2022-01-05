@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import store from '../store'
-import { more, send } from '../api/chat'
+import { more, send, openRedPacket } from '../api/chat'
 import { notifications, getLocal, sendTabsMessage } from '../utils/chromeUtil'
 import {
   MESSAGE_TYPE,
@@ -90,7 +90,7 @@ function messageHandler(event) {
       if (port) {
         port.postMessage({ type: EVENT.redPacketStatus, data: data.oId })
       }
-      store.commit('markRedPacket', data.oId)
+      store.commit('updateRedPacket', data.oId)
       break
     default:
       messageEvent(data, true)
@@ -117,6 +117,9 @@ chrome.runtime.onConnect.addListener(function (p) {
         options = msg.data
         sendTabsMessage({ type: TABS_EVENT.syncOptions, data: msg.data })
         break
+      case EVENT.markRedPacket:
+        store.commit('markRedPacket', msg.data)
+        break
       default:
         break
     }
@@ -139,6 +142,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (TABS_EVENT.sendMessage === request.type) {
     send({ content: request.data, apiKey: store.getters.key }).then()
     return
+  }
+  if (TABS_EVENT.openRedPacket === request.type) {
+    openRedPacket({ oId: request.data, apiKey: store.getters.key }).then(res => {
+      sendResponse({data: res, userName: store.getters.userInfo.userName})
+      return
+    })
   }
 })
 

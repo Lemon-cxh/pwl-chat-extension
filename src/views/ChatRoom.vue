@@ -66,7 +66,7 @@
           </div>
         </div>
         <div class="icon-box">
-          <i class="el-icon-loading icon" v-if="loading"></i>
+          <icon-svg icon-class="loading" class="loading" v-show="loading" />
         </div>
       </div>
     </div>
@@ -168,7 +168,7 @@ export default {
           that.loading = false
           break
         case EVENT.redPacketStatus:
-          that.markRedPacket(msg.data)
+          that.updateRedPacket(msg.data)
           break
         case EVENT.revoke:
           that.revoke(msg.data)
@@ -276,12 +276,15 @@ export default {
         this.dialogVisible = true
       })
     },
-    markRedPacket(oId) {
+    updateRedPacket(oId) {
       let msg
       let that = this
       this.message.some((e, index) => {
         if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
           msg = JSON.parse(e.content)
+          if (msg.got >= msg.count) {
+            return true
+          }
           msg.got += 1
           that.$set(that.message[index], 'content', JSON.stringify(msg))
           return true
@@ -327,6 +330,7 @@ export default {
         }
         return false
       })
+      this.port.postMessage({ type: EVENT.markRedPacket, data: info.oId })
     },
     sendMessage(content) {
       this.$refs.messageInput.sendMessage(content)
@@ -361,6 +365,11 @@ export default {
   color: white;
   font-size: 26px;
 }
+.loading {
+  animation: rotate 1s linear infinite;
+  font-size: 24px;
+  color: white;
+}
 .menu-row {
   height: 30px;
   justify-content: space-between;
@@ -373,6 +382,14 @@ export default {
 }
 .menu-item {
   margin: 0 3px;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
 <style>

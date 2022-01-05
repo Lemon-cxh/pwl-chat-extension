@@ -80,7 +80,8 @@ function sendMessage(input) {
 }
 
 function insetMessage(data) {
-  if (lastMessage.md === data.md && plusOneMessage(data)) {
+  let redPacket = isRedPacket(data);
+  if (!redPacket && lastMessage.md === data.md && plusOneMessage(data)) {
     return
   }
   let name = data.userNickname
@@ -96,16 +97,35 @@ function insetMessage(data) {
   let child = document.createElement('div')
   child.setAttribute('id', 'pwl-message-' + data.oId)
   data.content = data.content.substring(3, data.content.length - 4)
-  child.innerHTML = isRedPacket(data)
-    ? '🧧' + name + '的红包来啦，请在扩展中查看'
+  child.innerHTML = redPacket
+    ? '🧧' + name + '的红包来啦，点击领取'
     : name + ':' + data.content
-  child.setAttribute('class', 'pwl-message-child')
+  child.setAttribute('class', (redPacket ? 'red-packet ' : '') + 'pwl-message-child')
   box.appendChild(child)
   let second = getSecond(box, child)
   child.setAttribute('style', getSytle(child, second))
+  if (redPacket) {
+    redPacketClick(child)
+  }
   setTimeout(() => {
     box.removeChild(child)
   }, second * 1000)
+}
+
+function redPacketClick(child) {
+  child.addEventListener('click', (event) => {
+    if (child.getAttribute('open')) {
+      return
+    }
+    chrome.runtime.sendMessage({
+      type: TABS_EVENT.openRedPacket,
+      data: child.id.substring(12),
+    }, data => {
+      let got = data.data.who.find(e => data.userName === e.userName)
+      child.innerHTML += '[' + (got ? '抢到了' + got.userMoney : '没有抢到') + ']'
+      child.setAttribute('open', true)
+    })
+  })
 }
 
 function showImage(data) {
@@ -122,6 +142,7 @@ function showImage(data) {
   img.setAttribute('id', 'pwl-extension-img')
   img.setAttribute('alt', 'pwl-img')
   img.setAttribute('style', 'max-width: 60vw;')
+  img.setAttribute('referrerpolicy', 'no-referrer')
   img.setAttribute('onclick', 'this.style.display="none"')
   img.setAttribute('src', data.src)
   let div = document.createElement('div')

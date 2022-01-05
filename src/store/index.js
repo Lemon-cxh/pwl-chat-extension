@@ -142,6 +142,21 @@ export default new Vuex.Store({
       state.message.some((e) => {
         if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
           msg = JSON.parse(e.content)
+          msg.got = msg.count
+          e.content = JSON.stringify(msg)
+          return true
+        }
+        return false
+      })
+    },
+    updateRedPacket(state, oId) {
+      let msg
+      state.message.some((e) => {
+        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
+          msg = JSON.parse(e.content)
+          if (msg.got >= msg.count) {
+            return true
+          }
           msg.got += 1
           e.content = JSON.stringify(msg)
           return true

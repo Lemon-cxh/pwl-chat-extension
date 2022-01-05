@@ -47,7 +47,7 @@
             <el-row type="flex" class="flex-column menu">
               <el-row class="menu-item" @click.native="talkToHe">@他</el-row>
               <el-row class="menu-item" @click.native="quote">引用</el-row>
-              <el-row v-if="message.md" class="menu-item" @click.native="$emit('sendMessage', message.md)">+1</el-row>
+              <el-row v-if="message.md" class="menu-item" @click.native="$emit('sendMessage', message.md);closePopover()">+1</el-row>
               <el-row
                 class="menu-item"
                 v-show="imageUrl"
@@ -57,7 +57,7 @@
               <el-row
                 v-show="unlimitedRevoke || isOwn"
                 class="menu-item"
-                @click.native="$emit('revokeMessage', message)"
+                @click.native="$emit('revokeMessage', message);closePopover()"
                 >撤回</el-row
               >
             </el-row>

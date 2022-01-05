@@ -11,7 +11,7 @@
       <el-avatar :src="info.info.userAvatarURL"></el-avatar>
       <el-row class="item">{{ info.info.msg }}</el-row>
       <el-row class="count">{{
-        (info.info.count === info.info.got ? '总计: ' : '已抢: ') + count
+        (info.info.got >= info.info.count ? '总计: ' : '已抢: ') + count
       }}</el-row>
       <el-row v-if="reciverMessage">
         {{ reciverMessage }}
@@ -71,7 +71,7 @@ export default {
     info(val) {
       if (
         val.recivers &&
-        val.recivers.some((e) => e === this.userInfo.userName)
+        !val.recivers.some((e) => e === this.userInfo.userName)
       ) {
         this.reciverMessage = '终究还是错付了'
       }
