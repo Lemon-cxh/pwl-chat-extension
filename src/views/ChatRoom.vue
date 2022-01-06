@@ -208,6 +208,9 @@ export default {
         return
       }
       let last = this.message[0]
+      if (!last || !last.md) {
+        return
+      }
       if (message.md !== last.md || isRedPacket(message)) {
         this.message.unshift(message)
         return

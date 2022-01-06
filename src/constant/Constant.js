@@ -33,7 +33,8 @@ export const TABS_EVENT = {
   message: 2,
   sendMessage: 3,
   syncOptions: 4,
-  openRedPacket: 5
+  openRedPacket: 5,
+  markRedPacket: 6
 }
 
 export const defaultOptions = {

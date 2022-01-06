@@ -145,8 +145,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
   if (TABS_EVENT.openRedPacket === request.type) {
     openRedPacket({ oId: request.data, apiKey: store.getters.key }).then(res => {
-      sendResponse({data: res, userName: store.getters.userInfo.userName})
-      return
+      sendTabsMessage({ type: TABS_EVENT.markRedPacket, data: {data: res, userName: store.getters.userInfo.userName, oId: request.data} })
     })
   }
 })

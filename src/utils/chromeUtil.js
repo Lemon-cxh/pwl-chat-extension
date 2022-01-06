@@ -26,7 +26,7 @@ export function setSync(obj) {
 export function sendTabsMessage(message, callback) {
   chrome.tabs.query({ active: true, currentWindow: true, status: 'complete' }, function (tabs) {
     if (tabs.length === 0) {
-      callback()
+      callback && callback()
       return
     }
     chrome.tabs.sendMessage(tabs[0].id, message, response => {

@@ -25,18 +25,23 @@ window.onload = function () {
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (TABS_EVENT.showImage === request.type) {
-    showImage(request.data)
-    return
-  }
-  if (TABS_EVENT.message === request.type) {
-    insetMessage(request.data)
-    sendResponse({ hidden: document.hidden })
-    return
-  }
-  if (TABS_EVENT.syncOptions === request.type) {
-    options = request.data
-    height = options.barrageOptions.fontSize
+  switch (request.type) {
+    case TABS_EVENT.showImage:
+      showImage(request.data)
+      break
+    case TABS_EVENT.message:
+      insetMessage(request.data)
+      sendResponse({ hidden: document.hidden })
+      break
+    case TABS_EVENT.syncOptions:
+      options = request.data
+      height = options.barrageOptions.fontSize
+      break
+    case TABS_EVENT.markRedPacket:
+      markRedPacket(request.data)
+      break
+    default:
+      break
   }
 })
 
@@ -117,15 +122,18 @@ function redPacketClick(child) {
     if (child.getAttribute('open')) {
       return
     }
+    child.setAttribute('open', true)
     chrome.runtime.sendMessage({
       type: TABS_EVENT.openRedPacket,
       data: child.id.substring(12),
-    }, data => {
-      let got = data.data.who.find(e => data.userName === e.userName)
-      child.innerHTML += '[' + (got ? '抢到了' + got.userMoney : '没有抢到') + ']'
-      child.setAttribute('open', true)
     })
   })
+}
+
+function markRedPacket(data) {
+  let child = document.getElementById('pwl-message-' + data.oId)
+  let got = data.data.who.find(e => data.userName === e.userName)
+  child.innerHTML += '[' + (got ? '抢到了' + got.userMoney : '没有抢到') + ']'
 }
 
 function showImage(data) {
