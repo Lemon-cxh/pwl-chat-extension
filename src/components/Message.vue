@@ -310,6 +310,7 @@ export default {
   min-width: 0px;
 }
 .content * {
-  max-width: 255px;
+  max-width: 265px;
+  overflow: auto;
 }
 </style>

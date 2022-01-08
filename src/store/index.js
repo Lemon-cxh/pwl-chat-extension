@@ -4,7 +4,7 @@ import { getUserInfo } from '../api/login'
 import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
 import { setLocal, getLocal } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
-import { send } from '../api/chat'
+import { send, openRedPacket } from '../api/chat'
 
 Vue.use(Vuex)
 
@@ -88,40 +88,45 @@ export default new Vuex.Store({
       }
     },
     addMessage(state, message) {
-      if (message.isMsg) {
-        state.messageTotal += 1
-        let last = state.message[0]
-        if (
-          last &&
-          last.md &&
-          message.message.md === last.md &&
-          !isRedPacket(message.message)
-        ) {
-          let users = last.users,
-            oIds = last.oIds
-          if (!last.users) {
-            users = []
-            oIds = []
-          }
-          let length = users.push({
-            userName: message.message.userName,
-            userAvatarURL: message.message.userAvatarURL,
-          })
-          oIds.push(message.oId)
-          state.message[0].users = users
-          state.message[0].oIds = oIds
-          if (
-            message.plusOne &&
-            length === 3 &&
-            last.userName !== state.userInfo.userName &&
-            verifyPlusOne(message.message.md)
-          ) {
-            sendMessage(message.message.md, state.key)
-          }
-          return
-        }
+      if (!message.isMsg) {
+        state.message.unshift(message.message)
+        return
       }
-      state.message.unshift(message.message)
+      state.messageTotal += 1
+      if (isRedPacket(message.message)) {
+        setTimeout(() => {
+          openRedPacket({ oId: message.oId, apiKey: state.key }).then()
+        }, 3000)
+        state.message.unshift(message.message)
+        return
+      }
+      // 自动 +1 逻辑
+      let last = state.message[0]
+      if (!last || message.message.md !== last.md) {
+        state.message.unshift(message.message)
+        return
+      }
+      let users = last.users,
+        oIds = last.oIds
+      if (!last.users) {
+        users = []
+        oIds = []
+      }
+      let length = users.push({
+        userName: message.message.userName,
+        userAvatarURL: message.message.userAvatarURL,
+      })
+      oIds.push(message.oId)
+      state.message[0].users = users
+      state.message[0].oIds = oIds
+      if (
+        message.plusOne &&
+        length === 3 &&
+        last.userName !== state.userInfo.userName &&
+        verifyPlusOne(message.message.md)
+      ) {
+        sendMessage(message.message.md, state.key)
+      }
     },
     concatMessage(state, message) {
       state.message = state.message.concat(message)

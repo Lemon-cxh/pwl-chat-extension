@@ -101,10 +101,13 @@ function insetMessage(data) {
   let box = document.getElementById('pwl-message-box')
   let child = document.createElement('div')
   child.setAttribute('id', 'pwl-message-' + data.oId)
-  data.content = data.content.substring(3, data.content.length - 4)
-  child.innerHTML = redPacket
-    ? '🧧' + name + '的红包来啦，点击领取'
-    : name + ':' + data.content
+  if (redPacket) {
+    child.innerHTML = '🧧' + name + '的红包来啦，点击领取'
+  } else {
+    data.content = data.content.substring(3, data.content.length - 4)
+    data.content = data.content.replaceAll('<img ', '<img referrerpolicy="no-referrer" ')
+    child.innerHTML = name + ':' + data.content
+  }
   child.setAttribute('class', (redPacket ? 'red-packet ' : '') + 'pwl-message-child')
   box.appendChild(child)
   let second = getSecond(box, child)

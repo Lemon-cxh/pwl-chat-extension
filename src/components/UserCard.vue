@@ -6,7 +6,7 @@
              :before-close="closeHandler">
     <div class="background"
          :style="getBackgroundImage(userInfo.cardBg)">
-      <el-row type="flex" class="box">
+      <el-row type="flex" class="box" @click.native="goto">
         <el-row type="flex"
                 class="flex-column avatar-box">
           <el-avatar class="avatar"
@@ -48,6 +48,9 @@ export default {
   methods: {
     getBackgroundImage(url) {
       return url ? "padding-top: 25px;background-image:url('" + url + "')" : "";
+    },
+    goto() {
+      window.open(process.env.VUE_APP_BASE_URL + '/member/' + this.userInfo.userName);
     },
     openUrl() {
       if (this.userInfo.userURL) {
