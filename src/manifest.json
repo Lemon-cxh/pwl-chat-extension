@@ -1,8 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "摸鱼派聊天室",
+  "name": "__MSG_extName__",
   "homepage_url": "https://github.com/Lemon-cxh/pwl-chat-extension",
   "description": "摸鱼派聊天室插件",
+  "default_locale": "zh_CN",
   "permissions": [
     "background",
     "storage",
@@ -14,12 +15,12 @@
     "128": "icons/128.png"
   },
   "background": {
-    "page": "background.html",
+    "scripts": ["js/background.js"],
     "persistent": true
   },
   "browser_action": {
     "default_popup": "popup.html",
-    "default_title": "聊天室",
+    "default_title": "__MSG_extName__",
     "default_icon": {
       "19": "icons/128.png",
       "38": "icons/128.png"

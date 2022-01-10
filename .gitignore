@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 /dist
-/.history
+.history
 
 
 # local env files
@@ -28,3 +28,4 @@ pnpm-debug.log*
 *.pub
 *.zip
 /artifacts
+package-lock.json

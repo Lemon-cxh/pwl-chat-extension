@@ -1,74 +1,76 @@
 <template>
-  <el-popover placement="left-start"
-              width="211"
-              trigger="click">
-    <el-row type="flex"
-            class="emoji-box">
-      <div class="emoji"
-           v-for="(item, index) in emojis"
-           :key="index"
-           @click="selectEmoji(item.name)">
-        <img v-if="judgeEmojiIsImage(item.value)"
-             :src="item.value"
-             class="emoji" />
-        <span v-else>{{item.value}}</span>
+  <el-popover placement="left-start" width="211px" trigger="focus">
+    <template #reference>
+      <div tabindex="0"><icon-svg icon-class="emojiBtn" /></div
+    ></template>
+    <el-row class="emoji-box">
+      <div
+        class="emoji"
+        v-for="(item, index) in emojis"
+        :key="index"
+        @click="selectEmoji(item.name)"
+      >
+        <img
+          v-if="judgeEmojiIsImage(item.value)"
+          :src="item.value"
+          class="emoji"
+        />
+        <span v-else>{{ item.value }}</span>
       </div>
     </el-row>
-    <icon-svg slot="reference"
-              icon-class="emojiBtn" />
   </el-popover>
 </template>
 
 <script>
-import { getEmoji } from "../api/chat";
-import { mapGetters } from "vuex";
+import { getEmoji } from '../api/chat'
+import { mapGetters } from 'vuex'
 
 export default {
-  name: "emoji",
+  name: 'emoji',
+  emits: ['addContent'],
   data() {
     return {
       emojis: [],
-    };
+    }
   },
   computed: {
-    ...mapGetters(["key"]),
+    ...mapGetters(['key']),
     apiKey() {
-      return { apiKey: this.key };
+      return { apiKey: this.key }
     },
   },
   created() {
-    this.getEmoji();
+    this.getEmoji()
   },
   methods: {
     getEmoji() {
       getEmoji(this.apiKey).then((res) => {
         if (0 === res.code) {
-          let emojis = [];
-          let key;
+          let emojis = []
+          let key
           res.data.forEach((e) => {
             for (key in e) {
-              emojis.push({ name: key, value: e[key] });
+              emojis.push({ name: key, value: e[key] })
             }
-          });
-          this.emojis = emojis;
+          })
+          this.emojis = emojis
         }
-      });
+      })
     },
     selectEmoji(name) {
-      this.$emit("addContent", ':' + name + ':');
+      this.$emit('addContent', ':' + name + ':')
     },
     judgeEmojiIsImage(value) {
-      return value.startsWith("http");
+      return value.startsWith('http')
     },
   },
-};
+}
 </script>
 
 <style scoped>
 .emoji-box {
-  flex-wrap: wrap;
   max-height: 204px;
-  overflow: auto
+  overflow: auto;
 }
 .emoji {
   width: 30px;

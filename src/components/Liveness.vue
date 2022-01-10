@@ -28,6 +28,7 @@ export default {
       ],
     };
   },
+  inject: ['$message'],
   computed: {
     ...mapGetters(["key"]),
     apiKey() {
@@ -49,7 +50,7 @@ export default {
       });
     });
   },
-  destroyed() {
+  beforeUnmount() {
     if (this.intervalId) {
       window.clearInterval(this.intervalId);
     }

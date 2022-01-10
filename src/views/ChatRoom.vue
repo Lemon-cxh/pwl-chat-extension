@@ -2,20 +2,20 @@
   <div id="chatRoom">
     <!-- 活跃度，头像，输入框 -->
     <liveness />
-    <el-row type="flex" class="user-box">
-      <user-info @syncOptions="syncOptions" />
+    <el-row class="user-box">
+      <user-info @sync-options="syncOptions" />
       <send ref="messageInput" />
     </el-row>
     <!-- 菜单按钮 -->
-    <el-row type="flex" class="menu-row">
-      <online :online="online" @showUserCard="showUserCard" />
-      <el-row type="flex" class="menu">
+    <el-row class="menu-row">
+      <online :online="online" @show-user-card="showUserCard" />
+      <el-row class="menu">
         <red-packet class="menu-item" />
-        <emoji class="menu-item" @addContent="addContent" />
+        <emoji class="menu-item" @add-content="addContent" />
         <images
           ref="cloudImages"
           class="menu-item"
-          @sendMessage="sendMessage"
+          @send-message="sendMessage"
         />
       </el-row>
     </el-row>
@@ -35,7 +35,7 @@
       >
         <div
           ref="inner"
-          v-for="item in message"
+          v-for="item in messageArray"
           v-bind:key="
             type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
           "
@@ -44,8 +44,8 @@
           <hint-message
             v-if="item.type && type.redPacketStatus === item.type"
             :message="item"
-            @showUserCard="showUserCard"
-            @showRedpacketInfo="showRedpacketInfo"
+            @show-user-card="showUserCard"
+            @show-redpacket-info="showRedpacketInfo"
           />
           <div v-else-if="!item.type || type.msg === item.type">
             <hint-message v-if="item.revoke" :message="item" />
@@ -55,13 +55,13 @@
               :date="date"
               :unlimitedRevoke="unlimitedRevoke"
               :avatarPendant="avatarPendant"
-              @revokeMessage="revokeMessage"
-              @showUserCard="showUserCard"
-              @collectImages="collectImages"
-              @addContent="addContent"
-              @sendMessage="sendMessage"
+              @revoke-message="revokeMessage"
+              @show-user-card="showUserCard"
+              @collect-images="collectImages"
+              @add-content="addContent"
+              @send-message="sendMessage"
               @quote="quote"
-              @showRedpacketInfo="showRedpacketInfo"
+              @show-redpacket-info="showRedpacketInfo"
             />
           </div>
         </div>
@@ -73,7 +73,7 @@
     <user-card
       :userInfo="userCardInfo"
       :dialogVisible="dialogVisible"
-      @closeDialog="dialogVisible = false"
+      @close-dialog="dialogVisible = false"
     />
     <red-packet-info
       :userInfo="userInfo"
@@ -85,17 +85,7 @@
 </template>
 
 <script>
-import Message from '../components/Message.vue'
-import Liveness from '../components/Liveness.vue'
-import UserInfo from '../components/UserInfo.vue'
-import Online from '../components/Online.vue'
-import Send from '../components/Send.vue'
-import UserCard from '../components/UserCard.vue'
-import HintMessage from '../components/HintMessage.vue'
-import RedPacket from '../components/RedPacket.vue'
-import RedPacketInfo from '../components/RedPacketInfo.vue'
-import Emoji from '../components/Emoji.vue'
-import Images from '../components/Images.vue'
+import { ref } from 'vue'
 import { EVENT, MESSAGE_TYPE, TABS_EVENT } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
 import { sendTabsMessage } from '../utils/chromeUtil'
@@ -103,13 +93,13 @@ import { getUserInfo } from '../api/user'
 import { mapGetters } from 'vuex'
 import { revoke } from '../api/chat'
 
+let port
+
 export default {
   name: 'chatRoom',
   data() {
     return {
-      port: null,
       loading: true,
-      message: [],
       date: getDate(),
       dialogVisible: false,
       userCardInfo: {},
@@ -122,6 +112,7 @@ export default {
       avatarPendant: {},
     }
   },
+  inject: ['$message'],
   computed: {
     ...mapGetters(['userInfo', 'key']),
     apiKey() {
@@ -131,56 +122,35 @@ export default {
       return ['协警', 'OP', '管理员'].some((e) => e === this.userInfo.userRole)
     },
   },
-  components: {
-    Message,
-    Liveness,
-    UserInfo,
-    Online,
-    UserCard,
-    HintMessage,
-    RedPacket,
-    RedPacketInfo,
-    Emoji,
-    Images,
-    Send,
+  setup() {
+    const messageArray = ref([])
+    const unshiftMessage = (msg) => {
+      messageArray.value.unshift(msg)
+    }
+    const pushMessage = (msg) => {
+      messageArray.value.push(...msg)
+    }
+    const updateMessage = (index, property, value) => {
+      messageArray.value[index][property] = value
+    }
+    return {
+      messageArray,
+      unshiftMessage,
+      pushMessage,
+      updateMessage,
+    }
   },
   created() {
     let that = this
-    let port = chrome.runtime.connect()
+    port = chrome.runtime.connect({name:'pwl-chat'})
     port.postMessage({ type: EVENT.syncUserInfo, data: that.userInfo })
-    port.onMessage.addListener(function (msg) {
-      switch (msg.type) {
-        case EVENT.loadMessage:
-          that.message = msg.data.message
-          that.online = msg.data.online
-          if (msg.data.length === 0) {
-            alert('消息为空')
-            that.load()
-          } else {
-            that.loading = false
-          }
-          break
-        case EVENT.message:
-          that.addMessage(msg.data)
-          break
-        case EVENT.more:
-          that.message = that.message.concat(msg.data)
-          that.loading = false
-          break
-        case EVENT.redPacketStatus:
-          that.updateRedPacket(msg.data)
-          break
-        case EVENT.revoke:
-          that.revoke(msg.data)
-          break
-        case EVENT.online:
-          that.online = msg.data
-          break
-        default:
-          break
-      }
+    port.onMessage.addListener((msg) => that.messageListener(msg))
+    port.onDisconnect.addListener(function () {
+      alert('断开连接')
+      port.disconnect()
+      port = chrome.runtime.connect({name:'pwl-chat'})
+      port.onMessage.addListener((msg) => that.messageListener(msg))
     })
-    this.port = port
     this.avatarPendant.isChristmas =
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
   },
@@ -202,17 +172,48 @@ export default {
       })
   },
   methods: {
-    addMessage(message) {
+    messageListener(msg) {
+      switch (msg.type) {
+        case EVENT.loadMessage:
+          this.pushMessage(msg.data.message)
+          this.online = msg.data.online
+          if (msg.data.length === 0) {
+            this.load()
+          } else {
+            this.loading = false
+          }
+          break
+        case EVENT.message:
+          this.messageEvent(msg.data)
+          break
+        case EVENT.more:
+          this.pushMessage(msg.data)
+          this.loading = false
+          break
+        case EVENT.redPacketStatus:
+          this.updateRedPacket(msg.data)
+          break
+        case EVENT.revoke:
+          this.revoke(msg.data)
+          break
+        case EVENT.online:
+          this.online = msg.data
+          break
+        default:
+          break
+      }
+    },
+    messageEvent(message) {
       if (message.type !== this.type.msg) {
-        this.message.unshift(message)
+        this.unshiftMessage(message)
         return
       }
-      let last = this.message[0]
+      let last = this.messageArray[0]
       if (!last || !last.md) {
         return
       }
       if (message.md !== last.md || isRedPacket(message)) {
-        this.message.unshift(message)
+        this.unshiftMessage(message)
         return
       }
       let users = last.users ? last.users : []
@@ -220,7 +221,7 @@ export default {
         userName: message.userName,
         userAvatarURL: message.userAvatarURL,
       })
-      this.$set(this.message[0], 'users', users)
+      this.updateMessage(0, 'users', users)
     },
     load() {
       this.loading = true
@@ -229,7 +230,7 @@ export default {
       }, 300)
     },
     more() {
-      this.port.postMessage({ type: EVENT.getMore })
+      port.postMessage({ type: EVENT.getMore })
     },
     showMessageMenu(event) {
       let dom = event.path.find((e) => e.id && -1 !== e.id.indexOf('message_'))
@@ -281,24 +282,23 @@ export default {
     },
     updateRedPacket(oId) {
       let msg
-      let that = this
-      this.message.some((e, index) => {
+      this.messageArray.some((e, index) => {
         if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
           msg = JSON.parse(e.content)
           if (msg.got >= msg.count) {
             return true
           }
           msg.got += 1
-          that.$set(that.message[index], 'content', JSON.stringify(msg))
+          this.updateMessage(index, 'content', JSON.stringify(msg))
           return true
         }
         return false
       })
     },
     revoke(oId) {
-      this.message.some((e, index) => {
+      this.messageArray.some((e, index) => {
         if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
-          this.$set(this.message[index], 'revoke', true)
+          this.updateMessage(index, 'revoke', true)
           return true
         }
         return false
@@ -323,17 +323,20 @@ export default {
     showRedpacketInfo(info) {
       this.redPacketVisible = true
       this.redPacketInfo = info
+      if (info.info.got >= info.info.count) {
+        return
+      }
       let msg
-      this.message.some((e, index) => {
+      this.messageArray.some((e, index) => {
         if (e.oId == info.oId && (!e.type || e.type === MESSAGE_TYPE.msg)) {
           msg = JSON.parse(e.content)
           msg.got = msg.count
-          this.$set(this.message[index], 'content', JSON.stringify(msg))
+          this.updateMessage(index, 'content', JSON.stringify(msg))
           return true
         }
         return false
       })
-      this.port.postMessage({ type: EVENT.markRedPacket, data: info.oId })
+      port.postMessage({ type: EVENT.markRedPacket, data: info.oId })
     },
     sendMessage(content) {
       this.$refs.messageInput.sendMessage(content)
@@ -351,7 +354,7 @@ export default {
       this.redPacketVisible = false
     },
     syncOptions(options) {
-      this.port.postMessage({ type: EVENT.syncOptions, data: options })
+      port.postMessage({ type: EVENT.syncOptions, data: options })
     },
   },
 }

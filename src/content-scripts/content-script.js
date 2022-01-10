@@ -63,7 +63,7 @@ function createBarrage() {
     }
   })
 
-  var observe = new MutationObserver(function (mutations, observe) {
+  var observe = new MutationObserver(function () {
     let imgs = box.querySelectorAll('img')
     imgs.forEach((e) => {
       e.onmouseover = () => (e.style = 'max-height: 100vh;max-width: 60vw;')
@@ -121,7 +121,7 @@ function insetMessage(data) {
 }
 
 function redPacketClick(child) {
-  child.addEventListener('click', (event) => {
+  child.addEventListener('click', () => {
     if (child.getAttribute('open')) {
       return
     }
@@ -162,7 +162,7 @@ function showImage(data) {
   div.appendChild(img)
 }
 
-function plusOneMessage(data) {
+function plusOneMessage() {
   let box = document.getElementById('pwl-message-' + lastMessage.oId)
   if (!box) {
     return false

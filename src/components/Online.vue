@@ -1,45 +1,49 @@
 <template>
-
-  <el-popover placement="bottom"
-              width="257"
-              trigger="click">
-    <el-row type="flex"
-            class="avatar-box">
-      <el-avatar class="avatar"
-           v-for="(item, index) in online.users"
-           :key="index"
-           :size="30"
-           :src="item.userAvatarURL"
-           @click.native="$emit('showUserCard', item.userName)">
+  <el-popover placement="bottom" :width="257" trigger="focus">
+    <template #reference>
+      <div tabindex="0">
+        <el-badge
+          id="online-badge"
+          type="success"
+          :value="online.onlineChatCnt"
+          class="badge"
+        >
+          <icon-svg class="icon" icon-class="whale" />
+        </el-badge>
+      </div>
+    </template>
+    <el-row class="avatar-box">
+      <el-avatar
+        class="avatar"
+        v-for="(item, index) in online.users"
+        :key="index"
+        :size="30"
+        :src="item.userAvatarURL"
+        @click="$emit('showUserCard', item.userName)"
+      >
       </el-avatar>
     </el-row>
-    <el-badge slot="reference" id="online-badge"
-              type="success"
-              :value="online.onlineChatCnt"
-              class="badge">
-      <icon-svg class="icon"
-                icon-class="whale" />
-    </el-badge>
   </el-popover>
 </template>
 
 <script>
 export default {
-  name: "online",
+  name: 'online',
   props: {
     online: {
       type: Object,
       default() {
-        return { onlineChatCnt: 0, users: [] };
+        return { onlineChatCnt: 0, users: [] }
       },
     },
   },
+  emits: ['showUserCard'],
   data() {
     return {
-      visible: false
+      visible: false,
     }
   },
-};
+}
 </script>
 <style scoped>
 .icon {
@@ -49,7 +53,7 @@ export default {
 .avatar-box {
   flex-wrap: wrap;
   max-height: 144px;
-  overflow: auto
+  overflow: auto;
 }
 .avatar {
   margin: 3px;

@@ -1,12 +1,10 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import { getUserInfo } from '../api/login'
 import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
 import { setLocal, getLocal } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
 import { send, openRedPacket } from '../api/chat'
 
-Vue.use(Vuex)
 
 async function sendMessage(content, key) {
   send({ content: content, apiKey: key }).then()
@@ -19,7 +17,7 @@ function verifyPlusOne(message) {
   )
 }
 
-export default new Vuex.Store({
+export default createStore({
   state: {
     key: '',
     userInfo: {
@@ -95,7 +93,7 @@ export default new Vuex.Store({
       state.messageTotal += 1
       if (isRedPacket(message.message)) {
         setTimeout(() => {
-          openRedPacket({ oId: message.oId, apiKey: state.key }).then()
+          openRedPacket({ oId: message.message.oId, apiKey: state.key }).then()
         }, 3000)
         state.message.unshift(message.message)
         return
@@ -185,7 +183,7 @@ export default new Vuex.Store({
   },
   actions: {
     getUser(context) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         getLocal([STORAGE.key], function (result) {
           if (result && result[STORAGE.key]) {
             getUserInfo({ apiKey: result[STORAGE.key] }).then((res) => {

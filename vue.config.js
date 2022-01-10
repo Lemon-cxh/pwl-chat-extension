@@ -1,51 +1,50 @@
-const { resolve } = require('core-js/fn/promise');
-const ExtensionReloader  = require('webpack-extension-reloader');
+const AutoImport = require('unplugin-auto-import/webpack')
+const Components = require('unplugin-vue-components/webpack')
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+const Icons = require('unplugin-icons/webpack')
+const IconsResolver = require('unplugin-icons/resolver')
+const ExtensionReloader = require('webpack-extension-reloader')
 
 module.exports = {
   pages: {
     popup: {
       template: 'public/browser-extension.html',
       entry: './src/popup/main.js',
-      title: 'Popup'
-    },
-    background: {
-      template: 'public/browser-extension.html',
-      entry: './src/background/main.js',
-      title: 'Background'
+      title: 'Popup',
     }
   },
   pluginOptions: {
     browserExtension: {
+      manifestSync: ['version'],
       components: {
         background: true,
         contentScripts: true
       },
-      manifestSync: ['version'],
       componentOptions: {
         background: {
-          entry: './src/background/main.js'
+          entry: 'src/background.js',
         },
         contentScripts: {
           entries: {
-            'content-script': [
-              'src/content-scripts/content-script.js'
-            ]
-          }
-        }
+            'content-script': ['src/content-scripts/content-script.js'],
+          },
+        },
       },
-    }
+    },
   },
   configureWebpack: {
     plugins: [
+      AutoImport({
+        resolvers: [ElementPlusResolver()],
+      }),
+      Components({
+        resolvers: [ElementPlusResolver(), IconsResolver()],
+      }),
+      Icons(),
       new ExtensionReloader({
-        port: 9091,
-        reloadPage: true,
-        entries: {
-          background: 'background',
-          extensionPage: ['popup'],
-        }
+        port: 9091
       })
-    ]
+    ],
   },
   chainWebpack: config => {
     const svgRule = config.module.rule("svg");

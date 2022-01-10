@@ -1,19 +1,27 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
-import router from '../router'
 import store from '../store'
-import '/src/plugins/element.js'
+import router from '../router'
 import IconSvg from '../components/Icon-svg'
+import { ElMessage } from 'element-plus'
+import 'element-plus/dist/index.css'
 import { getUserInfo } from '../api/login'
 import { getLocal, setLocal } from '../utils/chromeUtil'
 import { STORAGE } from '../constant/Constant'
+document.documentElement.setAttribute('data-theme', 'dark');
+['success', 'warning', 'info', 'error'].forEach(type => {
+  ElMessage[type] = msg => {
+    return ElMessage({
+      message: msg,
+      type: type,
+      duration: 2000
+    });
+  };
+});
 
-Vue.config.productionTip = false
-Vue.component('icon-svg', IconSvg)
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 const req = require.context('../svg', false, /\.svg$/)
 requireAll(req)
-
 
 getLocal([STORAGE.key], function (result) {
   if (!result[STORAGE.key]) {
@@ -30,13 +38,14 @@ getLocal([STORAGE.key], function (result) {
     chrome.extension.getBackgroundPage().closeSocket()
     setLocal({ [STORAGE.key]: '' })
     router.push({ name: 'Login' })
-  }).catch(e => {
+  }).catch(() => {
     router.push({ name: 'Error' })
   })
 })
 
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount('#app')
+createApp(App)
+  .use(router)
+  .use(store)
+  .component('icon-svg', IconSvg)
+  .provide('$message', ElMessage)
+  .mount('#app')

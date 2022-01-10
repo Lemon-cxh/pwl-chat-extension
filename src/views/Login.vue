@@ -1,12 +1,12 @@
 <template>
   <div>
     <el-form ref="form" :model="form" :rules="rules" label-width="100px" class="form">
-      <img class="center" width="100px" src="icons/1024.png"/>
+      <img class="center" width="100" src="icons/1024.png"/>
       <el-form-item label="用户名" prop="nameOrEmail">
         <el-input class="input" v-model.trim="form.nameOrEmail" ref="nameOrEmail"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="userPassword">
-        <el-input class="input" v-model.trim="form.userPassword" @keyup.enter.native="onSubmit" ref="userPassword" show-password></el-input>
+        <el-input class="input" v-model.trim="form.userPassword" @keyup.enter="onSubmit" ref="userPassword" show-password></el-input>
       </el-form-item>
       <el-form-item label-width="140px">
         <el-button type="info" @click="register">注册</el-button>
@@ -41,6 +41,7 @@ export default {
       },
     }
   },
+  inject: ['$message'],
   created() {
     let that = this;
     getLocal([STORAGE.nameOrEmail], function (result) {

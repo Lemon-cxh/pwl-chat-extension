@@ -1,31 +1,26 @@
 <template>
   <div>
-    <el-popover placement="left-start" width="208" v-model="visible">
-      <el-row type="flex" class="image-box">
+    <el-popover placement="left-start" :width="208" trigger="focus">
+      <template #reference>
+        <div tabindex ="0"><icon-svg icon-class="imageBtn"/></div>
+      </template>
+      <el-row class="image-box">
         <div class="image" v-for="(item, index) in images" :key="index">
           <div class="image-item">
             <img :src="item" class="image" @click="selectImage(item)" />
-            <i class="el-icon-error delete" @click="deleteImage(item)" />
+            <circle-close-filled class="svg-icon delete" @click="deleteImage(item)" />
           </div>
         </div>
         <icon-svg
           class="image-add"
           icon-class="imageAdd"
-          @click.native="
-            url = '';
-            drawer = true
-          "
+          @click=";(url = ''), (drawer = true)"
         />
       </el-row>
-      <icon-svg
-        slot="reference"
-        icon-class="imageBtn"
-        @click="visible = true"
-      />
     </el-popover>
     <el-drawer
       title="从URL导入表情"
-      :visible.sync="drawer"
+      v-model="drawer"
       direction="ttb"
       :with-header="false"
       size="auto"
@@ -33,11 +28,11 @@
       <el-row class="title">从URL导入表情</el-row>
       <el-row type="flex"
         ><el-input
-          size="mini"
+          size="small"
           width="80%"
           placeholder="请输入URL"
           v-model="url"
-        /><el-button size="mini" type="primary" @click.native="addImage"
+        /><el-button size="small" type="primary" @click="addImage"
           >提交</el-button
         ></el-row
       >
@@ -48,17 +43,22 @@
 <script>
 import { getCloudImage, syncCloudImage } from '../api/chat'
 import { mapGetters } from 'vuex'
+import { CircleCloseFilled } from '@element-plus/icons-vue'
 
 export default {
   name: 'images',
+  emits: ['sendMessage'],
+  components: {
+    CircleCloseFilled
+  },
   data() {
     return {
-      visible: false,
       drawer: false,
       url: '',
       images: [],
     }
   },
+  inject: ['$message'],
   computed: {
     ...mapGetters(['key']),
     form() {
@@ -78,7 +78,6 @@ export default {
     },
     selectImage(image) {
       this.$emit('sendMessage', '![image.png](' + image + ')')
-      this.visible = false
     },
     syncCloudImage(url) {
       let that = this
@@ -116,8 +115,7 @@ export default {
     getCloud(fun) {
       getCloudImage(this.form).then((res) => {
         if (0 === res.code) {
-          let images = JSON.parse(res.data)
-          images = fun(images)
+          fun(JSON.parse(res.data))
         }
       })
     },

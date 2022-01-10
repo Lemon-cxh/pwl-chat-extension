@@ -1,5 +1,5 @@
 import axios from 'axios'
-import Vue from 'vue'
+import { ElMessage } from 'element-plus'
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_URL,
@@ -17,10 +17,18 @@ service.interceptors.response.use(
     if (response.status === 200) {
       return response.data
     }
-    Vue.prototype.$message.error(response.data)
+    ElMessage.error({
+      message: response.data,
+      type: 'error',
+      duration: 2000
+    })
   },
   error => {
-    Vue.prototype.$message.error(error)
+    ElMessage.error({
+      message: error,
+      type: 'error',
+      duration: 2000
+    })
     return Promise.reject(error)
   })
 

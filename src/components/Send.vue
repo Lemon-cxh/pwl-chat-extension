@@ -3,10 +3,27 @@
     <div>
       <el-popover
         placement="bottom-start"
-        width="150"
+        :width="150"
         trigger="manual"
-        v-model="visible"
+        v-model:visible="visible"
       >
+      <template #reference>
+          <el-input
+            size="large"
+            placeholder="说点什么吧!"
+            v-model="content"
+            ref="contentInput"
+            class="input-with-select"
+            @paste.capture.prevent="pasteHandler"
+            @keyup.enter="sendHandler"
+          >
+            <template #append>
+              <el-button
+                @click="sendHandler"
+              ><promotion class="svg-icon" /></el-button>
+            </template>
+          </el-input>
+        </template>
         <div class="at-box">
           <el-row
             v-for="item in userList"
@@ -16,46 +33,33 @@
           >
             <el-row
               class="at-item"
-              type="flex"
-              @click.native="selectAt(item.userName)"
+                @click="selectAt(item.userName)"
             >
               <img class="at-image" :src="item.userAvatarURL" />
               <span class="at-text">{{ item.userName }}</span>
             </el-row>
           </el-row>
         </div>
-        <el-input
-          slot="reference"
-          placeholder="说点什么吧!"
-          v-model="content"
-          ref="contentInput"
-          class="input-with-select"
-          @paste.native.capture.prevent="pasteHandler"
-          @keyup.enter.native="sendHandler"
-        >
-          <el-button
-            slot="append"
-            icon="el-icon-s-promotion"
-            @click="sendHandler"
-          ></el-button>
-        </el-input>
       </el-popover>
     </div>
     <el-popover
       popper-class="quote-popover"
       placement="bottom-start"
+      width="auto"
       trigger="manual"
-      v-model="quoteVisible"
+      v-model:visible="quoteVisible"
     >
+      <template #reference>
+        <div style="width: 1px"></div>
+      </template>
       <div id="quote-content" class="quote-content">
-        <el-row type="flex" class="quote-user">
+        <el-row class="quote-user">
           <div>引用 @{{ quoteForm.userName }}</div>
-          <i class="el-icon-circle-close quote-close" @click="closeQuote" />
+          <circle-close-filled class="svg-icon quote-close" @click="closeQuote" />
         </el-row>
         <span v-if="quoteForm.content" v-html="quoteForm.content"></span>
         <el-row v-else>{{ quoteForm.md }}</el-row>
       </div>
-      <div style="width: 1px" slot="reference"></div>
     </el-popover>
   </div>
 </template>
@@ -64,6 +68,7 @@
 import { send, upload } from '../api/chat'
 import { getUserName } from '../api/user'
 import { mapGetters } from 'vuex'
+import { Promotion, CircleCloseFilled } from '@element-plus/icons-vue'
 
 export default {
   name: 'send',
@@ -79,6 +84,9 @@ export default {
         content: '',
       },
     }
+  },
+  components: {
+    Promotion, CircleCloseFilled
   },
   watch: {
     content(val) {
@@ -160,7 +168,8 @@ export default {
         let quoteForm = this.quoteForm
 
         form.content =
-          '**引用** **@' + this.buildAtUser(quoteForm.userName) + 
+          '**引用** **@' +
+          this.buildAtUser(quoteForm.userName) +
           '**\n> ' +
           (quoteForm.md ? quoteForm.md : quoteForm.content) +
           '\n\n并说:' +
@@ -172,8 +181,18 @@ export default {
       })
     },
     buildAtUser(userName) {
-      return '<a href="' + process.env.VUE_APP_BASE_URL + '/member/' + userName + '" class="name-at" aria-label="' + userName + '" rel="nofollow">' + userName + '</a>'
-    }
+      return (
+        '<a href="' +
+        process.env.VUE_APP_BASE_URL +
+        '/member/' +
+        userName +
+        '" class="name-at" aria-label="' +
+        userName +
+        '" rel="nofollow">' +
+        userName +
+        '</a>'
+      )
+    },
   },
 }
 </script>
@@ -196,9 +215,9 @@ export default {
   margin-right: 10px;
 }
 .quote-content {
-  color: black;
+  color: white;
   max-width: 230px;
-  max-height: 120px;
+  max-height: 200px;
   overflow: auto;
 }
 .quote-user {
@@ -213,10 +232,6 @@ export default {
 }
 </style>
 <style>
-.el-popover {
-  padding: 5px;
-  background-color: #333333;
-}
 .quote-popover {
   background-color: #a3db92;
 }

@@ -1,11 +1,11 @@
 <template>
   <div>
-    <el-row type="flex" :class="(isOwn ? 'own-chat-item ' : '') + 'chat-item'">
+    <el-row :class="(isOwn ? 'own-chat-item ' : '') + 'chat-item'">
       <el-row
         :class="(isOwn ? 'own-avatar ' : '') + 'avatar'"
-        @click.native="$emit('showUserCard', message.userName)"
+        @click="$emit('showUserCard', message.userName)"
       >
-        <el-avatar
+        <el-avatar size="default"
           :id="'avatar_' + message.oId"
           :src="message.userAvatarURL"
         ></el-avatar>
@@ -27,7 +27,7 @@
           v-if="isRedPacket"
           :oId="message.oId"
           :content="message.content"
-          @showRedpacketInfo="showRedpacketInfo"
+          @show-redpacket-info="showRedpacketInfo"
         />
         <!-- 内容消息 -->
         <div
@@ -38,34 +38,37 @@
           "
         >
           <el-popover
-            :ref="'popover_' + message.oId"
+            width="auto"
             placement="bottom"
             trigger="manual"
-            v-model="visible"
+            v-model:visible="visible"
           >
+          <template #reference>
+              <span
+                :id="'message_' + message.oId"
+                v-html="message.content"
+              ></span>
+            </template>
             <!-- 消息菜单 -->
-            <el-row type="flex" class="flex-column menu">
-              <el-row class="menu-item" @click.native="talkToHe">@他</el-row>
-              <el-row class="menu-item" @click.native="quote">引用</el-row>
-              <el-row v-if="message.md" class="menu-item" @click.native="$emit('sendMessage', message.md);closePopover()">+1</el-row>
+            <el-row class="flex-column menu">
+              <el-row class="menu-item" @click="talkToHe">@他</el-row>
+              <el-row class="menu-item" @click="quote">引用</el-row>
               <el-row
+                v-if="message.md"
                 class="menu-item"
-                v-show="imageUrl"
-                @click.native="collectImages"
+                @click="$emit('sendMessage', message.md) && closePopover()"
+                >+1</el-row
+              >
+              <el-row class="menu-item" v-show="imageUrl" @click="collectImages"
                 >收藏表情</el-row
               >
               <el-row
                 v-show="unlimitedRevoke || isOwn"
                 class="menu-item"
-                @click.native="$emit('revokeMessage', message);closePopover()"
+                @click="$emit('revokeMessage', message) && closePopover()"
                 >撤回</el-row
               >
             </el-row>
-            <span
-              :id="'message_' + message.oId"
-              slot="reference"
-              v-html="message.content"
-            ></span>
           </el-popover>
         </div>
         <el-row class="time">{{ getTime(message.time) }}</el-row>
@@ -74,7 +77,7 @@
         v-if="message.users"
         class="plus-one"
         icon-class="plusOne"
-        @click.native="plusOne"
+        @click="$emit('sendMessage', message.md)"
       />
     </el-row>
     <!-- 多少人+1显示 -->
@@ -89,7 +92,7 @@
         :src="item.userAvatarURL"
         :size="20"
         class="plus-one-avatar"
-        @click.native="$emit('showUserCard', item.userName)"
+        @click="$emit('showUserCard', item.userName)"
       />
       <el-row
         :class="isOwn ? 'plus-one-text own-plus-one-text ' : 'plus-one-text'"
@@ -101,7 +104,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import RedPacketMessage from './RedPacketMessage.vue'
 import { isRedPacket } from '../utils/util'
 import { getMd } from '../api/chat'
 
@@ -113,6 +115,7 @@ export default {
     unlimitedRevoke: Boolean,
     avatarPendant: Object,
   },
+  emits: ['quote', 'addContent', 'collectImages', 'showRedpacketInfo'],
   data() {
     return {
       visible: false,
@@ -135,7 +138,6 @@ export default {
       return isRedPacket(this.message)
     },
   },
-  components: { RedPacketMessage },
   methods: {
     getTime(time) {
       if (-1 === time.indexOf(this.date)) {
@@ -169,7 +171,7 @@ export default {
         this.closePopover()
         return
       }
-      getMd(form.oId).then(res => {
+      getMd(form.oId).then((res) => {
         form.md = res.replace(/<!--.*?-->/g, '')
         this.$emit('quote', form)
         this.closePopover()
@@ -184,7 +186,7 @@ export default {
       this.closePopover()
     },
     closePopover() {
-      this.$refs['popover_' + this.message.oId].doClose()
+      this.visible = false;
     },
     showRedpacketInfo(info) {
       this.$emit('showRedpacketInfo', info)
@@ -242,7 +244,7 @@ export default {
   background-color: #a3db92;
 }
 .content-background::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 22px;
   left: -14px;
@@ -255,7 +257,7 @@ export default {
   background-color: white;
 }
 .own-content-background::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 22px;
   right: -14px;
@@ -306,7 +308,7 @@ export default {
 }
 </style>
 <style>
-.el-popover {
+.el-popover.el-popper {
   min-width: 0px;
 }
 .content * {

@@ -1,17 +1,15 @@
-import Vue from 'vue'
-import App from './App.vue'
-import store from '../store'
-import { more, send, openRedPacket } from '../api/chat'
-import { notifications, getLocal, sendTabsMessage } from '../utils/chromeUtil'
+import { createApp } from 'vue'
+import store from './store'
+import { more, send, openRedPacket } from './api/chat'
+import { notifications, getLocal, sendTabsMessage } from './utils/chromeUtil'
 import {
   MESSAGE_TYPE,
   STORAGE,
   EVENT,
   MESSAGE_LIMIT,
   TABS_EVENT,
-} from '../constant/Constant'
+} from './constant/Constant'
 
-Vue.config.productionTip = false
 const URL = 'wss://fishpi.cn/chat-room-channel'
 const MAX_PAGE = 4
 let port = null
@@ -104,8 +102,8 @@ chrome.runtime.onConnect.addListener(function (p) {
     message: store.getters.message,
     online: store.getters.online,
   }
-  p.postMessage({ type: EVENT.loadMessage, data: message })
-  p.onMessage.addListener(function (msg) {
+  port.postMessage({ type: EVENT.loadMessage, data: message })
+  port.onMessage.addListener(function (msg) {
     switch (msg.type) {
       case EVENT.getMore:
         getMoreEvent()
@@ -124,7 +122,7 @@ chrome.runtime.onConnect.addListener(function (p) {
         break
     }
   })
-  p.onDisconnect.addListener(function () {
+  port.onDisconnect.addListener(function () {
     port.disconnect()
     port = null
     if (pop_message) {
@@ -138,7 +136,7 @@ chrome.runtime.onConnect.addListener(function (p) {
   })
 })
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request) {
   if (TABS_EVENT.sendMessage === request.type) {
     send({ content: request.data, apiKey: store.getters.key }).then()
     return
@@ -200,7 +198,5 @@ function clearBadgeText() {
   chrome.browserAction.setBadgeText({ text: '' })
 }
 
-new Vue({
-  store,
-  render: (h) => h(App),
-}).$mount('#app')
+createApp()
+  .use(store)

@@ -1,16 +1,18 @@
 <template>
   <el-popover
     placement="left-start"
-    width="220"
-    trigger="click"
-    v-model="redPacketDialogVisible"
+    :width="220"
+    v-model:visible="redPacketDialogVisible"
     @show="redPacketHandler"
   >
+    <template #reference>
+      <icon-svg icon-class="redPacketBtn" @click="redPacketDialogVisible = !redPacketDialogVisible" />
+    </template>
     <el-form
       ref="form"
       :rules="rules"
       :model="redPacketForm"
-      size="mini"
+      size="small"
       class="form"
     >
       <el-form-item label="类型" prop="type">
@@ -82,7 +84,6 @@
         <el-button type="primary" @click="sendRedPacket">发 送</el-button>
       </el-form-item>
     </el-form>
-    <icon-svg slot="reference" icon-class="redPacketBtn" />
   </el-popover>
 </template>
 
@@ -122,6 +123,7 @@ export default {
       },
     }
   },
+  inject: ['$message'],
   computed: {
     ...mapGetters(['key']),
     apiKey() {

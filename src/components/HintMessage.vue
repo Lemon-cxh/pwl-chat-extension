@@ -22,6 +22,7 @@ export default {
   props: {
     message: Object,
   },
+  emits: ['showRedpacketInfo', 'showUserCard'],
   computed: {
     ...mapGetters(["key"]),
     form() {
@@ -47,8 +48,8 @@ export default {
 
 <style scoped>
 .message {
-  text-align: center;
   font-size: 14px;
+  justify-content: center;
 }
 .text {
   color: #4183c4;

@@ -18,15 +18,15 @@ export default {
 body {
   background: #333333;
 }
-.el-dialog__wrapper .el-dialog__body{
-  background: #333333;
-  color: white;
+.el-popover {
+  --el-popover-bg-color: #333333 !important;
+  --el-popover-padding: 5px !important;
 }
-.el-dialog__wrapper .el-dialog__header{
-  background: #333333;
+.el-popover.el-popper {
+  background: var(--el-popover-bg-color) !important;
 }
-.el-dialog__wrapper .el-dialog__title {
-  color: white;
+.el-popper.is-light .el-popper__arrow::before {
+  background: #333333 !important;
 }
 .content img {
   max-width: 200px;

@@ -1,13 +1,13 @@
 <template>
   <el-dialog
     :title="info.info.userName"
-    :visible.sync="dialogVisible"
+    v-model="visible"
     width="70%"
     :show-close="false"
     :before-close="close"
     center
   >
-    <el-row type="flex" class="flex-column">
+    <el-row class="flex-column">
       <el-avatar :src="info.info.userAvatarURL"></el-avatar>
       <el-row class="item">{{ info.info.msg }}</el-row>
       <el-row class="count">{{
@@ -29,13 +29,11 @@
               :size="35"
               :src="item.avatar"
             ></el-avatar>
-            <el-row type="flex" class="flex-column user">
+            <el-row class="flex-column user">
               <el-row class="text">{{ item.userName }}</el-row>
               <el-row class="time">{{ item.time }}</el-row>
             </el-row>
-          </el-row>
-
-          <el-row type="flex" class="flex-column">
+            <el-row class="flex-column money-column">
             <el-row
               :class="'money' + (item.userMoney > 0 ? ' red' : ' green')"
               >{{ item.userMoney }}</el-row
@@ -46,6 +44,7 @@
               >{{ item.showMessage ? item.showMessage : '手气最佳' }}</el-row
             >
           </el-row>
+          </el-row>
         </el-row>
       </div>
     </el-row>
@@ -53,6 +52,7 @@
 </template>
 
 <script>
+import { toRefs } from 'vue'
 export default {
   name: 'redPacket',
   props: {
@@ -60,12 +60,17 @@ export default {
     dialogVisible: Boolean,
     userInfo: Object,
   },
+  emits: ['close'],
   data() {
     return {
       message: '',
       max: 0,
       count: 0
     }
+  },
+  setup(props) {
+    const {dialogVisible:visible} = toRefs(props)
+    return {visible}
   },
   watch: {
     info(val) {
@@ -104,11 +109,11 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  color: white;
 }
 .item {
   margin: 5px 0;
   text-align: center;
-  max-width: 80%;
 }
 .count {
   font-size: 16px;
@@ -135,8 +140,10 @@ export default {
 .green {
   color: rgb(11, 219, 11);
 }
-.money {
+.money-column {
   width: 80px;
+}
+.money {
   font-size: 18px;
   font-weight: bolder;
 }

@@ -1,13 +1,12 @@
 <template>
   <div>
-    <el-row type="flex"
-            :class="'red-packet' + (redPacket.got >= redPacket.count ? ' red-packet-mask' : '')"
-            @click.native="openRedPacket">
-      <el-row type="flex" class="flex-colunmn icon-box">
+    <el-row :class="'red-packet' + (redPacket.got >= redPacket.count ? ' red-packet-mask' : '')"
+            @click="openRedPacket">
+      <el-row class="flex-colunmn icon-box">
         <icon-svg class="icon" icon-class="redPacketMessage"/>
         <el-row>{{redPacketTypeMap.get(redPacket.type).label}}</el-row>
       </el-row>
-      <el-row type="flex" class="flex-colunmn content-box">
+      <el-row class="flex-colunmn content-box">
         <el-row>{{redPacket.msg}}</el-row>
       </el-row>
     </el-row>
@@ -25,6 +24,7 @@ export default {
     oId: String,
     content: String,
   },
+  emits: ['showRedpacketInfo'],
   data() {
     return {
       dialogVisible: false,
