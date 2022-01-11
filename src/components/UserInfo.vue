@@ -1,26 +1,26 @@
 <template>
   <el-row class="avatar">
-    <el-dropdown trigger="click" @command="handleCommand">
+    <el-dropdown @command="handleCommand">
       <el-badge :value="unreadCount" :hidden="unreadCount == 0">
         <el-avatar size="default" :src="userInfo.userAvatarURL"></el-avatar>
       </el-badge>
       <template #dropdown>
-      <el-dropdown-menu>
-        <el-dropdown-item command="openNotifications">
-          <bell class="svg-icon" />
-          通 知
-          <el-badge :value="unreadCount" :hidden="unreadCount == 0">
-          </el-badge>
-        </el-dropdown-item>
-        <el-dropdown-item command="showSetting">
-          <setting class="svg-icon" />
-          设 置
-        </el-dropdown-item>
-        <el-dropdown-item command="logout">
-          <switch-button class="svg-icon" />
-          登 出
-        </el-dropdown-item>
-      </el-dropdown-menu>
+        <el-dropdown-menu>
+          <el-dropdown-item command="openNotifications">
+            <bell class="svg-icon" />
+            通 知
+            <el-badge :value="unreadCount" :hidden="unreadCount == 0">
+            </el-badge>
+          </el-dropdown-item>
+          <el-dropdown-item command="showSetting">
+            <setting class="svg-icon" />
+            设 置
+          </el-dropdown-item>
+          <el-dropdown-item command="logout">
+            <switch-button class="svg-icon" />
+            登 出
+          </el-dropdown-item>
+        </el-dropdown-menu>
       </template>
     </el-dropdown>
 
@@ -96,7 +96,7 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import { countNotifications, makeReadAtNotifications } from '../api/user'
+import { countNotifications, makeReadNotifications } from '../api/notification'
 import { STORAGE, defaultOptions } from '../constant/Constant'
 import { setLocal, getSync, setSync } from '../utils/chromeUtil'
 import { Bell, Setting, SwitchButton } from '@element-plus/icons-vue'
@@ -105,7 +105,9 @@ export default {
   name: 'userInfo',
   emits: ['syncOptions'],
   components: {
-    Bell, Setting, SwitchButton
+    Bell,
+    Setting,
+    SwitchButton,
   },
   data() {
     return {
@@ -137,7 +139,7 @@ export default {
         this.unreadCount =
           res.unreadNotificationCnt - res.unreadAtNotificationCnt
         if (res.unreadAtNotificationCnt > 0) {
-          makeReadAtNotifications(this.apiKey).then()
+          makeReadNotifications('at', this.apiKey).then()
         }
       })
     },
@@ -145,7 +147,7 @@ export default {
       this[command]()
     },
     openNotifications() {
-      window.open(process.env.VUE_APP_BASE_URL + '/notifications/commented')
+      this.$router.push({ name: 'Notification' })
     },
     showSetting() {
       this.drawer = true

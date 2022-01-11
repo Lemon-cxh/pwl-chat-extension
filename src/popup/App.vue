@@ -23,11 +23,17 @@ body {
   --el-popover-bg-color: #333333 !important;
   --el-popover-padding: 5px !important;
 }
+.el-divider__text {
+  color: white !important;
+}
 .el-popover.el-popper {
   background: var(--el-popover-bg-color) !important;
 }
-.el-popper.is-light .el-popper__arrow::before {
+.el-popper.is-light .el-popper__arrow::before, .el-divider__text {
   background: #333333 !important;
+}
+.el-tabs__nav-wrap::after {
+  content: none !important;
 }
 .content img {
   max-width: 200px;

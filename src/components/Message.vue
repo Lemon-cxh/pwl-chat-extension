@@ -5,7 +5,8 @@
         :class="(isOwn ? 'own-avatar ' : '') + 'avatar'"
         @click="$emit('showUserCard', message.userName)"
       >
-        <el-avatar size="default"
+        <el-avatar
+          size="default"
           :id="'avatar_' + message.oId"
           :src="message.userAvatarURL"
         ></el-avatar>
@@ -34,7 +35,7 @@
           v-else
           :class="
             (isOwn ? 'own-content-background' : 'content-background') +
-            ' content'
+            ' message-content'
           "
         >
           <el-popover
@@ -43,7 +44,7 @@
             trigger="manual"
             v-model:visible="visible"
           >
-          <template #reference>
+            <template #reference>
               <span
                 :id="'message_' + message.oId"
                 v-html="message.content"
@@ -186,7 +187,7 @@ export default {
       this.closePopover()
     },
     closePopover() {
-      this.visible = false;
+      this.visible = false
     },
     showRedpacketInfo(info) {
       this.$emit('showRedpacketInfo', info)
@@ -232,7 +233,7 @@ export default {
 .user-name {
   margin-left: 5px;
 }
-.content {
+.message-content {
   padding: 5px;
   border-radius: 5px;
   font-size: 14px;
@@ -311,7 +312,7 @@ export default {
 .el-popover.el-popper {
   min-width: 0px;
 }
-.content * {
+.message-content * {
   max-width: 265px;
   overflow: auto;
 }

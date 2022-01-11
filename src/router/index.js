@@ -16,6 +16,11 @@ const routes = [
     name: 'Error',
     component: () => import('../views/Error.vue')
   },
+  {
+    path: '/notification',
+    name: 'Notification',
+    component: () => import('../views/Notification.vue')
+  },
 ]
 
 const router = createRouter({

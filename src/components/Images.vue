@@ -2,13 +2,16 @@
   <div>
     <el-popover placement="left-start" :width="208" trigger="focus">
       <template #reference>
-        <div tabindex ="0"><icon-svg icon-class="imageBtn"/></div>
+        <div tabindex="0"><icon-svg icon-class="imageBtn" /></div>
       </template>
       <el-row class="image-box">
         <div class="image" v-for="(item, index) in images" :key="index">
           <div class="image-item">
             <img :src="item" class="image" @click="selectImage(item)" />
-            <circle-close-filled class="svg-icon delete" @click="deleteImage(item)" />
+            <circle-close-filled
+              class="svg-icon delete"
+              @click="deleteImage(item)"
+            />
           </div>
         </div>
         <icon-svg
@@ -49,7 +52,7 @@ export default {
   name: 'images',
   emits: ['sendMessage'],
   components: {
-    CircleCloseFilled
+    CircleCloseFilled,
   },
   data() {
     return {
@@ -121,6 +124,7 @@ export default {
     },
     syncCloud(images) {
       let form = this.form
+      images = images.reverse()
       form.data = JSON.stringify(images)
       syncCloudImage(form).then((r) => {
         if (0 === r.code) {
