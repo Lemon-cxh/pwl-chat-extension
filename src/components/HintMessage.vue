@@ -1,9 +1,6 @@
 <template>
   <div>
-    <el-row class="message hint" v-if="message.revoke">
-      有人尝试撤回下条消息
-    </el-row>
-    <el-row v-else class="message">
+    <el-row class="message">
       <span class="text" @click="showUserCard(message.whoGot)">{{message.whoGot}}</span>
       <span> 抢到了 </span> 
       <span class="text" @click="showUserCard(message.whoGive)">{{message.whoGive}} </span>的

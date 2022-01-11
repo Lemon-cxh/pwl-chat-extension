@@ -47,8 +47,8 @@
             @show-redpacket-info="showRedpacketInfo"
           />
           <div v-else-if="!item.type || type.msg === item.type">
-            <hint-message v-if="item.revoke" :message="item" />
             <message
+              v-if="!item.revoke"
               :ref="'message_' + item.oId"
               :message="item"
               :date="date"
