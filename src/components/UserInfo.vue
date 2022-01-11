@@ -51,14 +51,6 @@
               />
               <span class="option-text">弹幕消息</span>
             </el-row>
-            <el-row class="option-item">
-              <el-switch
-                v-model="options.plusOne"
-                active-color="#13ce66"
-                @change="optionsChange"
-              />
-              <span class="option-text">自动+1</span>
-            </el-row>
           </el-row>
         </el-tab-pane>
         <el-tab-pane label="弹幕设置">

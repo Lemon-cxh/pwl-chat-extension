@@ -17,7 +17,6 @@ let count = 0
 let pop_message = false
 let options = {
   atNotification: true,
-  plusOne: true,
   barrageOptions: {
     enable: false
   }
@@ -149,7 +148,7 @@ chrome.runtime.onMessage.addListener(function (request) {
 })
 
 function messageEvent(message, isMsg) {
-  store.commit('addMessage', { message: message, isMsg: isMsg, plusOne: options.plusOne })
+  store.commit('addMessage', { message: message, isMsg: isMsg})
   if (port) {
     port.postMessage({ type: EVENT.message, data: message })
     return

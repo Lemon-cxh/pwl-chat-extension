@@ -29,7 +29,6 @@
       ></el-backtop>
       <div
         id="messageList"
-        class="list"
         v-infinite-scroll="load"
         :infinite-scroll-disabled="loading"
       >
@@ -153,12 +152,6 @@ export default {
     port = chrome.runtime.connect({name:'pwl-chat'})
     port.postMessage({ type: EVENT.syncUserInfo, data: that.userInfo })
     port.onMessage.addListener((msg) => that.messageListener(msg))
-    port.onDisconnect.addListener(function () {
-      alert('断开连接')
-      port.disconnect()
-      port = chrome.runtime.connect({name:'pwl-chat'})
-      port.onMessage.addListener((msg) => that.messageListener(msg))
-    })
     this.avatarPendant.isChristmas =
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
   },
@@ -178,6 +171,11 @@ export default {
           this.clickA(dom)
         }
       })
+  },
+  beforeUnmount() {
+    if (port) {
+      port.disconnect()
+    }
   },
   methods: {
     messageListener(msg) {

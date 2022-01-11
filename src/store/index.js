@@ -3,20 +3,7 @@ import { getUserInfo } from '../api/login'
 import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
 import { setLocal, getLocal } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
-import { send, openRedPacket } from '../api/chat'
-
-let lastMessage = ''
-
-async function sendMessage(content, key) {
-  send({ content: content, apiKey: key }).then()
-}
-
-function verifyPlusOne(message) {
-  return (
-    !/^(小冰|嘿siri|小爱同学)/.test(message) &&
-    !/^~\s{1}[\u4e00-\u9fa5]{4,}$/.test(message)
-  )
-}
+import { openRedPacket } from '../api/chat'
 
 export default createStore({
   state: {
@@ -99,36 +86,27 @@ export default createStore({
         state.message.unshift(message.message)
         return
       }
-      // 自动 +1 逻辑
+      // +1 消息折叠
       let last = state.message[0]
       if (!last || message.message.md !== last.md) {
         state.message.unshift(message.message)
         return
       }
       let { users = [], oIds = [] } = last
-      let length = users.push({
+      users.push({
         userName: message.message.userName,
         userAvatarURL: message.message.userAvatarURL,
       })
       oIds.push(message.oId)
       state.message[0].users = users
       state.message[0].oIds = oIds
-      if (
-        message.plusOne &&
-        lastMessage !== message.message.md &&
-        length === 3 &&
-        last.userName !== state.userInfo.userName &&
-        verifyPlusOne(message.message.md)
-      ) {
-        lastMessage = message.message.md
-        sendMessage(message.message.md, state.key)
-      }
     },
     concatMessage(state, data) {
       state.messageTotal += data.size
       let index = state.message.length - 1
       let last = state.message[index]
       let message = data.message[0]
+      // +1 消息折叠
       if (!last || last.content !== message.content) {
         state.message = state.message.concat(data.message)
         return

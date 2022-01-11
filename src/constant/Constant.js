@@ -38,7 +38,7 @@ export const TABS_EVENT = {
 }
 
 export const defaultOptions = {
-  atNotification: true, plusOne: true, barrageOptions: {
+  atNotification: true, barrageOptions: {
     enable: false,
     fontSize: 16,
     opacity: 0.5,
