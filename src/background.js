@@ -184,10 +184,31 @@ function getMoreEvent() {
   let pageParams = store.getters.pageParams
   more({ page: pageParams.page, apiKey: store.getters.key }).then((res) => {
     if (res.code === 0) {
-      let data = res.data.slice(res.data.length - pageParams.length)
-      store.commit('concatMessage', data)
+      let data = res.data.slice(res.data.length - pageParams.length).reverse()
+      let arr = []
+      for (let index = 0; index < data.length; index++) {
+        if (index === 0) {
+          arr.unshift(data[index])
+          continue
+        }
+        let e = data[index];
+        let last = arr[0]
+        if (last.content !== e.content) {
+          arr.unshift(e)
+          continue
+        }
+        let {users = [], oIds = []} = last
+        users.push({
+          userName: e.userName,
+          userAvatarURL: e.userAvatarURL,
+        })
+        oIds.push(e.oId)
+        arr[0].users = users;
+        arr[0].oIds = oIds;
+      }
+      store.commit('concatMessage', {message: arr, size: data.length })
       if (port) {
-        port.postMessage({ type: EVENT.more, data: data })
+        port.postMessage({ type: EVENT.more, data: arr })
       }
     }
   })

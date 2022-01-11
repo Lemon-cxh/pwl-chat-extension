@@ -5,6 +5,7 @@ import { setLocal, getLocal } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
 import { send, openRedPacket } from '../api/chat'
 
+let lastMessage = ''
 
 async function sendMessage(content, key) {
   send({ content: content, apiKey: key }).then()
@@ -104,12 +105,7 @@ export default createStore({
         state.message.unshift(message.message)
         return
       }
-      let users = last.users,
-        oIds = last.oIds
-      if (!last.users) {
-        users = []
-        oIds = []
-      }
+      let { users = [], oIds = [] } = last
       let length = users.push({
         userName: message.message.userName,
         userAvatarURL: message.message.userAvatarURL,
@@ -119,16 +115,39 @@ export default createStore({
       state.message[0].oIds = oIds
       if (
         message.plusOne &&
+        lastMessage !== message.message.md &&
         length === 3 &&
         last.userName !== state.userInfo.userName &&
         verifyPlusOne(message.message.md)
       ) {
+        lastMessage = message.message.md
         sendMessage(message.message.md, state.key)
       }
     },
-    concatMessage(state, message) {
-      state.message = state.message.concat(message)
-      state.messageTotal += message.length
+    concatMessage(state, data) {
+      state.messageTotal += data.size
+      let index = state.message.length - 1
+      let last = state.message[index]
+      let message = data.message[0]
+      if (!last || last.content !== message.content) {
+        state.message = state.message.concat(data.message)
+        return
+      }
+      let { users = [], oIds = [] } = message
+      users.push({
+        userName: last.userName,
+        userAvatarURL: last.userAvatarURL,
+      })
+      oIds.push(last.oId)
+      if (last.users) {
+        message.users = users.concat(last.users)
+        message.oIds = oIds.concat(last.oIds)
+      } else {
+        message.users.users = users
+        message.oIds = oIds
+      }
+      state.message[index] = message
+      state.message = state.message.concat(data.message.slice(1))
     },
     clearMessage(state) {
       state.message = []

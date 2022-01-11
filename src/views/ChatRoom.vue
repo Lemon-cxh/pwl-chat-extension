@@ -128,7 +128,15 @@ export default {
       messageArray.value.unshift(msg)
     }
     const pushMessage = (msg) => {
-      messageArray.value.push(...msg)
+      let index = messageArray.value.length - 1
+      let last = messageArray.value[index]
+      let message = msg[0]
+      if (!last || last.content !== message.content) {
+        messageArray.value.push(...msg)
+        return
+      }
+      messageArray.value[index] = message
+      messageArray.value.push(...msg.slice(1))
     }
     const updateMessage = (index, property, value) => {
       messageArray.value[index][property] = value
