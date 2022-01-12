@@ -1,9 +1,11 @@
 <template>
   <div id="chatRoom">
     <!-- 活跃度，头像，输入框 -->
-    <liveness />
+    <!-- <liveness /> -->
     <el-row class="user-box">
+      <liveness>
       <user-info @sync-options="syncOptions" />
+      </liveness>
       <send ref="messageInput" />
     </el-row>
     <!-- 菜单按钮 -->
@@ -149,7 +151,7 @@ export default {
   },
   created() {
     let that = this
-    port = chrome.runtime.connect({name:'pwl-chat'})
+    port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.postMessage({ type: EVENT.syncUserInfo, data: that.userInfo })
     port.onMessage.addListener((msg) => that.messageListener(msg))
     this.avatarPendant.isChristmas =
@@ -215,10 +217,7 @@ export default {
         return
       }
       let last = this.messageArray[0]
-      if (!last || !last.md) {
-        return
-      }
-      if (message.md !== last.md || isRedPacket(message)) {
+      if (!last || !last.md || message.md !== last.md || isRedPacket(message)) {
         this.unshiftMessage(message)
         return
       }
