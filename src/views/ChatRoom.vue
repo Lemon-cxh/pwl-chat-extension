@@ -3,9 +3,7 @@
     <!-- 活跃度，头像，输入框 -->
     <!-- <liveness /> -->
     <el-row class="user-box">
-      <liveness>
       <user-info @sync-options="syncOptions" />
-      </liveness>
       <send ref="messageInput" />
     </el-row>
     <!-- 菜单按钮 -->
