@@ -87,6 +87,7 @@ export default {
       this.max = max
       this.count = count
       if (has) {
+        this.message = ''
         return
       }
       this.message = val.recivers && val.recivers.length > 0 &&
