@@ -77,17 +77,23 @@ export default {
       let userName = this.userInfo.userName
       let max = 0
       let count = 0
-      let has = false
+      let info = {
+        has: false,
+        userMoney: 0
+      }
       val.who.forEach((e) => {
         max = Math.max(max, e.userMoney)
         count += e.userMoney
         e.showMessage = this.showMessage(e.userMoney)
-        has = has ? has : e.userName === userName
+        if (e.userName === userName) {
+          info.has = true
+          info.userMoney = e.userMoney
+        }
       })
       this.max = max
       this.count = count
-      if (has) {
-        this.message = ''
+      if (info.has) {
+        this.message = `抢到了${info.userMoney}积分`
         return
       }
       this.message = val.recivers && val.recivers.length > 0 &&
@@ -118,10 +124,13 @@ export default {
 }
 .count {
   font-size: 16px;
+  margin-bottom: 3px;
 }
 .who-box {
-  max-height: 280px;
+  max-height: 285px;
   overflow: auto;
+  border-top: 1px solid;
+  margin-top: 3px;
 }
 .user {
   width: 150px;
