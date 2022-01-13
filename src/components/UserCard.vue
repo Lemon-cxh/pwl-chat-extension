@@ -36,7 +36,7 @@
             }}</span>
             <span>{{ userInfo.userNickname ? userInfo.userName : '' }}</span>
           </el-row>
-          <el-row style="height:20px;margin: 3px 5px;">
+          <el-row style="height: 20px; margin: 3px 5px">
             <template v-if="userInfo.sysMetal">
               <img
                 v-for="(item, index) in userInfo.sysMetal.list"
@@ -61,7 +61,8 @@
 </template>
 
 <script>
-import { toRefs } from 'vue'
+import { mapGetters } from 'vuex'
+import { getUserInfo } from '../api/user'
 import { Medal, Avatar, Coin, LocationFilled } from '@element-plus/icons-vue'
 
 export default {
@@ -72,14 +73,32 @@ export default {
     Coin,
     LocationFilled,
   },
+  emits: ['closeDialog'],
   props: {
     dialogVisible: Boolean,
-    userInfo: Object,
+    userName: String,
   },
-  emits: ['closeDialog'],
-  setup(props) {
-    const { dialogVisible: visible } = toRefs(props)
-    return { visible }
+  data() {
+    return {
+      userInfo: {},
+    }
+  },
+  computed: {
+    ...mapGetters(['key']),
+    visible() {
+      return this.dialogVisible
+    }
+  },
+  watch: {
+    userName(newValue) {
+      getUserInfo(newValue, { apiKey: this.key }).then((res) => {
+        let info = res
+        if (info.sysMetal) {
+          info.sysMetal = JSON.parse(info.sysMetal)
+        }
+        this.userInfo = info
+      })
+    },
   },
   methods: {
     getBackgroundImage(url) {

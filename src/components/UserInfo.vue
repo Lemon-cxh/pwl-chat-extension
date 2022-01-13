@@ -5,7 +5,7 @@
         class="progress"
         type="circle"
         :percentage="percentage"
-        width="52"
+        :width=52
         :color="colors"
         :show-text="false"
       >
@@ -247,14 +247,6 @@ export default {
   left: -3px;
   top: -5px;
 }
-</style>
-<style>
-.el-progress--without-text .el-progress__text {
-  display: block !important;
-}
-.el-progress--circle .el-progress__text, .el-progress--dashboard .el-progress__text {
-  top: 52%;
-}
 .avatar {
   width: 60px;
   height: 40px;
@@ -276,6 +268,12 @@ export default {
 }
 </style>
 <style>
+.el-progress--without-text .el-progress__text {
+  display: block !important;
+}
+.el-progress--circle .el-progress__text, .el-progress--dashboard .el-progress__text {
+  top: 52%;
+}
 .el-dropdown-menu,
 .el-drawer__body {
   background-color: #333333;

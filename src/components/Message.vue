@@ -116,7 +116,15 @@ export default {
     unlimitedRevoke: Boolean,
     avatarPendant: Object,
   },
-  emits: ['quote', 'addContent', 'collectImages', 'showRedpacketInfo'],
+  emits: [
+    'quote',
+    'addContent',
+    'collectImages',
+    'showRedpacketInfo',
+    'showUserCard',
+    'sendMessage',
+    'revokeMessage',
+  ],
   data() {
     return {
       visible: false,

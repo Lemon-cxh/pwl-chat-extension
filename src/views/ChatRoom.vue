@@ -70,7 +70,7 @@
       </div>
     </div>
     <user-card
-      :userInfo="userCardInfo"
+      :userName="userName"
       :dialogVisible="dialogVisible"
       @close-dialog="dialogVisible = false"
     />
@@ -88,7 +88,6 @@ import { ref } from 'vue'
 import { EVENT, MESSAGE_TYPE, TABS_EVENT } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
 import { sendTabsMessage } from '../utils/chromeUtil'
-import { getUserInfo } from '../api/user'
 import { mapGetters } from 'vuex'
 import { revoke } from '../api/chat'
 
@@ -101,7 +100,7 @@ export default {
       loading: true,
       date: getDate(),
       dialogVisible: false,
-      userCardInfo: {},
+      userName: '',
       redPacketInfo: {
         info: {},
       },
@@ -270,18 +269,13 @@ export default {
           process.env.VUE_APP_BASE_URL + '/forward?goto=',
           ''
         )
+        dom.target = '_blank'
         dom.href = decodeURIComponent(href)
       }
     },
     showUserCard(name) {
-      getUserInfo(name, this.apiKey).then((res) => {
-        let userCardInfo = res
-        if (userCardInfo.sysMetal) {
-          userCardInfo.sysMetal = JSON.parse(userCardInfo.sysMetal)
-        }
-        this.userCardInfo = userCardInfo
-        this.dialogVisible = true
-      })
+      this.userName = name
+      this.dialogVisible = true
     },
     updateRedPacket(oId) {
       let msg

@@ -23,6 +23,9 @@ body {
   --el-popover-bg-color: #333333 !important;
   --el-popover-padding: 5px !important;
 }
+.el-dialog {
+  margin: 50px auto 0 !important;
+}
 .el-divider__text {
   color: white !important;
 }
