@@ -3,7 +3,10 @@
     <el-row justify="space-between">
       <el-page-header @back="goBack">
         <template #content>
-          <a target="_blank" :href="getNotificationUrl()" class="page-header"
+          <a
+            target="_blank"
+            :href="getNotificationUrl('/notifications/' + tabsName)"
+            class="page-header"
             >通知</a
           >
           <el-badge
@@ -12,6 +15,18 @@
           />
         </template>
       </el-page-header>
+      <span
+        class="mark-notification"
+        v-if="count.unreadNewFollowerNotificationCnt > 0"
+      >
+        <a
+          target="_blank"
+          :href="getNotificationUrl('/member/Lemon/followers')"
+          class="page-header"
+          >新关注者</a
+        >
+        <el-badge :value="count.unreadNewFollowerNotificationCnt" />
+      </span>
       <span class="mark-notification" @click="makeReadNotifications()">
         标记为已读
         <finished class="svg-icon" />
@@ -58,8 +73,8 @@
         <template #label>
           <span>我关注的</span>
           <el-badge
-            v-show="count.unreadNewFollowerNotificationCnt > 0"
-            :value="count.unreadNewFollowerNotificationCnt"
+            v-show="count.unreadFollowingNotificationCnt > 0"
+            :value="count.unreadFollowingNotificationCnt"
           />
         </template>
       </el-tab-pane>
@@ -84,7 +99,12 @@
         </template>
       </el-tab-pane>
     </el-tabs>
-    <el-scrollbar ref="scrollbarRef" height="480px" @scroll="scroll">
+    <el-scrollbar
+      id="notification-box"
+      ref="scrollbarRef"
+      height="480px"
+      @scroll="scroll"
+    >
       <template v-for="item in list" :key="item.oId">
         <el-row :class="{ read: item.hasRead }">
           <el-divider content-position="left" style="margin-top: 15px"
@@ -146,6 +166,11 @@
         @click="backTop()"
       />
     </el-scrollbar>
+    <user-card
+      :userName="userName"
+      :dialogVisible="dialogVisible"
+      @close-dialog="dialogVisible = false"
+    />
   </div>
 </template>
 
@@ -185,6 +210,9 @@ export default {
       },
       showTop: false,
       nodata: false,
+      loading: false,
+      userName: '',
+      dialogVisible: false,
     }
   },
   computed: {
@@ -209,23 +237,38 @@ export default {
     this.getCountNotifications()
     this.load()
   },
+  mounted() {
+    document
+      .getElementById('notification-box')
+      .addEventListener('click', (event) => {
+        let dom = event.target
+        if (dom.tagName !== 'A') {
+          return
+        }
+        if (dom.className === 'name-at') {
+          dom.href='javascript:;'
+          this.userName = dom.innerText
+          this.dialogVisible = true
+        } else {
+          dom.target = '_blank'
+        }
+      })
+  },
   methods: {
-    getNotificationUrl() {
-      return process.env.VUE_APP_BASE_URL + '/notifications/commented'
+    getNotificationUrl(url) {
+      return process.env.VUE_APP_BASE_URL + url
     },
     getUrl(url) {
-      return url ? process.env.VUE_APP_BASE_URL + url : ''
+      return url ? process.env.VUE_APP_BASE_URL + url : 'javascript:;'
     },
     goBack() {
       this.$router.push({ name: 'ChatRoom' })
     },
     backTop() {
-      let height = this.$refs.scrollbarRef.wrap$.scrollHeight
-      while (height-- > 0) {
-        this.$refs.scrollbarRef.setScrollTop(height)
-      }
+      this.$refs.scrollbarRef.setScrollTop(0)
     },
     handleClick() {
+      this.loading = true
       this.nodata = false
       this.page = 0
       this.list = []
@@ -235,8 +278,7 @@ export default {
     scroll({ scrollTop }) {
       this.showTop = scrollTop > 100
       let height = this.$refs.scrollbarRef.wrap$.scrollHeight - 480
-      console.log(scrollTop, height)
-      if (scrollTop === height) {
+      if (!this.loading && scrollTop === height) {
         this.load()
       }
     },
@@ -253,6 +295,7 @@ export default {
       }
       this.page += 1
       getNotifications(this.params).then((res) => {
+        this.loading = false
         if (0 === res.code) {
           if (res.data.length === 0) {
             this.nodata = true
