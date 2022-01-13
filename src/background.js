@@ -11,7 +11,7 @@ import {
 } from './constant/Constant'
 
 const URL = 'wss://fishpi.cn/chat-room-channel'
-const MAX_PAGE = 4
+const MAX_PAGE = 2
 let port = null
 let count = 0
 let pop_message = false

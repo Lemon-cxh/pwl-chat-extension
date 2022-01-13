@@ -33,68 +33,16 @@
       </span>
     </el-row>
     <el-tabs v-model="tabsName" @tab-click="handleClick">
-      <el-tab-pane name="commented">
+      <el-tab-pane
+        v-for="item in typeArray"
+        :key="item.name"
+        :name="item.name"
+      >
         <template #label>
-          <span>收到的回帖</span>
+          <span>{{item.title}}</span>
           <el-badge
-            v-show="count.unreadCommentedNotificationCnt > 0"
-            :value="count.unreadCommentedNotificationCnt"
-          />
-        </template>
-      </el-tab-pane>
-      <el-tab-pane name="reply">
-        <template #label>
-          <span>收到的回复</span>
-          <el-badge
-            v-show="count.unreadReplyNotificationCnt > 0"
-            :value="count.unreadReplyNotificationCnt"
-          />
-        </template>
-      </el-tab-pane>
-      <el-tab-pane name="point">
-        <template #label>
-          <span>积分</span>
-          <el-badge
-            v-show="count.unreadPointNotificationCnt > 0"
-            :value="count.unreadPointNotificationCnt"
-          />
-        </template>
-      </el-tab-pane>
-      <el-tab-pane name="at">
-        <template #label>
-          <span>提及我的</span>
-          <el-badge
-            v-show="count.unreadAtNotificationCnt > 0"
-            :value="count.unreadAtNotificationCnt"
-          />
-        </template>
-      </el-tab-pane>
-      <el-tab-pane name="following">
-        <template #label>
-          <span>我关注的</span>
-          <el-badge
-            v-show="count.unreadFollowingNotificationCnt > 0"
-            :value="count.unreadFollowingNotificationCnt"
-          />
-        </template>
-      </el-tab-pane>
-      <el-tab-pane name="broadcast">
-        <template #label>
-          <span>同城</span>
-          <el-badge
-            v-show="count.unreadBroadcastNotificationCnt > 0"
-            :value="count.unreadBroadcastNotificationCnt"
-          />
-        </template>
-      </el-tab-pane>
-      <el-tab-pane name="sys-announce">
-        <template #label>
-          <span>系统</span>
-          <el-badge
-            v-show="
-              count.unreadAtNotiunreadSysAnnounceNotificationCntficationCnt > 0
-            "
-            :value="count.unreadSysAnnounceNotificationCnt"
+            v-show="count[item.count] > 0"
+            :value="count[item.count]"
           />
         </template>
       </el-tab-pane>
@@ -182,7 +130,7 @@ import {
   makeReadNotifications,
 } from '../api/notification'
 import { getDateTime } from '../utils/util'
-import { type } from '../constant/NotificationConstant'
+import { type, typeArray } from '../constant/NotificationConstant'
 import { Finished } from '@element-plus/icons-vue'
 
 export default {
@@ -195,6 +143,7 @@ export default {
       loadDisabled: true,
       list: [],
       type: type,
+      typeArray: typeArray,
       count: {
         unreadNotificationCnt: 0,
         code: 0,
@@ -246,7 +195,7 @@ export default {
           return
         }
         if (dom.className === 'name-at') {
-          dom.href='javascript:;'
+          dom.href = 'javascript:;'
           this.userName = dom.innerText
           this.dialogVisible = true
         } else {

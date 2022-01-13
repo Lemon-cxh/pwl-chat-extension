@@ -1,3 +1,40 @@
+export const typeArray = [
+  {
+    name: 'commented',
+    title: '收到的回帖',
+    count: 'unreadCommentedNotificationCnt',
+  },
+  {
+    name: 'reply',
+    title: '收到的回复',
+    count: 'unreadReplyNotificationCnt',
+  },
+  {
+    name: 'point',
+    title: '积分',
+    count: 'unreadPointNotificationCnt',
+  },
+  {
+    name: 'at',
+    title: '提及我的',
+    count: 'unreadAtNotificationCnt',
+  },
+  {
+    name: 'following',
+    title: '我关注的',
+    count: 'unreadFollowingNotificationCnt',
+  },
+  {
+    name: 'broadcast',
+    title: '同城',
+    count: 'unreadBroadcastNotificationCnt',
+  },
+  {
+    name: 'sys-announce',
+    title: '系统',
+    count: 'unreadAtNotiunreadSysAnnounceNotificationCntficationCnt',
+  },
+]
 export const type = new Map([
   [
     'commented',
@@ -24,37 +61,34 @@ export const type = new Map([
   [
     'at',
     {
-      '38': 
-      {
+      38: {
         title: '聊天室消息',
         avatar: 'userAvatarURL',
         userName: 'userName',
         content: 'content',
         time: 'createTime',
       },
-      '39': {
+      39: {
         title: '聊天室红包',
         avatar: 'userAvatarURL',
         userName: 'userName',
         content: 'content',
         time: 'createTime',
-      },      
-      '24':
-      {
+      },
+      24: {
         title: '帖子',
         avatar: 'thumbnailURL',
         userName: 'userName',
         content: 'description',
         time: 'createTime',
       },
-      '27':
-      {
+      27: {
         title: '帖子',
         avatar: 'thumbnailURL',
         userName: 'userName',
         content: 'description',
         time: 'createTime',
-      }
+      },
     },
   ],
   [
