@@ -1,7 +1,6 @@
 <template>
   <div id="chatRoom">
     <!-- 活跃度，头像，输入框 -->
-    <!-- <liveness /> -->
     <el-row class="user-box">
       <user-info @sync-options="syncOptions" />
       <send ref="messageInput" />
@@ -20,55 +19,58 @@
       </el-row>
     </el-row>
     <!-- 消息列表 -->
-    <div class="infinite-list-wrapper" style="overflow: auto; height: 420px">
-      <el-backtop
-        target=".infinite-list-wrapper"
-        :bottom="20"
-        :right="20"
-        :visibility-height="100"
-      ></el-backtop>
+    <div v-show="hasNewMessage" class="new-message-tip">
+      <info-filled class="svg-icon" />有新消息啦
+    </div>
+    <el-scrollbar
+      id="messageList"
+      ref="messageScrollbar"
+      height="420px"
+      always
+      @scroll="scroll"
+    >
       <div
-        id="messageList"
-        v-infinite-scroll="load"
-        :infinite-scroll-disabled="loading"
+        ref="inner"
+        v-for="item in messageArray"
+        v-bind:key="
+          type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
+        "
+        class="infinite-list-item"
       >
-        <div
-          ref="inner"
-          v-for="item in messageArray"
-          v-bind:key="
-            type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
-          "
-          class="infinite-list-item"
-        >
-          <hint-message
-            v-if="item.type && type.redPacketStatus === item.type"
+        <hint-message
+          v-if="item.type && type.redPacketStatus === item.type"
+          :message="item"
+          @show-user-card="showUserCard"
+          @show-redpacket-info="showRedpacketInfo"
+        />
+        <div v-else-if="!item.type || type.msg === item.type">
+          <message
+            v-if="!item.revoke"
+            :ref="'message_' + item.oId"
             :message="item"
+            :date="date"
+            :unlimitedRevoke="unlimitedRevoke"
+            :avatarPendant="avatarPendant"
+            @revoke-message="revokeMessage"
             @show-user-card="showUserCard"
+            @collect-images="collectImages"
+            @add-content="addContent"
+            @send-message="sendMessage"
+            @quote="quote"
             @show-redpacket-info="showRedpacketInfo"
           />
-          <div v-else-if="!item.type || type.msg === item.type">
-            <message
-              v-if="!item.revoke"
-              :ref="'message_' + item.oId"
-              :message="item"
-              :date="date"
-              :unlimitedRevoke="unlimitedRevoke"
-              :avatarPendant="avatarPendant"
-              @revoke-message="revokeMessage"
-              @show-user-card="showUserCard"
-              @collect-images="collectImages"
-              @add-content="addContent"
-              @send-message="sendMessage"
-              @quote="quote"
-              @show-redpacket-info="showRedpacketInfo"
-            />
-          </div>
-        </div>
-        <div class="icon-box">
-          <icon-svg icon-class="loading" class="loading" v-if="loading" />
         </div>
       </div>
-    </div>
+      <div class="icon-box">
+        <icon-svg icon-class="loading" class="loading" v-if="loading" />
+      </div>
+      <icon-svg
+        icon-class="top"
+        class="back-top"
+        v-show="showTop"
+        @click="backTop()"
+      />
+    </el-scrollbar>
     <user-card
       :userName="userName"
       :dialogVisible="dialogVisible"
@@ -84,17 +86,22 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, defineAsyncComponent } from 'vue'
 import { EVENT, MESSAGE_TYPE, TABS_EVENT } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
 import { sendTabsMessage } from '../utils/chromeUtil'
 import { mapGetters } from 'vuex'
 import { revoke } from '../api/chat'
+import { InfoFilled } from '@element-plus/icons-vue'
 
 let port
 
 export default {
   name: 'chatRoom',
+  components: {
+    InfoFilled,
+    UserInfo: defineAsyncComponent(() => import('../components/UserInfo.vue')),
+  },
   data() {
     return {
       loading: true,
@@ -108,6 +115,9 @@ export default {
       redPacketVisible: false,
       type: MESSAGE_TYPE,
       avatarPendant: {},
+      showTop: false,
+      isTop: true,
+      hasNewMessage: false,
     }
   },
   inject: ['$message'],
@@ -148,14 +158,16 @@ export default {
   },
   created() {
     let that = this
+    // 连接background.js
     port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.postMessage({ type: EVENT.syncUserInfo, data: that.userInfo })
     port.onMessage.addListener((msg) => that.messageListener(msg))
+    // 是否展示圣诞头像挂件
     this.avatarPendant.isChristmas =
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
   },
   mounted() {
-    document.getElementById('messageList').oncontextmenu = () => {
+    document.getElementById('messageList').oncontextmenu = (event) => {
       this.showMessageMenu(event)
       return false
     }
@@ -180,13 +192,13 @@ export default {
     messageListener(msg) {
       switch (msg.type) {
         case EVENT.loadMessage:
-          this.pushMessage(msg.data.message)
-          this.online = msg.data.online
-          if (msg.data.length === 0) {
+          if (msg.data.message.length === 0) {
             this.load()
           } else {
+            this.pushMessage(msg.data.message)
             this.loading = false
           }
+          this.online = msg.data.online
           break
         case EVENT.message:
           this.messageEvent(msg.data)
@@ -210,12 +222,12 @@ export default {
     },
     messageEvent(message) {
       if (message.type !== this.type.msg) {
-        this.unshiftMessage(message)
+        this.newMessage(message)
         return
       }
       let last = this.messageArray[0]
       if (!last || !last.md || message.md !== last.md || isRedPacket(message)) {
-        this.unshiftMessage(message)
+        this.newMessage(message)
         return
       }
       let users = last.users ? last.users : []
@@ -225,11 +237,28 @@ export default {
       })
       this.updateMessage(0, 'users', users)
     },
+    newMessage(message) {
+      this.unshiftMessage(message)
+      if (!this.isTop) {
+        this.hasNewMessage = true
+      }
+    },
+    scroll({ scrollTop }) {
+      this.isTop = scrollTop < 50
+      this.showTop = scrollTop > 100
+      let distance =
+        this.$refs.messageScrollbar.wrap$.scrollHeight - scrollTop - 420
+      if (!this.loading && distance < 10) {
+        this.load()
+      }
+    },
     load() {
       this.loading = true
-      setTimeout(() => {
-        this.more()
-      }, 300)
+      this.more()
+    },
+    backTop() {
+      this.$refs.messageScrollbar.setScrollTop(0)
+      this.hasNewMessage = false
     },
     more() {
       port.postMessage({ type: EVENT.getMore })
@@ -364,10 +393,6 @@ export default {
   width: 100%;
   text-align: center;
 }
-.icon {
-  color: white;
-  font-size: 26px;
-}
 .loading {
   animation: rotate 1s linear infinite;
   font-size: 24px;
@@ -386,6 +411,24 @@ export default {
 .menu-item {
   margin: 0 3px;
 }
+.new-message-tip {
+  position: fixed;
+  top: 85px;
+  left: calc(50% - 70px);
+  height: 30px;
+  line-height: 30px;
+  width: 140px;
+  font-size: 16px;
+  text-align: center;
+  color: #8ac36d;
+  background-color: rgb(57 86 43);
+  border: 1px solid rgb(63 161 15);
+  border-radius: 5px;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 @keyframes rotate {
   from {
     transform: rotate(0deg);
@@ -393,11 +436,5 @@ export default {
   to {
     transform: rotate(360deg);
   }
-}
-</style>
-<style>
-.el-backtop,
-.el-backtop:hover {
-  background-color: #565656;
 }
 </style>

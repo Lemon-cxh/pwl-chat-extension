@@ -1,7 +1,7 @@
 .pwl-extension-img {
   position: fixed;
   z-index: 1111111111;
-  max-height: 100vh;
+  max-height: 90vh;
   max-width: 60vw;
   overflow: auto;
   top: 50px;

@@ -41,8 +41,23 @@ body {
 .content img {
   max-width: 200px;
 }
+.el-scrollbar {
+  --el-scrollbar-bg-color: rgb(247, 149, 51) !important;
+}
+.el-scrollbar__thumb:hover {
+  --el-scrollbar-hover-bg-color: rgb(247, 149, 51) !important;
+}
+.el-scrollbar__thumb {
+  opacity: 1 !important;
+}
 p {
   margin: 0px;
+}
+.back-top {
+  position: absolute;
+  bottom: 25px;
+  right: 20px;
+  font-size: 36px;
 }
 ::-webkit-scrollbar {
   width: 5px;

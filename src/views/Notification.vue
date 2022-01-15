@@ -33,23 +33,16 @@
       </span>
     </el-row>
     <el-tabs v-model="tabsName" @tab-click="handleClick">
-      <el-tab-pane
-        v-for="item in typeArray"
-        :key="item.name"
-        :name="item.name"
-      >
+      <el-tab-pane v-for="item in typeArray" :key="item.name" :name="item.name">
         <template #label>
-          <span>{{item.title}}</span>
-          <el-badge
-            v-show="count[item.count] > 0"
-            :value="count[item.count]"
-          />
+          <span>{{ item.title }}</span>
+          <el-badge v-show="count[item.count] > 0" :value="count[item.count]" />
         </template>
       </el-tab-pane>
     </el-tabs>
     <el-scrollbar
       id="notification-box"
-      ref="scrollbarRef"
+      ref="notificationScrollbar"
       height="480px"
       @scroll="scroll"
     >
@@ -109,7 +102,7 @@
       <el-row class="tip" v-show="nodata">没有数据啦~</el-row>
       <icon-svg
         icon-class="top"
-        class="top"
+        class="back-top"
         v-show="showTop"
         @click="backTop()"
       />
@@ -208,13 +201,17 @@ export default {
       return process.env.VUE_APP_BASE_URL + url
     },
     getUrl(url) {
-      return url ? process.env.VUE_APP_BASE_URL + url : 'javascript:;'
+      return url
+        ? url.startsWith(process.env.VUE_APP_BASE_URL)
+          ? url
+          : process.env.VUE_APP_BASE_URL + url
+        : 'javascript:;'
     },
     goBack() {
       this.$router.push({ name: 'ChatRoom' })
     },
     backTop() {
-      this.$refs.scrollbarRef.setScrollTop(0)
+      this.$refs.notificationScrollbar.setScrollTop(0)
     },
     handleClick() {
       this.loading = true
@@ -226,7 +223,7 @@ export default {
     },
     scroll({ scrollTop }) {
       this.showTop = scrollTop > 100
-      let height = this.$refs.scrollbarRef.wrap$.scrollHeight - 480
+      let height = this.$refs.notificationScrollbar.wrap$.scrollHeight - 480
       if (!this.loading && scrollTop === height) {
         this.load()
       }
@@ -343,11 +340,5 @@ export default {
 }
 .el-page-header * {
   color: white;
-}
-.top {
-  position: absolute;
-  bottom: 25px;
-  right: 20px;
-  font-size: 36px;
 }
 </style>

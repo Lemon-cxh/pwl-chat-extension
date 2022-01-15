@@ -24,11 +24,13 @@ let options = {
 
 store.dispatch('getUser').then(() => {
   init()
+  getMoreEvent()
 })
 
 window.openSocket = function () {
   store.dispatch('getUser').then(() => {
     init()
+    getMoreEvent()
   })
 }
 
