@@ -32,7 +32,8 @@
       always
       @scroll="scroll"
     >
-      <template
+    <transition-group name="list-complete" tag="div">
+      <div
         ref="inner"
         v-for="item in messageArray"
         v-bind:key="
@@ -48,6 +49,7 @@
         <div v-else-if="!item.type || type.msg === item.type">
           <message
             v-if="!item.revoke"
+            class="list-complete-item"
             :ref="'message_' + item.oId"
             :message="item"
             :date="date"
@@ -62,7 +64,8 @@
             @show-redpacket-info="showRedpacketInfo"
           />
         </div>
-      </template>
+      </div>
+    </transition-group>
       <div class="icon-box">
         <icon-svg icon-class="loading" class="loading" v-if="loading" />
       </div>
@@ -456,5 +459,14 @@ export default {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+.list-complete-enter-active,
+.list-complete-leave-active {
+  transition: all 1s ease;
+}
+.list-complete-enter-from,
+.list-complete-leave-to {
+  opacity: 0;
+  transform: translateY(-50px);
 }
 </style>
