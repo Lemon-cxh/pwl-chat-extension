@@ -19,23 +19,25 @@
       </el-row>
     </el-row>
     <!-- 消息列表 -->
-    <div v-show="hasNewMessage" class="new-message-tip">
-      <info-filled class="svg-icon" />有新消息啦
-    </div>
+    <transition name="fade">
+      <div v-show="hasNewMessage" class="new-message-tip">
+        <info-filled class="svg-icon" />有新消息啦
+      </div>
+    </transition>
     <el-scrollbar
       id="messageList"
       ref="messageScrollbar"
+      class="message-box"
       height="420px"
       always
       @scroll="scroll"
     >
-      <div
+      <template
         ref="inner"
         v-for="item in messageArray"
         v-bind:key="
           type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
         "
-        class="infinite-list-item"
       >
         <hint-message
           v-if="item.type && type.redPacketStatus === item.type"
@@ -60,7 +62,7 @@
             @show-redpacket-info="showRedpacketInfo"
           />
         </div>
-      </div>
+      </template>
       <div class="icon-box">
         <icon-svg icon-class="loading" class="loading" v-if="loading" />
       </div>
@@ -244,7 +246,12 @@ export default {
       }
     },
     scroll({ scrollTop }) {
-      this.isTop = scrollTop < 50
+      if (scrollTop < 50) {
+        this.isTop = true
+        this.hasNewMessage = false
+      } else {
+        this.isTop = false
+      }
       this.showTop = scrollTop > 100
       let distance =
         this.$refs.messageScrollbar.wrap$.scrollHeight - scrollTop - 420
@@ -429,6 +436,9 @@ export default {
   justify-content: center;
   align-items: center;
 }
+.message-box {
+  padding-right: 5px;
+}
 @keyframes rotate {
   from {
     transform: rotate(0deg);
@@ -436,5 +446,15 @@ export default {
   to {
     transform: rotate(360deg);
   }
+}
+</style>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
