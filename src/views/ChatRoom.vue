@@ -462,7 +462,7 @@ export default {
 }
 .list-complete-enter-active,
 .list-complete-leave-active {
-  transition: all 1s ease;
+  transition: all 0.5s ease;
 }
 .list-complete-enter-from,
 .list-complete-leave-to {
