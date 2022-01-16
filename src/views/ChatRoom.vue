@@ -244,7 +244,7 @@ export default {
     },
     newMessage(message) {
       this.unshiftMessage(message)
-      if (!this.isTop) {
+      if (!this.isTop && message.userName !== this.userInfo.userName) {
         this.hasNewMessage = true
       }
     },
@@ -462,11 +462,12 @@ export default {
 }
 .list-complete-enter-active,
 .list-complete-leave-active {
-  transition: all 0.5s ease;
+  transition: all 0.2s ease;
 }
 .list-complete-enter-from,
 .list-complete-leave-to {
   opacity: 0;
-  transform: translateY(-50px);
+  transform: translateY(-20px);
+  opacity: 0;
 }
 </style>
