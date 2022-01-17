@@ -13,7 +13,7 @@
             placeholder="说点什么吧!"
             v-model="content"
             ref="contentInput"
-            class="input-with-select"
+            class="dark-mode"
             @paste.capture.prevent="pasteHandler"
             @keyup.enter="sendHandler"
           >

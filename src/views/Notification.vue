@@ -99,7 +99,8 @@
           </el-row>
         </el-row>
       </template>
-      <el-row class="tip" v-show="nodata">没有数据啦~</el-row>
+      <el-empty v-show="!loading && list.length === 0" class="dark-mode"></el-empty>
+      <el-row class="tip" v-show="list.length > 0 && nodata">没有数据啦~</el-row>
       <icon-svg
         icon-class="top"
         class="back-top"
@@ -152,7 +153,7 @@ export default {
       },
       showTop: false,
       nodata: false,
-      loading: false,
+      loading: true,
       userName: '',
       dialogVisible: false,
     }
@@ -214,7 +215,6 @@ export default {
       this.$refs.notificationScrollbar.setScrollTop(0)
     },
     handleClick() {
-      this.loading = true
       this.nodata = false
       this.page = 0
       this.list = []
@@ -239,6 +239,7 @@ export default {
       if (this.nodata) {
         return
       }
+      this.loading = true
       this.page += 1
       getNotifications(this.params).then((res) => {
         this.loading = false

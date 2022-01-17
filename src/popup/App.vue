@@ -70,4 +70,7 @@ p {
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgb(247, 149, 51);
 }
+.dark-mode {
+  filter: invert(0.75) hue-rotate(180deg);
+}
 </style>
