@@ -159,7 +159,7 @@ function messageEvent(message, isMsg) {
     port.postMessage({ type: EVENT.message, data: message })
     return
   }
-  if (!isMsg) {
+  if (!isMsg || message.isBlack) {
     return
   }
   if (options.barrageOptions.enable) {

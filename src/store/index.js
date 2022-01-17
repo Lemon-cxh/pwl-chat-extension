@@ -82,7 +82,7 @@ export default createStore({
       if (isRedPacket(message.message)) {
         setTimeout(() => {
           openRedPacket({ oId: message.message.oId, apiKey: state.key }).then()
-        }, 3000)
+        }, 3000 + Math.ceil(Math.random() * 1000))
         state.message.unshift(message.message)
         return
       }
