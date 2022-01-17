@@ -43,7 +43,8 @@ export const defaultOptions = {
     fontSize: 16,
     opacity: 0.5,
     color: '#FFFFFF',
-  }
+  },
+  blacklist: []
 }
 
 export const MESSAGE_LIMIT = 25;

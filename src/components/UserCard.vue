@@ -7,7 +7,7 @@
     :before-close="closeHandler"
   >
     <div class="background" :style="getBackgroundImage(userInfo.cardBg)">
-      <el-row class="box" @click="goto">
+      <el-row class="box">
         <el-row class="flex-column avatar-box">
           <el-avatar class="avatar" :src="userInfo.userAvatarURL"></el-avatar>
           <el-row class="column">
@@ -30,7 +30,7 @@
         </el-row>
 
         <el-row class="flex-column info">
-          <el-row class="name-column">
+          <el-row class="name-column" @click="goto">
             <span class="name">{{
               userInfo.userNickname ? userInfo.userNickname : userInfo.userName
             }}</span>

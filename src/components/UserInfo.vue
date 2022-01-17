@@ -5,7 +5,7 @@
         class="progress"
         type="circle"
         :percentage="percentage"
-        :width=51
+        :width="51"
         :color="colors"
         :show-text="false"
       >
@@ -39,6 +39,7 @@
       v-model="drawer"
       direction="ttb"
       :with-header="false"
+      destroy-on-close
       size="auto"
     >
       <el-tabs>
@@ -98,6 +99,32 @@
             </el-row>
           </el-row>
         </el-tab-pane>
+        <el-tab-pane label="黑名单">
+          <el-row>
+            <el-select
+              v-model="options.blacklist"
+              multiple
+              filterable
+              remote
+              placeholder="请输入用户名"
+              :remote-method="remoteMethod"
+              :loading="loading"
+              @change="optionsChange"
+            >
+              <el-option
+                v-for="item in userList"
+                :key="item.userName"
+                :label="item.userName"
+                :value="item.userName"
+              >
+              <el-row>
+              <el-avatar :size="30" :src="item.userAvatarURL" />
+              <span style="margin-left: 5px">{{ item.userName }}</span>
+              </el-row>
+              </el-option>
+            </el-select>
+          </el-row>
+        </el-tab-pane>
       </el-tabs>
     </el-drawer>
   </el-row>
@@ -105,7 +132,12 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import { liveness, isCollectedLiveness, getLivenessReward } from '../api/user'
+import {
+  liveness,
+  isCollectedLiveness,
+  getLivenessReward,
+  getUserName,
+} from '../api/user'
 import { countNotifications, makeReadNotifications } from '../api/notification'
 import { STORAGE, defaultOptions } from '../constant/Constant'
 import { getDate } from '../utils/util'
@@ -132,6 +164,8 @@ export default {
       ],
       unreadCount: 0,
       drawer: false,
+      loading: false,
+      userList: [],
       options: defaultOptions,
     }
   },
@@ -157,8 +191,10 @@ export default {
       })
     })
     getSync({ [STORAGE.options]: defaultOptions }, (result) => {
+      if (result.options.blacklist) {
+        result.options.blacklist = JSON.parse(result.options.blacklist)
+      }
       this.options = result.options
-      this.$emit('syncOptions', result.options)
     })
     this.countNotifications()
   },
@@ -219,6 +255,13 @@ export default {
         }
       })
     },
+    remoteMethod(query) {
+      getUserName({ name: query }).then((res) => {
+        if (0 === res.code) {
+          this.userList = res.data
+        }
+      })
+    },
     handleCommand(command) {
       this[command]()
     },
@@ -235,8 +278,10 @@ export default {
       this.$router.push({ name: 'Login' })
     },
     optionsChange() {
-      setSync({ [STORAGE.options]: this.options })
+      let options = {...this.options}
       this.$emit('syncOptions', this.options)
+      options.blacklist = JSON.stringify(options.blacklist)
+      setSync({ [STORAGE.options]: options })
     },
   },
 }

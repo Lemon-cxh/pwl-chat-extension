@@ -1,13 +1,14 @@
 import { createApp } from 'vue'
 import store from './store'
 import { more, send, openRedPacket } from './api/chat'
-import { notifications, getLocal, sendTabsMessage } from './utils/chromeUtil'
+import { notifications, getLocal, sendTabsMessage, getSync } from './utils/chromeUtil'
 import {
   MESSAGE_TYPE,
   STORAGE,
   EVENT,
   MESSAGE_LIMIT,
   TABS_EVENT,
+  defaultOptions
 } from './constant/Constant'
 
 const URL = 'wss://fishpi.cn/chat-room-channel'
@@ -15,12 +16,14 @@ const MAX_PAGE = 2
 let port = null
 let count = 0
 let pop_message = false
-let options = {
-  atNotification: true,
-  barrageOptions: {
-    enable: false
+let options = defaultOptions
+
+getSync({ [STORAGE.options]: defaultOptions }, (result) => {
+  if (result.options.blacklist) {
+    result.options.blacklist = JSON.parse(result.options.blacklist)
   }
-}
+  options = result.options
+})
 
 store.dispatch('getUser').then(() => {
   init()
@@ -150,6 +153,7 @@ chrome.runtime.onMessage.addListener(function (request) {
 })
 
 function messageEvent(message, isMsg) {
+  markBlack(message)
   store.commit('addMessage', { message: message, isMsg: isMsg})
   if (port) {
     port.postMessage({ type: EVENT.message, data: message })
@@ -189,12 +193,14 @@ function getMoreEvent() {
       let arr = []
       for (let index = 0; index < data.length; index++) {
         if (index === 0) {
+          markBlack(data[index])
           arr.unshift(data[index])
           continue
         }
         let e = data[index];
         let last = arr[0]
         if (last.content !== e.content) {
+          markBlack(e)
           arr.unshift(e)
           continue
         }
@@ -213,6 +219,12 @@ function getMoreEvent() {
       }
     }
   })
+}
+
+function markBlack(message) {
+  if (options.blacklist && options.blacklist.some(e => e === message.userName)) {
+    message.isBlack = true;
+  }
 }
 
 function clearBadgeText() {

@@ -48,7 +48,7 @@
         />
         <div v-else-if="!item.type || type.msg === item.type">
           <message
-            v-if="!item.revoke"
+            v-if="!item.revoke && !item.isBlack"
             class="list-complete-item"
             :ref="'message_' + item.oId"
             :message="item"
