@@ -5,7 +5,7 @@
         class="progress"
         type="circle"
         :percentage="percentage"
-        :width="51"
+        :width="50"
         :color="colors"
         :show-text="false"
       >
@@ -315,6 +315,9 @@ export default {
 <style>
 .el-progress--without-text .el-progress__text {
   display: block !important;
+}
+.el-progress--circle .el-progress__text, .el-progress--dashboard .el-progress__text {
+  top: 26px !important
 }
 .el-dropdown-menu,
 .el-drawer__body {
