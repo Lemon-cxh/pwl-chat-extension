@@ -33,7 +33,6 @@ store.dispatch('getUser').then(() => {
 window.openSocket = function () {
   store.dispatch('getUser').then(() => {
     init()
-    getMoreEvent()
   })
 }
 
