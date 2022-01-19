@@ -85,6 +85,7 @@ export default {
       },
     }
   },
+  inject: ['$message'],
   components: {
     Promotion, CircleCloseFilled
   },
@@ -175,9 +176,13 @@ export default {
           '\n\n并说:' +
           form.content
       }
-      send(form).then(() => {
-        this.quoteVisible = false
-        this.content = ''
+      send(form).then((res) => {
+        if (0 === res.code) {
+          this.quoteVisible = false
+          this.content = ''
+          return
+        }
+        this.$message.warning(res.msg)
       })
     },
     buildAtUser(userName) {

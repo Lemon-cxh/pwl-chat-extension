@@ -105,6 +105,7 @@
               v-model="options.blacklist"
               multiple
               filterable
+              allow-create
               remote
               placeholder="请输入用户名"
               :remote-method="remoteMethod"
