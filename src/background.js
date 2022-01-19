@@ -1,14 +1,19 @@
 import { createApp } from 'vue'
 import store from './store'
 import { more, send, openRedPacket } from './api/chat'
-import { notifications, getLocal, sendTabsMessage, getSync } from './utils/chromeUtil'
+import {
+  notifications,
+  getLocal,
+  sendTabsMessage,
+  getSync,
+} from './utils/chromeUtil'
 import {
   MESSAGE_TYPE,
   STORAGE,
   EVENT,
   MESSAGE_LIMIT,
   TABS_EVENT,
-  defaultOptions
+  defaultOptions,
 } from './constant/Constant'
 
 const URL = 'wss://fishpi.cn/chat-room-channel'
@@ -17,10 +22,14 @@ let port = null
 let count = 0
 let pop_message = false
 let options = defaultOptions
+let careOnline = []
 
 getSync({ [STORAGE.options]: defaultOptions }, (result) => {
   if (result.options.blacklist) {
     result.options.blacklist = JSON.parse(result.options.blacklist)
+  }
+  if (result.options.care) {
+    result.options.care = JSON.parse(result.options.care)
   }
   options = result.options
 })
@@ -79,6 +88,7 @@ function messageHandler(event) {
         port.postMessage({ type: EVENT.online, data: data })
       }
       store.commit('setOnline', data)
+      onlineEvent(data)
       break
     case MESSAGE_TYPE.revoke:
       if (port) {
@@ -145,15 +155,24 @@ chrome.runtime.onMessage.addListener(function (request) {
     return
   }
   if (TABS_EVENT.openRedPacket === request.type) {
-    openRedPacket({ oId: request.data, apiKey: store.getters.key }).then(res => {
-      sendTabsMessage({ type: TABS_EVENT.markRedPacket, data: {data: res, userName: store.getters.userInfo.userName, oId: request.data} })
-    })
+    openRedPacket({ oId: request.data, apiKey: store.getters.key }).then(
+      (res) => {
+        sendTabsMessage({
+          type: TABS_EVENT.markRedPacket,
+          data: {
+            data: res,
+            userName: store.getters.userInfo.userName,
+            oId: request.data,
+          },
+        })
+      }
+    )
   }
 })
 
 function messageEvent(message, isMsg) {
   markBlack(message)
-  store.commit('addMessage', { message: message, isMsg: isMsg})
+  store.commit('addMessage', { message: message, isMsg: isMsg })
   if (port) {
     port.postMessage({ type: EVENT.message, data: message })
     return
@@ -170,6 +189,26 @@ function messageEvent(message, isMsg) {
     return
   }
   atNotifications(message)
+}
+
+function onlineEvent(data) {
+  if (!options.care || options.care.length === 0) {
+    return
+  }
+  let currentOnline = data.users
+    .filter((element) => options.care.some((e) => e === element.userName))
+    .flatMap((e) => e.userName)
+  currentOnline
+    .filter((current) => !careOnline.some((e) => current === e))
+    .forEach((e) => {
+      notifications('特别关心', '[' + e + ']上线了')
+    })
+  careOnline
+    .filter((e) => !currentOnline.some((current) => current === e))
+    .forEach((e) => {
+      notifications('特别关心', '[' + e + ']下线了')
+    })
+  careOnline = currentOnline
 }
 
 function atNotifications(message) {
@@ -196,23 +235,23 @@ function getMoreEvent() {
           arr.unshift(data[index])
           continue
         }
-        let e = data[index];
+        let e = data[index]
         let last = arr[0]
         if (last.content !== e.content) {
           markBlack(e)
           arr.unshift(e)
           continue
         }
-        let {users = [], oIds = []} = last
+        let { users = [], oIds = [] } = last
         users.push({
           userName: e.userName,
           userAvatarURL: e.userAvatarURL,
         })
         oIds.push(e.oId)
-        arr[0].users = users;
-        arr[0].oIds = oIds;
+        arr[0].users = users
+        arr[0].oIds = oIds
       }
-      store.commit('concatMessage', {message: arr, size: data.length })
+      store.commit('concatMessage', { message: arr, size: data.length })
       if (port) {
         port.postMessage({ type: EVENT.more, data: arr })
       }
@@ -221,8 +260,11 @@ function getMoreEvent() {
 }
 
 function markBlack(message) {
-  if (options.blacklist && options.blacklist.some(e => e === message.userName)) {
-    message.isBlack = true;
+  if (
+    options.blacklist &&
+    options.blacklist.some((e) => e === message.userName)
+  ) {
+    message.isBlack = true
   }
 }
 
@@ -231,5 +273,4 @@ function clearBadgeText() {
   chrome.browserAction.setBadgeText({ text: '' })
 }
 
-createApp()
-  .use(store)
+createApp().use(store)

@@ -121,7 +121,7 @@ export default createStore({
         message.users = users.concat(last.users)
         message.oIds = oIds.concat(last.oIds)
       } else {
-        message.users.users = users
+        message.users = users
         message.oIds = oIds
       }
       state.message[index] = message

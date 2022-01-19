@@ -101,29 +101,12 @@
         </el-tab-pane>
         <el-tab-pane label="黑名单">
           <el-row>
-            <el-select
-              v-model="options.blacklist"
-              multiple
-              filterable
-              allow-create
-              remote
-              placeholder="请输入用户名"
-              :remote-method="remoteMethod"
-              :loading="loading"
-              @change="optionsChange"
-            >
-              <el-option
-                v-for="item in userList"
-                :key="item.userName"
-                :label="item.userName"
-                :value="item.userName"
-              >
-              <el-row>
-              <el-avatar :size="30" :src="item.userAvatarURL" />
-              <span style="margin-left: 5px">{{ item.userName }}</span>
-              </el-row>
-              </el-option>
-            </el-select>
+            <user-select :user="options.blacklist" @change="blacklistChange"/>
+          </el-row>
+        </el-tab-pane>
+        <el-tab-pane label="特别关心">
+          <el-row>
+            <user-select :user="options.care" @change="careChange"/>
           </el-row>
         </el-tab-pane>
       </el-tabs>
@@ -136,8 +119,7 @@ import { mapGetters, mapMutations } from 'vuex'
 import {
   liveness,
   isCollectedLiveness,
-  getLivenessReward,
-  getUserName,
+  getLivenessReward
 } from '../api/user'
 import { countNotifications, makeReadNotifications } from '../api/notification'
 import { STORAGE, defaultOptions } from '../constant/Constant'
@@ -165,8 +147,6 @@ export default {
       ],
       unreadCount: 0,
       drawer: false,
-      loading: false,
-      userList: [],
       options: defaultOptions,
     }
   },
@@ -194,6 +174,9 @@ export default {
     getSync({ [STORAGE.options]: defaultOptions }, (result) => {
       if (result.options.blacklist) {
         result.options.blacklist = JSON.parse(result.options.blacklist)
+      }
+      if (result.options.care) {
+        result.options.care = JSON.parse(result.options.care)
       }
       this.options = result.options
     })
@@ -256,13 +239,6 @@ export default {
         }
       })
     },
-    remoteMethod(query) {
-      getUserName({ name: query }).then((res) => {
-        if (0 === res.code) {
-          this.userList = res.data
-        }
-      })
-    },
     handleCommand(command) {
       this[command]()
     },
@@ -278,10 +254,19 @@ export default {
       this.clearMessage()
       this.$router.push({ name: 'Login' })
     },
+    blacklistChange(val) {
+      this.options.blacklist = val;
+      this.optionsChange()
+    },
+    careChange(val) {
+      this.options.care = val;
+      this.optionsChange()
+    },
     optionsChange() {
       let options = {...this.options}
       this.$emit('syncOptions', this.options)
       options.blacklist = JSON.stringify(options.blacklist)
+      options.care  = JSON.stringify(options.care)
       setSync({ [STORAGE.options]: options })
     },
   },
