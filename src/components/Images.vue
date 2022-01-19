@@ -142,6 +142,7 @@ export default {
   flex-wrap: wrap;
   max-height: 264px;
   overflow: auto;
+  overflow-x: hidden;
 }
 .delete {
   position: absolute;
@@ -149,13 +150,15 @@ export default {
   right: -8px;
   font-size: 16px;
 }
-
 .image {
   width: 60px;
   height: 60px;
   margin: 3px;
 }
-
+.image:hover {
+  transform: scale(1.2);
+  z-index: 999;
+}
 .image-item {
   position: relative;
   width: 60px;

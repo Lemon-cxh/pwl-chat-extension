@@ -1,5 +1,5 @@
 <template>
-  <el-popover placement="bottom" :width="257" trigger="focus">
+  <el-popover placement="bottom" width="auto" trigger="focus">
     <template #reference>
       <div tabindex="0">
         <el-badge
@@ -53,6 +53,7 @@ export default {
 .avatar-box {
   flex-wrap: wrap;
   max-height: 144px;
+  max-width: 257px;
   overflow: auto;
 }
 .avatar {
