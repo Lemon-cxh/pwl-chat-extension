@@ -5,6 +5,7 @@
     filterable
     allow-create
     remote
+    style="width: 396px"
     placeholder="请输入用户名"
     :remote-method="remoteMethod"
     :loading="loading"
