@@ -4,18 +4,18 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/Lemon-cxh/pwl-chat-extension)
 ![GitHub top language](https://img.shields.io/github/languages/top/Lemon-cxh/pwl-chat-extension)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Lemon-cxh/pwl-chat-extension)
-
-![GitHub all releases](https://img.shields.io/github/downloads/Lemon-cxh/pwl-chat-extension/total)
+![GitHub all releases](https://img.shields.io/github/downloads/Lemon-cxh/pwl-chat-extension/total?color=blue)
 ![GitHub watchers](https://img.shields.io/github/watchers/Lemon-cxh/pwl-chat-extension)
 ![GitHub followers](https://img.shields.io/github/followers/Lemon-cxh)
 ![GitHub User's stars](https://img.shields.io/github/stars/Lemon-cxh/pwl-chat-extension)
 
-[Chrome Web Store](https://chrome.google.com/webstore/detail/%E6%91%B8%E9%B1%BC%E6%B4%BE%E8%81%8A%E5%A4%A9%E5%AE%A4/fkaomdjjdbglkbcmfhhlioejkpacbbpe?hl=zh-CN&authuser=0)
+![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fkaomdjjdbglkbcmfhhlioejkpacbbpe?color=success&link=https%3A%2F%2Fchrome.google.com%2Fwebstore%2Fdetail%2F%25E6%2591%25B8%25E9%25B1%25BC%25E6%25B4%25BE%25E8%2581%258A%25E5%25A4%25A9%25E5%25AE%25A4%2Ffkaomdjjdbglkbcmfhhlioejkpacbbpe%3Fhl%3Dzh-CN%26authuser%3D0)
+![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fkaomdjjdbglkbcmfhhlioejkpacbbpe?color=blue)
+![Chrome Web Store](https://img.shields.io/chrome-web-store/rating/fkaomdjjdbglkbcmfhhlioejkpacbbpe)
 
-![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fkaomdjjdbglkbcmfhhlioejkpacbbpe)
-![Chrome Web Store](https://img.shields.io/chrome-web-store/stars/fkaomdjjdbglkbcmfhhlioejkpacbbpe)
-
-[Microsoft Store](https://microsoftedge.microsoft.com/addons/detail/%E6%91%B8%E9%B1%BC%E6%B4%BE%E8%81%8A%E5%A4%A9%E5%AE%A4/oldbilakhdpiamjbkocdcdnlnakainfm)
+![Microsoft Store](https://img.shields.io/badge/dynamic/json?label=Microsoft%20Web%20Store&prefix=v&query=%24.version&color=success&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Foldbilakhdpiamjbkocdcdnlnakainfm%3Fhl%3Dzh-CN%26gl%3DCN&link=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fdetail%2F%25E6%2591%25B8%25E9%25B1%25BC%25E6%25B4%25BE%25E8%2581%258A%25E5%25A4%25A9%25E5%25AE%25A4%2Foldbilakhdpiamjbkocdcdnlnakainfm)
+![Microsoft Store](https://img.shields.io/badge/dynamic/json?label=user&query=%24.activeInstallCount&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Foldbilakhdpiamjbkocdcdnlnakainfm%3Fhl%3Dzh-CN%26gl%3DCN)
+![Microsoft Store](https://img.shields.io/badge/dynamic/json?label=rating&query=%24.averageRating&suffix=%2F5&color=red&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Foldbilakhdpiamjbkocdcdnlnakainfm%3Fhl%3Dzh-CN%26gl%3DCN)
 
 基于[摸鱼派开放 API](https://fishpi.cn/article/1636516552191) 开发的聊天室扩展
 
@@ -54,7 +54,7 @@
 │   ├── store/                  - 全局 store 管理
 │   ├── svg/                    - svg 文件
 │   ├── utils/                  - 工具方法
-│   ├── views/                   - 所有view
+│   ├── views/                  - 所有view
 │   ├── background.js           - 在后台运行的js
 │   └── manifest.json           - 扩展配置文件
 ```
