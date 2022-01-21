@@ -8,7 +8,8 @@ import 'element-plus/es/components/message/style/css'
 import { getUserInfo } from '../api/login'
 import { getLocal, setLocal } from '../utils/chromeUtil'
 import { STORAGE } from '../constant/Constant'
-document.documentElement.setAttribute('data-theme', 'dark');
+
+// 设置ElMessage显示时间
 ['success', 'warning', 'info', 'error'].forEach(type => {
   ElMessage[type] = msg => {
     return ElMessage({
@@ -19,6 +20,7 @@ document.documentElement.setAttribute('data-theme', 'dark');
   };
 });
 
+// 导入svg
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 const req = require.context('../svg', false, /\.svg$/)
 requireAll(req)
@@ -43,6 +45,7 @@ getLocal([STORAGE.key], function (result) {
   })
 })
 
+// Icon-svg、ElMessage注册为全局组件，
 createApp(App)
   .use(router)
   .use(store)

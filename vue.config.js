@@ -6,6 +6,7 @@ const IconsResolver = require('unplugin-icons/resolver')
 const ExtensionReloader = require('webpack-extension-reloader')
 
 module.exports = {
+  // vue-cli-plugin-browser-extension 相关设置
   pages: {
     popup: {
       template: 'public/browser-extension.html',
@@ -34,6 +35,7 @@ module.exports = {
   },
   configureWebpack: {
     plugins: [
+      // 自动导入Element Plus 以及 Element Icon
       AutoImport({
         resolvers: [ElementPlusResolver()],
       }),
@@ -41,12 +43,14 @@ module.exports = {
         resolvers: [ElementPlusResolver(), IconsResolver()],
       }),
       Icons(),
+      // webpack-extension-reloader 热加载端口设置
       new ExtensionReloader({
         port: 9091
       })
     ],
   },
   chainWebpack: config => {
+    // 自定义的 Icon-svg 组件配置
     const svgRule = config.module.rule("svg");
     svgRule.uses.clear();
     svgRule
