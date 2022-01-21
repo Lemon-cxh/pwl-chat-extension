@@ -233,4 +233,7 @@ export default {
 .quote-content * {
   max-width: 220px;
 }
+.quote-content a {
+  color: white;
+}
 </style>

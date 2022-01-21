@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-popover placement="left-start" :width="208" trigger="focus">
+    <el-popover placement="left-start" width="auto" trigger="focus">
       <template #reference>
         <div tabindex="0"><icon-svg icon-class="imageBtn" /></div>
       </template>
@@ -140,7 +140,8 @@ export default {
 <style scoped>
 .image-box {
   flex-wrap: wrap;
-  max-height: 264px;
+  max-width: 268px;
+  max-height: 260px;
   overflow: auto;
   overflow-x: hidden;
 }
@@ -151,18 +152,14 @@ export default {
   font-size: 16px;
 }
 .image {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   margin: 3px;
-}
-.image:hover {
-  transform: scale(1.2);
-  z-index: 999;
 }
 .image-item {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
 }
 .image-add {
   width: 56px;

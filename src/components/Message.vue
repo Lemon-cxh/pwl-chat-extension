@@ -263,7 +263,7 @@ export default {
   border-right: 8px solid #a3db92;
 }
 .own-content-background {
-  background-color: white;
+  background-color: #fffbe6;
 }
 .own-content-background::after {
   content: '';
@@ -273,7 +273,7 @@ export default {
   width: 0;
   height: 0;
   border: 6px solid transparent;
-  border-left: 8px solid white;
+  border-left: 8px solid #fffbe6;
 }
 .time {
   padding: 0 5px;
