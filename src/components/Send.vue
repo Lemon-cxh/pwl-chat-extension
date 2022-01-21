@@ -7,7 +7,7 @@
         trigger="manual"
         v-model:visible="visible"
       >
-      <template #reference>
+        <template #reference>
           <el-input
             size="large"
             placeholder="说点什么吧!"
@@ -18,9 +18,9 @@
             @keyup.enter="sendHandler"
           >
             <template #append>
-              <el-button
-                @click="sendHandler"
-              ><promotion class="svg-icon" /></el-button>
+              <el-button @click="sendHandler"
+                ><promotion class="svg-icon"
+              /></el-button>
             </template>
           </el-input>
         </template>
@@ -31,10 +31,7 @@
             :label="item.userName"
             :value="item.userName"
           >
-            <el-row
-              class="at-item"
-                @click="selectAt(item.userName)"
-            >
+            <el-row class="at-item" @click="selectAt(item.userName)">
               <img class="at-image" :src="item.userAvatarURL" />
               <span class="at-text">{{ item.userName }}</span>
             </el-row>
@@ -55,7 +52,10 @@
       <div id="quote-content" class="quote-content">
         <el-row class="quote-user">
           <div>引用 @{{ quoteForm.userName }}</div>
-          <circle-close-filled class="svg-icon quote-close" @click="closeQuote" />
+          <circle-close-filled
+            class="svg-icon quote-close"
+            @click="closeQuote"
+          />
         </el-row>
         <span v-if="quoteForm.content" v-html="quoteForm.content"></span>
         <el-row v-else>{{ quoteForm.md }}</el-row>
@@ -87,7 +87,8 @@ export default {
   },
   inject: ['$message'],
   components: {
-    Promotion, CircleCloseFilled
+    Promotion,
+    CircleCloseFilled,
   },
   watch: {
     content(val) {
@@ -118,10 +119,11 @@ export default {
   methods: {
     pasteHandler(e) {
       if (e.clipboardData.types.some((e) => e === 'Files')) {
+        let type = e.clipboardData.files[0].type
         upload(e.clipboardData.files[0]).then((res) => {
           let succMap = res.data.succMap
-          for (let key in succMap) {
-            this.content += '![' + key + '](' + succMap[key] + ')'
+          for (let key in succMap) { 
+            this.content += `${type.startsWith('image') ? '!' : ''}[${key}](${succMap[key]})`
           }
         })
       } else {
@@ -168,13 +170,11 @@ export default {
       if (this.quoteVisible) {
         let quoteForm = this.quoteForm
 
-        form.content =
-          '**引用** **@' +
-          this.buildAtUser(quoteForm.userName) +
-          '**\n> ' +
-          (quoteForm.md ? quoteForm.md : quoteForm.content) +
-          '\n\n并说:' +
+        form.content = `**引用** **@${this.buildAtUser(
+          quoteForm.userName
+        )}**\n> ${quoteForm.md ? quoteForm.md : quoteForm.content}\n\n并说:${
           form.content
+        }`
       }
       send(form).then((res) => {
         if (0 === res.code) {
@@ -186,17 +186,7 @@ export default {
       })
     },
     buildAtUser(userName) {
-      return (
-        '<a href="' +
-        process.env.VUE_APP_BASE_URL +
-        '/member/' +
-        userName +
-        '" class="name-at" aria-label="' +
-        userName +
-        '" rel="nofollow">' +
-        userName +
-        '</a>'
-      )
+      return `<a href="${process.env.VUE_APP_BASE_URL}/member/${userName}" class="name-at" aria-label="${userName}" rel="nofollow">${userName}</a>`
     },
   },
 }
