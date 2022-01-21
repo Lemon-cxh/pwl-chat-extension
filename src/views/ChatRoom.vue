@@ -406,7 +406,7 @@ export default {
 .loading {
   animation: rotate 1s linear infinite;
   font-size: 24px;
-  color: white;
+  color: #f79533;
 }
 .menu-row {
   height: 30px;

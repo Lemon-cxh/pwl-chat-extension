@@ -162,10 +162,9 @@ export default {
   height: 80px;
 }
 .image-add {
-  width: 56px;
-  height: 56px;
+  width: 80px;
+  height: 80px;
   margin: 3px;
-  padding: 2px;
 }
 .title {
   font-size: 16px;

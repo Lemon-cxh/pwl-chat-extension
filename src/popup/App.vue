@@ -17,7 +17,7 @@ export default {
 }
 body {
   background: #333333;
-  margin-top: 5px;
+  margin: 5px;
 }
 .el-popover {
   --el-popover-bg-color: #333333 !important;
