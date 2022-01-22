@@ -9,11 +9,13 @@
 ![GitHub followers](https://img.shields.io/github/followers/Lemon-cxh)
 ![GitHub User's stars](https://img.shields.io/github/stars/Lemon-cxh/pwl-chat-extension)
 
-![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fkaomdjjdbglkbcmfhhlioejkpacbbpe?logo=GoogleChrome&logoColor=white&label=Chrome%20Web%20Store&color=success&link=https%3A%2F%2Fchrome.google.com%2Fwebstore%2Fdetail%2F%25E6%2591%25B8%25E9%25B1%25BC%25E6%25B4%25BE%25E8%2581%258A%25E5%25A4%25A9%25E5%25AE%25A4%2Ffkaomdjjdbglkbcmfhhlioejkpacbbpe%3Fhl%3Dzh-CN%26authuser%3D0)
+[Chrome Web Store](https://chrome.google.com/webstore/detail/%E6%91%B8%E9%B1%BC%E6%B4%BE%E8%81%8A%E5%A4%A9%E5%AE%A4/fkaomdjjdbglkbcmfhhlioejkpacbbpe?hl=zh-CN&authuser=0)
+![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fkaomdjjdbglkbcmfhhlioejkpacbbpe?logo=GoogleChrome&logoColor=white&label=version&color=success)
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fkaomdjjdbglkbcmfhhlioejkpacbbpe?color=blue)
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/rating/fkaomdjjdbglkbcmfhhlioejkpacbbpe)
 
-![Microsoft Store](https://img.shields.io/badge/dynamic/json?logo=MicrosoftEdge&label=Microsoft%20Web%20Store&prefix=v&query=%24.version&color=success&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Foldbilakhdpiamjbkocdcdnlnakainfm%3Fhl%3Dzh-CN%26gl%3DCN&link=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fdetail%2F%25E6%2591%25B8%25E9%25B1%25BC%25E6%25B4%25BE%25E8%2581%258A%25E5%25A4%25A9%25E5%25AE%25A4%2Foldbilakhdpiamjbkocdcdnlnakainfm)
+[Microsoft Web Store](https://microsoftedge.microsoft.com/addons/detail/%E6%91%B8%E9%B1%BC%E6%B4%BE%E8%81%8A%E5%A4%A9%E5%AE%A4/oldbilakhdpiamjbkocdcdnlnakainfm)
+![Microsoft Store](https://img.shields.io/badge/dynamic/json?logo=MicrosoftEdge&label=version&prefix=v&query=%24.version&color=success&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Foldbilakhdpiamjbkocdcdnlnakainfm%3Fhl%3Dzh-CN%26gl%3DCN)
 ![Microsoft Store](https://img.shields.io/badge/dynamic/json?label=user&query=%24.activeInstallCount&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Foldbilakhdpiamjbkocdcdnlnakainfm%3Fhl%3Dzh-CN%26gl%3DCN)
 ![Microsoft Store](https://img.shields.io/badge/dynamic/json?label=rating&query=%24.averageRating&suffix=%2F5&color=red&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Foldbilakhdpiamjbkocdcdnlnakainfm%3Fhl%3Dzh-CN%26gl%3DCN)
 
