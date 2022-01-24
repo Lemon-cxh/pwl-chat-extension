@@ -87,7 +87,7 @@ export default {
     ...mapGetters(['key']),
     visible() {
       return this.dialogVisible
-    }
+    },
   },
   watch: {
     userName(newValue) {
@@ -103,12 +103,12 @@ export default {
   methods: {
     getBackgroundImage(url) {
       return url
-        ? "background-image:url('" + url + "')"
+        ? `background-image:url('${url}')`
         : 'background-color: #1b4f8f;'
     },
     goto() {
       window.open(
-        process.env.VUE_APP_BASE_URL + '/member/' + this.userInfo.userName
+        `${process.env.VUE_APP_BASE_URL}/member/${this.userInfo.userName}`
       )
     },
     openUrl() {

@@ -85,12 +85,12 @@ function sendMessage(input) {
 }
 
 function insetMessage(data) {
-  let redPacket = isRedPacket(data);
+  let redPacket = isRedPacket(data)
   if (!redPacket && lastMessage.md === data.md && plusOneMessage(data)) {
     return
   }
   let name = data.userNickname
-    ? data.userNickname + '(' + data.userName + ')'
+    ? `${data.userNickname}(${data.userName})`
     : data.userName
   lastMessage = {
     md: data.md,
@@ -102,13 +102,19 @@ function insetMessage(data) {
   let child = document.createElement('div')
   child.setAttribute('id', 'pwl-message-' + data.oId)
   if (redPacket) {
-    child.innerHTML = '🧧' + name + '的红包来啦，点击领取'
+    child.innerHTML = `🧧${name}的红包来啦，点击领取`
   } else {
     data.content = data.content.substring(3, data.content.length - 4)
-    data.content = data.content.replaceAll('<img ', '<img referrerpolicy="no-referrer" ')
+    data.content = data.content.replaceAll(
+      '<img ',
+      '<img referrerpolicy="no-referrer" '
+    )
     child.innerHTML = name + ':' + data.content
   }
-  child.setAttribute('class', (redPacket ? 'red-packet ' : '') + 'pwl-message-child')
+  child.setAttribute(
+    'class',
+    (redPacket ? 'red-packet ' : '') + 'pwl-message-child'
+  )
   box.appendChild(child)
   let second = getSecond(box, child)
   child.setAttribute('style', getSytle(child, second))
@@ -135,8 +141,8 @@ function redPacketClick(child) {
 
 function markRedPacket(data) {
   let child = document.getElementById('pwl-message-' + data.oId)
-  let got = data.data.who.find(e => data.userName === e.userName)
-  child.innerHTML += '[' + (got ? '抢到了' + got.userMoney : '没有抢到') + ']'
+  let got = data.data.who.find((e) => data.userName === e.userName)
+  child.innerHTML += `[${got ? `抢到了${got.userMoney}` : '没有抢到'}]`
 }
 
 function showImage(data) {
@@ -169,12 +175,12 @@ function plusOneMessage() {
   }
   let plusOne = document.getElementById('pwl-plus-one-' + lastMessage.oId)
   if (plusOne) {
-    plusOne.innerText = ' [' + ++lastMessage.count + '人 +1]'
+    plusOne.innerText = ` [${++lastMessage.count}人 +1]`
     return true
   }
   plusOne = document.createElement('span')
   plusOne.setAttribute('id', 'pwl-plus-one-' + lastMessage.oId)
-  plusOne.innerText = ' [' + ++lastMessage.count + '人 +1]'
+  plusOne.innerText = ` [${++lastMessage.count}人 +1]`
   box.appendChild(plusOne)
   return true
 }
@@ -186,21 +192,5 @@ function getSecond(box, child) {
 function getSytle(dom, second) {
   index = (index + 3) % 13
   let top = index * height
-  return (
-    'font-size:' +
-    options.barrageOptions.fontSize +
-    'px;opacity:' +
-    options.barrageOptions.opacity +
-    ';color:' +
-    options.barrageOptions.color +
-    ';top:' +
-    top +
-    'px;right:-' +
-    dom.offsetWidth +
-    'px;transform: translateX(calc(-100vw - ' +
-    dom.offsetWidth +
-    'px));transition: transform ' +
-    second +
-    's linear;'
-  )
+  return `font-size: ${options.barrageOptions.fontSize}px;opacity: ${options.barrageOptions.opacity};color: ${options.barrageOptions.color};top: ${top}px;right: -${dom.offsetWidth}px;transform: translateX(calc(-100vw - ${dom.offsetWidth}px));transition: transform ${second}s linear;`
 }

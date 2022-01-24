@@ -34,16 +34,16 @@
               <el-row class="time">{{ item.time }}</el-row>
             </el-row>
             <el-row class="flex-column money-column">
-            <el-row
-              :class="'money' + (item.userMoney > 0 ? ' red' : ' green')"
-              >{{ item.userMoney }}</el-row
-            >
-            <el-row
-              v-if="item.showMessage || item.userMoney === max"
-              class="text"
-              >{{ item.showMessage ? item.showMessage : '手气最佳' }}</el-row
-            >
-          </el-row>
+              <el-row
+                :class="['money', item.userMoney > 0 ? 'red' : 'green']"
+                >{{ item.userMoney }}</el-row
+              >
+              <el-row
+                v-if="item.showMessage || item.userMoney === max"
+                class="text"
+                >{{ item.showMessage ? item.showMessage : '手气最佳' }}</el-row
+              >
+            </el-row>
           </el-row>
         </el-row>
       </div>
@@ -65,12 +65,12 @@ export default {
     return {
       message: '',
       max: 0,
-      count: 0
+      count: 0,
     }
   },
   setup(props) {
-    const {dialogVisible:visible} = toRefs(props)
-    return {visible}
+    const { dialogVisible: visible } = toRefs(props)
+    return { visible }
   },
   watch: {
     info(val) {
@@ -79,7 +79,7 @@ export default {
       let count = 0
       let info = {
         has: false,
-        userMoney: 0
+        userMoney: 0,
       }
       val.who.forEach((e) => {
         max = Math.max(max, e.userMoney)
@@ -96,8 +96,12 @@ export default {
         this.message = `抢到了${info.userMoney}积分`
         return
       }
-      this.message = val.recivers && val.recivers.length > 0 &&
-        !val.recivers.some((e) => e === userName) ?  '终究还是错付了' : '很遗憾，没有抢到'
+      this.message =
+        val.recivers &&
+        val.recivers.length > 0 &&
+        !val.recivers.some((e) => e === userName)
+          ? '终究还是错付了'
+          : '很遗憾，没有抢到'
     },
   },
   methods: {

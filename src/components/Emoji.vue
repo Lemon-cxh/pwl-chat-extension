@@ -58,7 +58,7 @@ export default {
       })
     },
     selectEmoji(name) {
-      this.$emit('addContent', ':' + name + ':')
+      this.$emit('addContent', `:${name}:`)
     },
     judgeEmojiIsImage(value) {
       return value.startsWith('http')

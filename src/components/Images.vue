@@ -80,7 +80,7 @@ export default {
       })
     },
     selectImage(image) {
-      this.$emit('sendMessage', '![image.png](' + image + ')')
+      this.$emit('sendMessage', `![image.png](${image})`)
     },
     syncCloudImage(url) {
       let that = this

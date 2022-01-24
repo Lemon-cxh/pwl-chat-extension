@@ -1,25 +1,30 @@
 <template>
   <div>
-    <el-row :class="'red-packet' + (redPacket.got >= redPacket.count ? ' red-packet-mask' : '')"
-            @click="openRedPacket">
+    <el-row
+      :class="[
+        'red-packet',
+        { 'red-packet-mask': redPacket.got >= redPacket.count },
+      ]"
+      @click="openRedPacket"
+    >
       <el-row class="flex-colunmn icon-box">
-        <icon-svg class="icon" icon-class="redPacketMessage"/>
-        <el-row>{{redPacketTypeMap.get(redPacket.type).label}}</el-row>
+        <icon-svg class="icon" icon-class="redPacketMessage" />
+        <el-row>{{ redPacketTypeMap.get(redPacket.type).label }}</el-row>
       </el-row>
       <el-row class="flex-colunmn content-box">
-        <el-row>{{redPacket.msg}}</el-row>
+        <el-row>{{ redPacket.msg }}</el-row>
       </el-row>
     </el-row>
   </div>
 </template>
 
 <script>
-import { openRedPacket } from "../api/chat";
-import { mapGetters } from "vuex";
-import { redPacketTypeMap } from "../constant/RedPacketConstant"
+import { openRedPacket } from '../api/chat'
+import { mapGetters } from 'vuex'
+import { redPacketTypeMap } from '../constant/RedPacketConstant'
 
 export default {
-  name: "redPacketMessage",
+  name: 'redPacketMessage',
   props: {
     oId: String,
     content: String,
@@ -28,16 +33,16 @@ export default {
   data() {
     return {
       dialogVisible: false,
-      redPacketTypeMap: redPacketTypeMap
-    };
+      redPacketTypeMap: redPacketTypeMap,
+    }
   },
   computed: {
-    ...mapGetters(["key"]),
+    ...mapGetters(['key']),
     redPacket() {
       return JSON.parse(this.content)
     },
     form() {
-      return { oId: this.oId, apiKey: this.key };
+      return { oId: this.oId, apiKey: this.key }
     },
   },
   methods: {
@@ -45,10 +50,10 @@ export default {
       openRedPacket(this.form).then((res) => {
         res.oId = this.oId
         this.$emit('showRedpacketInfo', res)
-      });
+      })
     },
   },
-};
+}
 </script>
 
 <style scoped>

@@ -10,7 +10,7 @@ export function more(data) {
 
 export function getMd(oId) {
   return request({
-    url: '/cr/raw/' + oId,
+    url: `/cr/raw/${oId}`,
     method: 'get',
   })
 }
@@ -43,7 +43,7 @@ export function upload(file) {
 
 export function revoke(oId, data) {
   return request({
-    url: '/chat-room/revoke/' + oId,
+    url: `/chat-room/revoke/${oId}`,
     method: 'delete',
     data: data
   })

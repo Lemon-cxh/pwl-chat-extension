@@ -6,7 +6,10 @@
     @show="redPacketHandler"
   >
     <template #reference>
-      <icon-svg icon-class="redPacketBtn" @click="redPacketDialogVisible = !redPacketDialogVisible" />
+      <icon-svg
+        icon-class="redPacketBtn"
+        @click="redPacketDialogVisible = !redPacketDialogVisible"
+      />
     </template>
     <el-form
       ref="form"
@@ -135,7 +138,7 @@ export default {
         ? [redPacketForm.recivers]
         : redPacketForm.recivers
       return {
-        content: '[redpacket]' + JSON.stringify(redPacketForm) + '[/redpacket]',
+        content: `[redpacket]${JSON.stringify(redPacketForm)}[/redpacket]`,
         apiKey: this.key,
       }
     },

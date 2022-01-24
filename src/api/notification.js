@@ -18,7 +18,7 @@ export function countNotifications(data) {
 
 export function makeReadNotifications(type, data) {
   return request({
-    url: '/notifications/make-read/' + type,
+    url: `/notifications/make-read/${type}`,
     method: 'get',
     params: data
   })

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <el-row :class="(isOwn ? 'own-chat-item ' : '') + 'chat-item'">
+    <el-row :class="[{ 'own-chat-item': isOwn }, 'chat-item']">
       <el-row
-        :class="(isOwn ? 'own-avatar ' : '') + 'avatar'"
+        :class="[{ 'own-avatar': isOwn }, 'avatar']"
         @click="$emit('showUserCard', message.userName)"
       >
         <el-avatar
@@ -16,7 +16,7 @@
           src="../../public/image/Christmas.png"
         />
       </el-row>
-      <el-row :class="(isOwn ? 'own-chat ' : '') + 'flex-column'" type="flex">
+      <el-row :class="[{ 'own-chat': isOwn }, 'flex-column']" type="flex">
         <el-row class="name">
           <span class="nick-name">{{ message.userNickname }}</span>
           <span :class="message.userNickname ? 'user-name' : 'nick-name'">{{
@@ -33,10 +33,10 @@
         <!-- 内容消息 -->
         <div
           v-else
-          :class="
-            (isOwn ? 'own-content-background' : 'content-background') +
-            ' message-content'
-          "
+          :class="[
+            isOwn ? 'own-content-background' : 'content-background',
+            'message-content',
+          ]"
         >
           <el-popover
             width="auto"
@@ -96,7 +96,7 @@
         @click="$emit('showUserCard', item.userName)"
       />
       <el-row
-        :class="isOwn ? 'plus-one-text own-plus-one-text ' : 'plus-one-text'"
+        :class="isOwn ? 'plus-one-text own-plus-one-text' : 'plus-one-text'"
         >{{ message.users.length }} 人+1
       </el-row>
     </el-row>
@@ -161,7 +161,7 @@ export default {
       }
       this.visible = true
       let message = this.message
-      this.userName = '@' + message.userName + ' '
+      this.userName = `@${message.userName} `
       this.quoteForm = {
         oId: message.oId,
         userName: message.userName,

@@ -32,40 +32,40 @@
       always
       @scroll="scroll"
     >
-    <transition-group name="list-complete" tag="div">
-      <div
-        ref="inner"
-        v-for="item in messageArray"
-        v-bind:key="
-          type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
-        "
-      >
-        <hint-message
-          v-if="item.type && type.redPacketStatus === item.type"
-          :message="item"
-          @show-user-card="showUserCard"
-          @show-redpacket-info="showRedpacketInfo"
-        />
-        <div v-else-if="!item.type || type.msg === item.type">
-          <message
-            v-if="!item.revoke && !item.isBlack"
-            class="list-complete-item"
-            :ref="'message_' + item.oId"
+      <transition-group name="list-complete" tag="div">
+        <div
+          ref="inner"
+          v-for="item in messageArray"
+          v-bind:key="
+            type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
+          "
+        >
+          <hint-message
+            v-if="item.type && type.redPacketStatus === item.type"
             :message="item"
-            :date="date"
-            :unlimitedRevoke="unlimitedRevoke"
-            :avatarPendant="avatarPendant"
-            @revoke-message="revokeMessage"
             @show-user-card="showUserCard"
-            @collect-images="collectImages"
-            @add-content="addContent"
-            @send-message="sendMessage"
-            @quote="quote"
             @show-redpacket-info="showRedpacketInfo"
           />
+          <div v-else-if="!item.type || type.msg === item.type">
+            <message
+              v-if="!item.revoke && !item.isBlack"
+              class="list-complete-item"
+              :ref="'message_' + item.oId"
+              :message="item"
+              :date="date"
+              :unlimitedRevoke="unlimitedRevoke"
+              :avatarPendant="avatarPendant"
+              @revoke-message="revokeMessage"
+              @show-user-card="showUserCard"
+              @collect-images="collectImages"
+              @add-content="addContent"
+              @send-message="sendMessage"
+              @quote="quote"
+              @show-redpacket-info="showRedpacketInfo"
+            />
+          </div>
         </div>
-      </div>
-    </transition-group>
+      </transition-group>
       <div class="icon-box">
         <icon-svg icon-class="loading" class="loading" v-if="loading" />
       </div>
@@ -305,7 +305,7 @@ export default {
         this.showUserCard(dom.innerText)
       } else {
         let href = dom.href.replace(
-          process.env.VUE_APP_BASE_URL + '/forward?goto=',
+          `${process.env.VUE_APP_BASE_URL}/forward?goto=`,
           ''
         )
         dom.target = '_blank'
@@ -347,7 +347,7 @@ export default {
         message.oIds.forEach((oId) => {
           revoke(oId).then((res) => (count += res.code === 0 ? 1 : 0))
         })
-        this.$message.success('批量撤回' + count + '条消息')
+        this.$message.success(`批量撤回${count }条消息`)
         return
       }
       revoke(message.oId).then((res) => {

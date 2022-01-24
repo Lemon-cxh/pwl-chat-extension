@@ -122,8 +122,10 @@ export default {
         let type = e.clipboardData.files[0].type
         upload(e.clipboardData.files[0]).then((res) => {
           let succMap = res.data.succMap
-          for (let key in succMap) { 
-            this.content += `${type.startsWith('image') ? '!' : ''}[${key}](${succMap[key]})`
+          for (let key in succMap) {
+            this.content += `${type.startsWith('image') ? '!' : ''}[${key}](${
+              succMap[key]
+            })`
           }
         })
       } else {
