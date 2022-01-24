@@ -1,12 +1,28 @@
 <template>
   <div>
-    <el-form ref="form" :model="form" :rules="rules" label-width="100px" class="form">
-      <img class="center" width="100" src="icons/1024.png"/>
+    <el-form
+      ref="form"
+      :model="form"
+      :rules="rules"
+      label-width="100px"
+      class="form"
+    >
+      <img class="center" width="100" src="icons/1024.png" />
       <el-form-item label="用户名" prop="nameOrEmail">
-        <el-input class="input" v-model.trim="form.nameOrEmail" ref="nameOrEmail"></el-input>
+        <el-input
+          class="input"
+          v-model.trim="form.nameOrEmail"
+          ref="nameOrEmail"
+        ></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="userPassword">
-        <el-input class="input" v-model.trim="form.userPassword" @keyup.enter="onSubmit" ref="userPassword" show-password></el-input>
+        <el-input
+          class="input"
+          v-model.trim="form.userPassword"
+          @keyup.enter="onSubmit"
+          ref="userPassword"
+          show-password
+        ></el-input>
       </el-form-item>
       <el-form-item label-width="140px">
         <el-button type="info" @click="register">注册</el-button>
@@ -20,7 +36,7 @@
 import { getKey, getUserInfo } from '../api/login'
 import { mapMutations } from 'vuex'
 import md5 from 'js-md5'
-import { setLocal, getLocal } from "../utils/chromeUtil"
+import { setLocal, getLocal } from '../utils/chromeUtil'
 import { STORAGE } from '../constant/Constant'
 
 export default {
@@ -43,10 +59,10 @@ export default {
   },
   inject: ['$message'],
   created() {
-    let that = this;
-    getLocal([STORAGE.nameOrEmail], function (result) {
-      if (result[STORAGE.nameOrEmail]) {
-        that.form.nameOrEmail = result[STORAGE.nameOrEmail];
+    let that = this
+    getLocal([STORAGE.account], function (result) {
+      if (result[STORAGE.account]) {
+        that.form.nameOrEmail = result[STORAGE.account].nameOrEmail
         that.$refs.userPassword.focus()
         return
       }
@@ -59,7 +75,7 @@ export default {
       let data = { ...this.form }
       data.userPassword = md5(data.userPassword)
       getKey(data).then((response) => {
-        if (0 !== response.code ) {
+        if (0 !== response.code) {
           this.$message.error(response.msg ? response.msg : response)
           return
         }
@@ -70,15 +86,18 @@ export default {
           }
           this.setKey(response.Key)
           this.setUserInfo(res.data)
-          setLocal({ [STORAGE.key]: response.Key, [STORAGE.nameOrEmail]: this.form.nameOrEmail })
-          chrome.extension.getBackgroundPage().openSocket();
-          this.$router.push({name: 'ChatRoom'})
+          setLocal({
+            [STORAGE.key]: response.Key,
+            [STORAGE.account]: data,
+          })
+          chrome.extension.getBackgroundPage().openSocket()
+          this.$router.push({ name: 'ChatRoom' })
         })
       })
     },
     register() {
-      window.open(process.env.VUE_APP_BASE_URL + '/register?r=Lemon');
-    }
+      window.open(process.env.VUE_APP_BASE_URL + '/register?r=Lemon')
+    },
   },
 }
 </script>

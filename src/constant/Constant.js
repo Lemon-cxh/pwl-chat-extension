@@ -9,7 +9,7 @@ export const MESSAGE_TYPE = {
 // storage存储key
 export const STORAGE = {
   key: 'keyStorage',
-  nameOrEmail: 'nameOrEmailStorage',
+  account: 'accountStorage',
   liveness: 'livenessStorage',
   options: 'options'
 }

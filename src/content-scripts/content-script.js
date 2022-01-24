@@ -106,8 +106,8 @@ function insetMessage(data) {
   } else {
     data.content = data.content.substring(3, data.content.length - 4)
     data.content = data.content.replaceAll(
-      '<img ',
-      '<img referrerpolicy="no-referrer" '
+      /(<img )/g,
+      '$1referrerpolicy="no-referrer" '
     )
     child.innerHTML = name + ':' + data.content
   }

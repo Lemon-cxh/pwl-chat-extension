@@ -34,16 +34,14 @@ getSync({ [STORAGE.options]: defaultOptions }, (result) => {
   options = result.options
 })
 
-store.dispatch('getUser').then(() => {
-  init()
-  getMoreEvent()
-})
-
 window.openSocket = function () {
   store.dispatch('getUser').then(() => {
-    init()
+    initWebSocket()
   })
 }
+
+window.openSocket()
+getMoreEvent()
 
 window.closeSocket = function () {
   if (window.mySocket && window.mySocket.readyState !== WebSocket.CLOSED) {
@@ -52,7 +50,7 @@ window.closeSocket = function () {
   store.commit('clearMessage')
 }
 
-function init() {
+function initWebSocket() {
   getLocal([STORAGE.key], function (result) {
     if (!result[STORAGE.key]) {
       window.closeSocket()
@@ -69,12 +67,12 @@ function init() {
     window.mySocket.onmessage = (event) => messageHandler(event)
     window.mySocket.onerror = () => {
       setTimeout(() => {
-        init()
+        window.openSocket()
       }, 5000)
     }
     window.mySocket.onclose = () => {
       setTimeout(() => {
-        init()
+        window.openSocket()
       }, 5000)
     }
   })

@@ -5,44 +5,48 @@ import router from '../router'
 import IconSvg from '../components/Icon-svg'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
-import { getUserInfo } from '../api/login'
+import { getUserInfo, getKey } from '../api/login'
 import { getLocal, setLocal } from '../utils/chromeUtil'
 import { STORAGE } from '../constant/Constant'
 
 // 设置ElMessage显示时间
-['success', 'warning', 'info', 'error'].forEach(type => {
-  ElMessage[type] = msg => {
+;['success', 'warning', 'info', 'error'].forEach((type) => {
+  ElMessage[type] = (msg) => {
     return ElMessage({
       message: msg,
       type: type,
-      duration: 2000
-    });
-  };
-});
+      duration: 2000,
+    })
+  }
+})
 
 // 导入svg
-const requireAll = requireContext => requireContext.keys().map(requireContext)
+const requireAll = (requireContext) => requireContext.keys().map(requireContext)
 const req = require.context('../svg', false, /\.svg$/)
 requireAll(req)
 
-getLocal([STORAGE.key], function (result) {
-  if (!result[STORAGE.key]) {
+getLocal([STORAGE.key, STORAGE.account], async (result) => {
+  let key = result[STORAGE.key]
+  if (!key) {
     router.push({ name: 'Login' })
     return
   }
-  getUserInfo({ apiKey: result[STORAGE.key] }).then((res) => {
-    if (res && 0 === res.code) {
-      store.commit('setKey', result[STORAGE.key])
-      store.commit('setUserInfo', res.data)
-      router.push({ name: 'ChatRoom' })
+  let res = await getUserInfo({ apiKey: key })
+  if (res.code !== 0) {
+    let r = await getKey(result[STORAGE.account])
+    if (r.code !== 0) {
+      chrome.extension.getBackgroundPage().closeSocket()
+      setLocal({ [STORAGE.key]: '' })
+      router.push({ name: 'Login' })
       return
     }
-    chrome.extension.getBackgroundPage().closeSocket()
-    setLocal({ [STORAGE.key]: '' })
-    router.push({ name: 'Login' })
-  }).catch(() => {
-    router.push({ name: 'Error' })
-  })
+    key = r.Key
+    res = await getUserInfo({ apiKey: key })
+    setLocal({ [STORAGE.key]: key })
+  }
+  store.commit('setKey', key)
+  store.commit('setUserInfo', res.data)
+  router.push({ name: 'ChatRoom' })
 })
 
 // Icon-svg、ElMessage注册为全局组件，

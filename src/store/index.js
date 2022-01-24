@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import { getUserInfo } from '../api/login'
+import { getUserInfo, getKey } from '../api/login'
 import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
 import { setLocal, getLocal } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
@@ -181,17 +181,23 @@ export default createStore({
   actions: {
     getUser(context) {
       return new Promise((resolve) => {
-        getLocal([STORAGE.key], function (result) {
+        getLocal([STORAGE.key, STORAGE.account], async (result) => {
           if (result && result[STORAGE.key]) {
-            getUserInfo({ apiKey: result[STORAGE.key] }).then((res) => {
-              if (res.code !== 0) {
+            let key = result[STORAGE.key]
+            let res = await getUserInfo({ apiKey: key })
+            if (res.code !== 0) {
+              let r = await getKey(result[STORAGE.account])
+              if (r.code !== 0) {
                 setLocal({ [STORAGE.key]: '' })
                 return
               }
-              context.commit('setUserInfo', res.data)
-              context.commit('setKey', result[STORAGE.key])
-              resolve()
-            })
+              key = r.key
+              setLocal({ [STORAGE.key]: r.Key })
+              res = await getUserInfo({ apiKey: key })
+            }
+            context.commit('setUserInfo', res.data)
+            context.commit('setKey', key)
+            resolve()
           }
         })
       })
