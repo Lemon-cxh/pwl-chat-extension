@@ -24,6 +24,7 @@ service.interceptors.response.use(
     })
   },
   error => {
+    console.dir(error)
     ElMessage.error({
       message: error,
       type: 'error',
