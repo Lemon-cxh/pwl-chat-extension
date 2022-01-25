@@ -55,4 +55,10 @@ createApp(App)
   .use(store)
   .component('icon-svg', IconSvg)
   .provide('$message', ElMessage)
+  // 自定义 v-focus 指令
+  .directive('focus', {
+    mounted(el) {
+      el.children[0].focus()
+    }
+  })
   .mount('#app')

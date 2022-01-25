@@ -12,7 +12,7 @@
         <el-input
           class="input"
           v-model.trim="form.nameOrEmail"
-          ref="nameOrEmail"
+          v-focus
         ></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="userPassword">
@@ -66,7 +66,6 @@ export default {
         that.$refs.userPassword.focus()
         return
       }
-      that.$refs.nameOrEmail.focus()
     })
   },
   methods: {

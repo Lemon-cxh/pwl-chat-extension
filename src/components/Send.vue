@@ -12,6 +12,7 @@
             size="large"
             placeholder="说点什么吧!"
             v-model="content"
+            v-focus
             ref="contentInput"
             class="dark-mode"
             @paste.capture.prevent="pasteHandler"
@@ -110,11 +111,6 @@ export default {
     form() {
       return { content: this.content, apiKey: this.key }
     },
-  },
-  mounted() {
-    this.$nextTick(function () {
-      this.$refs.contentInput.focus()
-    })
   },
   methods: {
     pasteHandler(e) {

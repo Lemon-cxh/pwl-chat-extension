@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_URL,
-  timeout: 5000
+  timeout: 10000
 })
 
 service.interceptors.request.use(config => {
@@ -26,7 +26,7 @@ service.interceptors.response.use(
   error => {
     console.dir(error)
     ElMessage.error({
-      message: error,
+      message: error.message,
       type: 'error',
       duration: 2000
     })
