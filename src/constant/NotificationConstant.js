@@ -82,6 +82,13 @@ export const type = new Map([
         content: 'description',
         time: 'createTime',
       },
+      25: {
+        title: '帖子',
+        avatar: 'thumbnailURL',
+        userName: 'userName',
+        content: 'description',
+        time: 'createTime',
+      },
       27: {
         title: '帖子',
         avatar: 'thumbnailURL',
@@ -89,6 +96,13 @@ export const type = new Map([
         content: 'description',
         time: 'createTime',
       },
+      2: {
+        title: '帖子中提及了你',
+        avatar: 'thumbnailURL',
+        userName: 'authorName',
+        content: 'articleTitle',
+        time: 'createTime',
+      }
     },
   ],
   [
