@@ -191,8 +191,8 @@ export default createStore({
                 setLocal({ [STORAGE.key]: '' })
                 return
               }
-              key = r.key
-              setLocal({ [STORAGE.key]: r.Key })
+              key = r.Key
+              setLocal({ [STORAGE.key]: key })
               res = await getUserInfo({ apiKey: key })
             }
             context.commit('setUserInfo', res.data)
