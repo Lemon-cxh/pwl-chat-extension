@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_URL,
-  timeout: 10000
+  // timeout: 10000
 })
 
 service.interceptors.request.use(config => {

@@ -66,7 +66,7 @@
           </div>
         </div>
       </transition-group>
-      <div class="icon-box">
+      <div class="loading-box">
         <icon-svg icon-class="loading" class="loading" v-if="loading" />
       </div>
       <icon-svg
@@ -399,15 +399,6 @@ export default {
 .user-box {
   padding: 5px;
 }
-.icon-box {
-  width: 100%;
-  text-align: center;
-}
-.loading {
-  animation: rotate 1s linear infinite;
-  font-size: 24px;
-  color: #f79533;
-}
 .menu-row {
   height: 30px;
   justify-content: space-between;
@@ -441,14 +432,6 @@ export default {
 }
 .message-box {
   padding-right: 5px;
-}
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>
 <style>

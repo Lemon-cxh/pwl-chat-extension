@@ -101,6 +101,9 @@
       </template>
       <el-empty v-show="!loading && list.length === 0" class="dark-mode"></el-empty>
       <el-row class="tip" v-show="list.length > 0 && nodata">没有数据啦~</el-row>
+      <div class="loading-box">
+        <icon-svg icon-class="loading" class="loading" v-if="loading" />
+      </div>
       <icon-svg
         icon-class="top"
         class="back-top"

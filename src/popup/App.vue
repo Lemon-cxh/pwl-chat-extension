@@ -59,6 +59,23 @@ p {
   right: 20px;
   font-size: 36px;
 }
+.loading-box {
+  width: 100%;
+  text-align: center;
+}
+.loading {
+  animation: rotate 1s linear infinite;
+  font-size: 30px;
+  color: #f79533;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
