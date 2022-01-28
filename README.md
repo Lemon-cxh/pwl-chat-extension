@@ -12,7 +12,7 @@
 [Chrome Web Store](https://chrome.google.com/webstore/detail/%E6%91%B8%E9%B1%BC%E6%B4%BE%E8%81%8A%E5%A4%A9%E5%AE%A4/fkaomdjjdbglkbcmfhhlioejkpacbbpe?hl=zh-CN&authuser=0)
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fkaomdjjdbglkbcmfhhlioejkpacbbpe?logo=GoogleChrome&logoColor=white&label=version&color=success)
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/fkaomdjjdbglkbcmfhhlioejkpacbbpe?color=blue)
-![Chrome Web Store](https://img.shields.io/chrome-web-store/rating/fkaomdjjdbglkbcmfhhlioejkpacbbpe&color=red)
+![Chrome Web Store](https://img.shields.io/chrome-web-store/rating/fkaomdjjdbglkbcmfhhlioejkpacbbpe?color=red)
 
 [Microsoft Web Store](https://microsoftedge.microsoft.com/addons/detail/%E6%91%B8%E9%B1%BC%E6%B4%BE%E8%81%8A%E5%A4%A9%E5%AE%A4/oldbilakhdpiamjbkocdcdnlnakainfm)
 ![Microsoft Store](https://img.shields.io/badge/dynamic/json?logo=MicrosoftEdge&label=version&prefix=v&query=%24.version&color=success&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Foldbilakhdpiamjbkocdcdnlnakainfm%3Fhl%3Dzh-CN%26gl%3DCN)
