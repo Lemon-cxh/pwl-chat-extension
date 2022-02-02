@@ -199,12 +199,12 @@ function onlineEvent(data) {
   currentOnline
     .filter((current) => !careOnline.some((e) => current === e))
     .forEach((e) => {
-      notifications('特别关心', '[' + e + ']上线了')
+      notifications('特别关心', `[${e}]上线了`)
     })
   careOnline
     .filter((e) => !currentOnline.some((current) => current === e))
     .forEach((e) => {
-      notifications('特别关心', '[' + e + ']下线了')
+      notifications('特别关心', `[${e}]下线了`)
     })
   careOnline = currentOnline
 }
@@ -216,9 +216,9 @@ function atNotifications(message) {
     message.md &&
     -1 !== message.md.indexOf('@' + store.getters.userInfo.userName)
   ) {
-    notifications(message.userName + '@了你', message.md)
+    notifications(`${message.userName}@了你, ${message.md}`)
   }
-  chrome.browserAction.setBadgeText({ text: '' + ++count })
+  chrome.action.setBadgeText({ text: `${++count}` })
 }
 
 function getMoreEvent() {
@@ -268,7 +268,7 @@ function markBlack(message) {
 
 function clearBadgeText() {
   count = 0
-  chrome.browserAction.setBadgeText({ text: '' })
+  chrome.action.setBadgeText({ text: '' })
 }
 
 createApp().use(store)

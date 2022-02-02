@@ -33,6 +33,13 @@ module.exports = {
           },
         },
       },
+      artifactFilename: ({ name, version, mode }) => {
+        return `${name}-v${version}-${mode}.zip`;
+      },
+      manifestTransformer: (manifest) => {
+        manifest.content_security_policy = {"extension_pages": "script-src 'self'; object-src 'self';"}
+        return manifest;
+      }
     },
   },
   productionSourceMap: isProduction ? false : true,
@@ -52,6 +59,7 @@ module.exports = {
       }),
       Icons()
     )
+    config.devtool = 'source-map'
     if (isProduction) {
       // webpack-extension-reloader 热加载
       config.plugins.push(
