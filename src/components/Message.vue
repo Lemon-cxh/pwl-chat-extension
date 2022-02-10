@@ -85,7 +85,7 @@
     <el-row
       v-if="message.users"
       type="flex"
-      :class="isOwn ? 'own-plus-one-box plus-one-box' : 'plus-one-box'"
+      :class="[{'own-plus-one-box' : isOwn}, 'plus-one-box']"
     >
       <el-avatar
         v-for="(item, index) in message.users"
@@ -96,7 +96,7 @@
         @click="$emit('showUserCard', item.userName)"
       />
       <el-row
-        :class="isOwn ? 'plus-one-text own-plus-one-text' : 'plus-one-text'"
+        :class="[{'own-plus-one-text': isOwn}, 'plus-one-text']"
         >{{ message.users.length }} 人+1
       </el-row>
     </el-row>
