@@ -1,12 +1,7 @@
 import { createApp } from 'vue'
 import store from './store'
 import { more, send, openRedPacket } from './api/chat'
-import {
-  notifications,
-  getLocal,
-  sendTabsMessage,
-  getSync,
-} from './utils/chromeUtil'
+import { notifications, getLocal, sendTabsMessage } from './utils/chromeUtil'
 import {
   MESSAGE_TYPE,
   STORAGE,
@@ -24,7 +19,8 @@ let pop_message = false
 let options = defaultOptions
 let careOnline = []
 
-getSync({ [STORAGE.options]: defaultOptions }, (result) => {
+chrome.storage.sync.get({ [STORAGE.options]: defaultOptions }, (result) => {
+  console.dir(result.options)
   if (result.options.blacklist) {
     result.options.blacklist = JSON.parse(result.options.blacklist)
   }
@@ -32,78 +28,14 @@ getSync({ [STORAGE.options]: defaultOptions }, (result) => {
     result.options.care = JSON.parse(result.options.care)
   }
   options = result.options
+  window.openSocket()
+  getMoreEvent()
 })
 
 window.openSocket = function () {
   store.dispatch('getUser').then(() => {
     initWebSocket()
   })
-}
-
-window.openSocket()
-getMoreEvent()
-
-window.closeSocket = function () {
-  if (window.mySocket && window.mySocket.readyState !== WebSocket.CLOSED) {
-    window.mySocket.close()
-  }
-  store.commit('clearMessage')
-}
-
-function initWebSocket() {
-  getLocal([STORAGE.key], function (result) {
-    if (!result[STORAGE.key]) {
-      window.closeSocket()
-      return
-    }
-    if (
-      window.mySocket &&
-      (window.mySocket.readyState === WebSocket.OPEN ||
-        window.mySocket.readyState === WebSocket.CONNECTING)
-    ) {
-      return
-    }
-    window.mySocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
-    window.mySocket.onmessage = (event) => messageHandler(event)
-    window.mySocket.onerror = () => {
-      setTimeout(() => {
-        window.openSocket()
-      }, 5000)
-    }
-    window.mySocket.onclose = () => {
-      setTimeout(() => {
-        window.openSocket()
-      }, 5000)
-    }
-  })
-}
-
-function messageHandler(event) {
-  let data = JSON.parse(event.data)
-  switch (data.type) {
-    case MESSAGE_TYPE.online:
-      if (port) {
-        port.postMessage({ type: EVENT.online, data: data })
-      }
-      store.commit('setOnline', data)
-      onlineEvent(data)
-      break
-    case MESSAGE_TYPE.revoke:
-      if (port) {
-        port.postMessage({ type: EVENT.revoke, data: data.oId })
-      }
-      store.commit('revoke', data.oId)
-      break
-    case MESSAGE_TYPE.redPacketStatus:
-      messageEvent(data, false)
-      if (port) {
-        port.postMessage({ type: EVENT.redPacketStatus, data: data.oId })
-      }
-      store.commit('updateRedPacket', data.oId)
-      break
-    default:
-      messageEvent(data, true)
-  }
 }
 
 chrome.runtime.onConnect.addListener(function (p) {
@@ -167,6 +99,69 @@ chrome.runtime.onMessage.addListener(function (request) {
     )
   }
 })
+
+window.closeSocket = function () {
+  if (window.mySocket && window.mySocket.readyState !== WebSocket.CLOSED) {
+    window.mySocket.close()
+  }
+  store.commit('clearMessage')
+}
+
+function initWebSocket() {
+  getLocal([STORAGE.key], function (result) {
+    if (!result[STORAGE.key]) {
+      window.closeSocket()
+      return
+    }
+    if (
+      window.mySocket &&
+      (window.mySocket.readyState === WebSocket.OPEN ||
+        window.mySocket.readyState === WebSocket.CONNECTING)
+    ) {
+      return
+    }
+    window.mySocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
+    window.mySocket.onmessage = (event) => messageHandler(event)
+    window.mySocket.onerror = () => {
+      setTimeout(() => {
+        window.openSocket()
+      }, 5000)
+    }
+    window.mySocket.onclose = () => {
+      setTimeout(() => {
+        window.openSocket()
+      }, 5000)
+    }
+  })
+}
+
+function messageHandler(event) {
+  let data = JSON.parse(event.data)
+  switch (data.type) {
+    case MESSAGE_TYPE.online:
+      if (port) {
+        port.postMessage({ type: EVENT.online, data: data })
+      }
+      store.commit('setOnline', data)
+      onlineEvent(data)
+      break
+    case MESSAGE_TYPE.revoke:
+      if (port) {
+        port.postMessage({ type: EVENT.revoke, data: data.oId })
+      }
+      store.commit('revoke', data.oId)
+      break
+    case MESSAGE_TYPE.redPacketStatus:
+      messageEvent(data, false)
+      if (port) {
+        port.postMessage({ type: EVENT.redPacketStatus, data: data.oId })
+      }
+      store.commit('updateRedPacket', data.oId)
+      break
+    default:
+      messageEvent(data, true)
+  }
+}
 
 function messageEvent(message, isMsg) {
   markBlack(message)
