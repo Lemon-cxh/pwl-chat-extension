@@ -32,7 +32,7 @@ export const typeArray = [
   {
     name: 'sys-announce',
     title: '系统',
-    count: 'unreadAtNotiunreadSysAnnounceNotificationCntficationCnt',
+    count: 'unreadSysAnnounceNotificationCnt',
   },
 ]
 export const type = new Map([
