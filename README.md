@@ -46,7 +46,7 @@
 ├── src/
 │   ├── api/                    - 所有请求
 │   ├── components/             - 各个组件
-│   ├── components/             - 常量
+│   ├── constant/               - 常量
 │   ├── content-scripts/
 │   │   └── content-script.js   - 需要向网页注入的js
 │   ├── popup/                  - 点击扩展图标展示的入口页面
