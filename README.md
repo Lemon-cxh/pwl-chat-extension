@@ -6,7 +6,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/Lemon-cxh/pwl-chat-extension)
 ![GitHub all releases](https://img.shields.io/github/downloads/Lemon-cxh/pwl-chat-extension/total?color=blue)
 ![GitHub watchers](https://img.shields.io/github/watchers/Lemon-cxh/pwl-chat-extension)
-![GitHub followers](https://img.shields.io/github/followers/Lemon-cxh)
+![GitHub forks](https://img.shields.io/github/forks/Lemon-cxh/pwl-chat-extension)
 ![GitHub User's stars](https://img.shields.io/github/stars/Lemon-cxh/pwl-chat-extension)
 
 [Chrome Web Store](https://chrome.google.com/webstore/detail/%E6%91%B8%E9%B1%BC%E6%B4%BE%E8%81%8A%E5%A4%A9%E5%AE%A4/fkaomdjjdbglkbcmfhhlioejkpacbbpe?hl=zh-CN&authuser=0)

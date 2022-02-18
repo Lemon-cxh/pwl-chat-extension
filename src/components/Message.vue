@@ -324,4 +324,9 @@ export default {
   max-width: 265px;
   overflow: auto;
 }
+.message-content blockquote {
+  margin: 0px;
+  border-left: 3px solid #6e6e6e;
+  padding-left: 5px;
+}
 </style>
