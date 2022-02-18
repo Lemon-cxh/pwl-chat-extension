@@ -44,8 +44,8 @@ export const defaultOptions = {
     opacity: 0.5,
     color: '#FFFFFF',
   },
-  blacklist: [],
-  care: []
+  blacklist: '',
+  care: ''
 }
 
 export const MESSAGE_LIMIT = 25;

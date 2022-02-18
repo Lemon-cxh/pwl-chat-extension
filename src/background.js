@@ -17,9 +17,14 @@ import {
 } from './constant/Constant'
 
 const URL = 'wss://fishpi.cn/chat-room-channel'
+// 最大保留两页消息
 const MAX_PAGE = 2
+let intervalId = undefined
+// 与popup页面的通信
 let port = null
+// 未读消息数
 let count = 0
+// 是否删除多余消息
 let pop_message = false
 let options = defaultOptions
 let careOnline = []
@@ -40,9 +45,6 @@ window.openSocket = function () {
   })
 }
 
-window.openSocket()
-getMoreEvent()
-
 window.closeSocket = function () {
   if (window.mySocket && window.mySocket.readyState !== WebSocket.CLOSED) {
     window.mySocket.close()
@@ -50,7 +52,10 @@ window.closeSocket = function () {
   store.commit('clearMessage')
 }
 
+window.openSocket()
+
 function initWebSocket() {
+  window.closeSocket()
   getLocal([STORAGE.key], function (result) {
     if (!result[STORAGE.key]) {
       window.closeSocket()
@@ -64,17 +69,22 @@ function initWebSocket() {
       return
     }
     window.mySocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
+    if (intervalId) {
+      clearInterval(intervalId)
+      intervalId = undefined;
+    }
     window.mySocket.onmessage = (event) => messageHandler(event)
     window.mySocket.onerror = () => {
-      setTimeout(() => {
+      intervalId = setInterval(() => {
         window.openSocket()
-      }, 5000)
+      }, 10000)
     }
     window.mySocket.onclose = () => {
-      setTimeout(() => {
+      intervalId = setInterval(() => {
         window.openSocket()
-      }, 5000)
+      }, 10000)
     }
+    getMoreEvent()
   })
 }
 

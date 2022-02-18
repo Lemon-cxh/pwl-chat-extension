@@ -182,23 +182,27 @@ export default createStore({
     getUser(context) {
       return new Promise((resolve) => {
         getLocal([STORAGE.key, STORAGE.account], async (result) => {
-          if (result && result[STORAGE.key]) {
-            let key = result[STORAGE.key]
-            let res = await getUserInfo({ apiKey: key })
-            if (res.code !== 0) {
-              let r = await getKey(result[STORAGE.account])
-              if (r.code !== 0) {
-                setLocal({ [STORAGE.key]: '' })
-                return
-              }
-              key = r.Key
-              setLocal({ [STORAGE.key]: key })
-              res = await getUserInfo({ apiKey: key })
-            }
-            context.commit('setUserInfo', res.data)
-            context.commit('setKey', key)
-            resolve()
+          if (!result || !result[STORAGE.key]) {
+            return
           }
+          let key = result[STORAGE.key]
+          let res = await getUserInfo({ apiKey: key })
+          if (!res) {
+            return
+          }
+          if (res.code !== 0) {
+            let r = await getKey(result[STORAGE.account])
+            if (r.code !== 0) {
+              setLocal({ [STORAGE.key]: '' })
+              return
+            }
+            key = r.Key
+            setLocal({ [STORAGE.key]: key })
+            res = await getUserInfo({ apiKey: key })
+          }
+          context.commit('setUserInfo', res.data)
+          context.commit('setKey', key)
+          resolve()
         })
       })
     },
