@@ -71,7 +71,7 @@ function initWebSocket() {
     window.mySocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
     if (intervalId) {
       clearInterval(intervalId)
-      intervalId = undefined;
+      intervalId = undefined
     }
     window.mySocket.onmessage = (event) => messageHandler(event)
     window.mySocket.onerror = () => {
@@ -179,7 +179,7 @@ chrome.runtime.onMessage.addListener(function (request) {
 })
 
 function messageEvent(message, isMsg) {
-  markBlack(message)
+  markCareAndBlack(message)
   store.commit('addMessage', { message: message, isMsg: isMsg })
   if (port) {
     port.postMessage({ type: EVENT.message, data: message })
@@ -188,15 +188,15 @@ function messageEvent(message, isMsg) {
   if (!isMsg || message.isBlack) {
     return
   }
-  if (options.barrageOptions.enable) {
-    sendTabsMessage({ type: TABS_EVENT.message, data: message }, (res) => {
-      if (!res || res.hidden) {
-        atNotifications(message)
-      }
-    })
+  if (!options.barrageOptions.enable) {
+    atNotifications(message)
     return
   }
-  atNotifications(message)
+  sendTabsMessage({ type: TABS_EVENT.message, data: message }, (res) => {
+    if (!res || res.hidden) {
+      atNotifications(message)
+    }
+  })
 }
 
 function onlineEvent(data) {
@@ -209,26 +209,29 @@ function onlineEvent(data) {
   currentOnline
     .filter((current) => !careOnline.some((e) => current === e))
     .forEach((e) => {
-      notifications('特别关心', '[' + e + ']上线了')
+      notifications('特别关心', `[${e}]上线了`)
     })
   careOnline
     .filter((e) => !currentOnline.some((current) => current === e))
     .forEach((e) => {
-      notifications('特别关心', '[' + e + ']下线了')
+      notifications('特别关心', `[${e}]下线了`)
     })
   careOnline = currentOnline
 }
 
 function atNotifications(message) {
+  chrome.browserAction.setBadgeText({ text: '' + ++count })
+  if (message.isCare) {
+    notifications(message.userName, message.md)
+    return
+  }
   if (
     options.atNotification &&
-    message.type === MESSAGE_TYPE.msg &&
     message.md &&
     -1 !== message.md.indexOf('@' + store.getters.userInfo.userName)
   ) {
-    notifications(message.userName + '@了你', message.md)
+    notifications(`${message.userName}@了你`, message.md)
   }
-  chrome.browserAction.setBadgeText({ text: '' + ++count })
 }
 
 function getMoreEvent() {
@@ -239,14 +242,14 @@ function getMoreEvent() {
       let arr = []
       for (let index = 0; index < data.length; index++) {
         if (index === 0) {
-          markBlack(data[index])
+          markCareAndBlack(data[index])
           arr.unshift(data[index])
           continue
         }
         let e = data[index]
         let last = arr[0]
         if (last.content !== e.content) {
-          markBlack(e)
+          markCareAndBlack(e)
           arr.unshift(e)
           continue
         }
@@ -267,13 +270,11 @@ function getMoreEvent() {
   })
 }
 
-function markBlack(message) {
-  if (
-    options.blacklist &&
-    options.blacklist.some((e) => e === message.userName)
-  ) {
-    message.isBlack = true
-  }
+function markCareAndBlack(message) {
+  message.isCare =
+    options.care && options.care.some((e) => e === message.userName)
+  message.isBlack =
+    options.blacklist && options.blacklist.some((e) => e === message.userName)
 }
 
 function clearBadgeText() {

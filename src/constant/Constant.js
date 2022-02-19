@@ -29,11 +29,29 @@ export const EVENT = {
 }
 
 export const TABS_EVENT = {
+  /**
+   * 显示图片
+   */
   showImage: 1,
+  /**
+   * 网页接收消息
+   */
   message: 2,
+  /**
+   * 网页发送消息
+   */
   sendMessage: 3,
+  /**
+   * 同步配置
+   */
   syncOptions: 4,
+  /**
+   * 网页打开红包
+   */
   openRedPacket: 5,
+  /**
+   * 标记红包领取状态
+   */
   markRedPacket: 6
 }
 

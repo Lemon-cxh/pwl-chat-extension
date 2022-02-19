@@ -32,6 +32,10 @@ getLocal([STORAGE.key, STORAGE.account], async (result) => {
     return
   }
   let res = await getUserInfo({ apiKey: key })
+  if (typeof res.code === 'undefined') {
+    router.push({ name: 'Error' })
+    return
+  }
   if (res.code !== 0) {
     let r = await getKey(result[STORAGE.account])
     if (r.code !== 0) {

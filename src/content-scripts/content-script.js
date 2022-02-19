@@ -3,8 +3,9 @@ import { getSync } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
 
 let height = 25
-// 屏幕宽 / 时间
+// 弹幕滚动速度：屏幕宽 / 时间
 const speed = 76
+// 弹幕所在的行数
 let index = 0
 let lastMessage = {
   oId: '',
@@ -102,14 +103,16 @@ function insetMessage(data) {
   let child = document.createElement('div')
   child.setAttribute('id', 'pwl-message-' + data.oId)
   if (redPacket) {
-    child.innerHTML = `🧧${name}的红包来啦，点击领取`
+    child.innerHTML = `🧧${name}的红包来啦,点击领取`
   } else {
     data.content = data.content.substring(3, data.content.length - 4)
     data.content = data.content.replaceAll(
       /(<img )/g,
       '$1referrerpolicy="no-referrer" '
     )
-    child.innerHTML = name + ':' + data.content
+    child.innerHTML = `${data.isCare ? '♥' : ''}${name}:${data.content}${
+      data.isCare ? '♥' : ''
+    }`
   }
   child.setAttribute(
     'class',
@@ -117,7 +120,7 @@ function insetMessage(data) {
   )
   box.appendChild(child)
   let second = getSecond(box, child)
-  child.setAttribute('style', getSytle(child, second))
+  child.setAttribute('style', getSytle(child, second, data.isCare))
   if (redPacket) {
     redPacketClick(child)
   }
@@ -189,8 +192,16 @@ function getSecond(box, child) {
   return Math.round((box.offsetWidth + child.offsetWidth) / speed)
 }
 
-function getSytle(dom, second) {
+function getSytle(dom, second, isCare) {
   index = (index + 3) % 13
   let top = index * height
-  return `font-size: ${options.barrageOptions.fontSize}px;opacity: ${options.barrageOptions.opacity};color: ${options.barrageOptions.color};top: ${top}px;right: -${dom.offsetWidth}px;transform: translateX(calc(-100vw - ${dom.offsetWidth}px));transition: transform ${second}s linear;`
+  return `font-size: ${options.barrageOptions.fontSize}px;${
+    isCare ? 'font-weight: bolder;' : ''
+  }opacity: ${options.barrageOptions.opacity};color: ${
+    options.barrageOptions.color
+  };top: ${top}px;right: -${
+    dom.offsetWidth
+  }px;transform: translateX(calc(-100vw - ${
+    dom.offsetWidth
+  }px));transition: transform ${second}s linear;`
 }
