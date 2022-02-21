@@ -93,12 +93,12 @@ export default {
   },
   watch: {
     content(val) {
-      let matAt = val.match(/@([^\s]+?)$/)
-      if (!matAt) {
+      let matchAt = val.match(/@([^\s]+?)$/)
+      if (!matchAt) {
         this.visible = false
         return
       }
-      getUserName({ name: matAt[1] }).then((res) => {
+      getUserName({ name: matchAt[1] }).then((res) => {
         if (0 === res.code && res.data.length > 0) {
           this.userList = res.data
           this.visible = true
@@ -171,7 +171,6 @@ export default {
           quoteForm.userName
         )}:\n${quoteForm.md ? '> ' + quoteForm.md : quoteForm.content}`
       }
-      console.log(form.content)
       send(form).then((res) => {
         if (0 === res.code) {
           this.quoteVisible = false

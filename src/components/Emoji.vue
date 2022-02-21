@@ -1,8 +1,10 @@
 <template>
   <el-popover placement="left-start" width="211px" trigger="focus">
     <template #reference>
-      <div tabindex="0"><icon-svg icon-class="emojiBtn" /></div
-    ></template>
+      <div tabindex="0">
+        <icon-svg icon-class="emojiBtn" />
+      </div>
+    </template>
     <el-row class="emoji-box">
       <div
         class="emoji"
@@ -47,9 +49,8 @@ export default {
       getEmoji(this.apiKey).then((res) => {
         if (0 === res.code) {
           let emojis = []
-          let key
           res.data.forEach((e) => {
-            for (key in e) {
+            for (let key in e) {
               emojis.push({ name: key, value: e[key] })
             }
           })

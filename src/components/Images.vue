@@ -29,16 +29,17 @@
       size="auto"
     >
       <el-row class="title">从URL导入表情</el-row>
-      <el-row type="flex"
-        ><el-input
+      <el-row type="flex">
+        <el-input
           size="small"
           width="80%"
           placeholder="请输入URL"
           v-model="url"
-        /><el-button size="small" type="primary" @click="addImage"
-          >提交</el-button
-        ></el-row
-      >
+        />
+        <el-button size="small" type="primary" @click="addImage">
+          提交
+        </el-button>
+      </el-row>
     </el-drawer>
   </div>
 </template>
