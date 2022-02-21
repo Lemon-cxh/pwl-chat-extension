@@ -38,6 +38,7 @@
 .pwl-message-child * {
   margin: 0px;
   padding: 0px;
+  font-size: 1em;
 }
 .pwl-message-child img[class="emoji"] {
   pointer-events: none;

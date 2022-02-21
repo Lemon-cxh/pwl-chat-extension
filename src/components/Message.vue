@@ -323,5 +323,6 @@ export default {
 .message-content * {
   max-width: 265px;
   overflow: auto;
+  margin: 0px;
 }
 </style>
