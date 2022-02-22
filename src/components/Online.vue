@@ -14,11 +14,11 @@
     </template>
     <el-row class="avatar-box">
       <el-avatar
-        class="avatar"
         v-for="(item, index) in online.users"
         :key="index"
         :size="30"
         :src="item.userAvatarURL"
+        class="avatar"
         @click="$emit('showUserCard', item.userName)"
       >
       </el-avatar>

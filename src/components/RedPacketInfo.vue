@@ -18,10 +18,10 @@
       </el-row>
       <div class="who-box">
         <el-row
-          class="item"
-          type="flex"
           v-for="(item, index) in info.who"
           :key="index"
+          class="item"
+          type="flex"
         >
           <el-row type="flex">
             <el-avatar
@@ -61,16 +61,16 @@ export default {
     userInfo: Object,
   },
   emits: ['close'],
+  setup(props) {
+    const { dialogVisible: visible } = toRefs(props)
+    return { visible }
+  },
   data() {
     return {
       message: '',
       max: 0,
       count: 0,
     }
-  },
-  setup(props) {
-    const { dialogVisible: visible } = toRefs(props)
-    return { visible }
   },
   watch: {
     info(val) {

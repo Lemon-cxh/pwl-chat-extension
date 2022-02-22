@@ -5,7 +5,7 @@
         <div tabindex="0"><icon-svg icon-class="imageBtn" /></div>
       </template>
       <el-row class="image-box">
-        <div class="image" v-for="(item, index) in images" :key="index">
+        <div v-for="(item, index) in images" :key="index" class="image">
           <div class="image-item">
             <img :src="item" class="image" @click="selectImage(item)" />
             <circle-close-filled
@@ -51,10 +51,11 @@ import { CircleCloseFilled } from '@element-plus/icons-vue'
 
 export default {
   name: 'images',
-  emits: ['sendMessage'],
   components: {
     CircleCloseFilled,
   },
+  inject: ['$message'],
+  emits: ['sendMessage'],
   data() {
     return {
       drawer: false,
@@ -62,7 +63,6 @@ export default {
       images: [],
     }
   },
-  inject: ['$message'],
   computed: {
     ...mapGetters(['key']),
     form() {

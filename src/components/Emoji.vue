@@ -7,9 +7,9 @@
     </template>
     <el-row class="emoji-box">
       <div
-        class="emoji"
         v-for="(item, index) in emojis"
         :key="index"
+        class="emoji"
         @click="selectEmoji(item.name)"
       >
         <img

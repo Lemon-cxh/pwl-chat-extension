@@ -73,6 +73,11 @@ import { Promotion, CircleCloseFilled } from '@element-plus/icons-vue'
 
 export default {
   name: 'send',
+  components: {
+    Promotion,
+    CircleCloseFilled,
+  },
+  inject: ['$message'],
   data() {
     return {
       content: '',
@@ -86,10 +91,11 @@ export default {
       },
     }
   },
-  inject: ['$message'],
-  components: {
-    Promotion,
-    CircleCloseFilled,
+  computed: {
+    ...mapGetters(['key']),
+    form() {
+      return { content: this.content, apiKey: this.key }
+    },
   },
   watch: {
     content(val) {
@@ -104,12 +110,6 @@ export default {
           this.visible = true
         }
       })
-    },
-  },
-  computed: {
-    ...mapGetters(['key']),
-    form() {
-      return { content: this.content, apiKey: this.key }
     },
   },
   methods: {

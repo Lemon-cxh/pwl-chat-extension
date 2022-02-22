@@ -6,8 +6,8 @@
         @click="$emit('showUserCard', message.userName)"
       >
         <el-avatar
-          size="default"
           :id="'avatar_' + message.oId"
+          size="default"
           :src="message.userAvatarURL"
         ></el-avatar>
         <img
@@ -26,7 +26,7 @@
         <!-- 红包消息 -->
         <red-packet-message
           v-if="isRedPacket"
-          :oId="message.oId"
+          :o-id="message.oId"
           :content="message.content"
           @show-redpacket-info="showRedpacketInfo"
         />

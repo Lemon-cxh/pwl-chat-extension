@@ -73,11 +73,11 @@ export default {
     Coin,
     LocationFilled,
   },
-  emits: ['closeDialog'],
   props: {
     dialogVisible: Boolean,
     userName: String,
   },
+  emits: ['closeDialog'],
   data() {
     return {
       userInfo: {},

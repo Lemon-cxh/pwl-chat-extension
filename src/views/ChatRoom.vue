@@ -53,8 +53,8 @@
               :ref="'message_' + item.oId"
               :message="item"
               :date="date"
-              :unlimitedRevoke="unlimitedRevoke"
-              :avatarPendant="avatarPendant"
+              :unlimited-revoke="unlimitedRevoke"
+              :avatar-pendant="avatarPendant"
               @revoke-message="revokeMessage"
               @show-user-card="showUserCard"
               @collect-images="collectImages"
@@ -77,14 +77,14 @@
       />
     </el-scrollbar>
     <user-card
-      :userName="userName"
-      :dialogVisible="dialogVisible"
+      :user-name="userName"
+      :dialog-visible="dialogVisible"
       @close-dialog="dialogVisible = false"
     />
     <red-packet-info
-      :userInfo="userInfo"
+      :user-info="userInfo"
       :info="redPacketInfo"
-      :dialogVisible="redPacketVisible"
+      :dialog-visible="redPacketVisible"
       @close="redPacketVisible = false"
     ></red-packet-info>
   </div>

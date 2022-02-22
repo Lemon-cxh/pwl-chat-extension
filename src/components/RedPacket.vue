@@ -40,9 +40,9 @@
         ></el-input-number>
       </el-form-item>
       <el-form-item
-        label="个数"
         v-if="'specify' !== redPacketForm.type"
         prop="count"
+        label="个数"
       >
         <el-input-number
           v-model="redPacketForm.count"
@@ -103,6 +103,7 @@ import { inputRule, selectRule, numberRule } from '../constant/RuleConstant'
 
 export default {
   name: 'redPacket',
+  inject: ['$message'],
   data() {
     return {
       redPacketForm: {
@@ -126,7 +127,6 @@ export default {
       },
     }
   },
-  inject: ['$message'],
   computed: {
     ...mapGetters(['key']),
     apiKey() {

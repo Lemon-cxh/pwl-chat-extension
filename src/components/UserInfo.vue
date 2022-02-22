@@ -101,12 +101,12 @@
         </el-tab-pane>
         <el-tab-pane label="黑名单">
           <el-row>
-            <user-select :user="options.blacklist" @change="blacklistChange"/>
+            <user-select :user="options.blacklist" @change="blacklistChange" />
           </el-row>
         </el-tab-pane>
         <el-tab-pane label="特别关心">
           <el-row>
-            <user-select :user="options.care" @change="careChange"/>
+            <user-select :user="options.care" @change="careChange" />
           </el-row>
         </el-tab-pane>
       </el-tabs>
@@ -116,11 +116,7 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import {
-  liveness,
-  isCollectedLiveness,
-  getLivenessReward
-} from '../api/user'
+import { liveness, isCollectedLiveness, getLivenessReward } from '../api/user'
 import { countNotifications, makeReadNotifications } from '../api/notification'
 import { STORAGE, defaultOptions } from '../constant/Constant'
 import { getDate } from '../utils/util'
@@ -131,12 +127,13 @@ const REQUEST_INTERVAL = 30000
 
 export default {
   name: 'userInfo',
-  emits: ['syncOptions'],
+  inject: ['$message'],
   components: {
     Bell,
     Setting,
     SwitchButton,
   },
+  emits: ['syncOptions'],
   data() {
     return {
       percentage: 0,
@@ -150,7 +147,6 @@ export default {
       options: defaultOptions,
     }
   },
-  inject: ['$message'],
   computed: {
     ...mapGetters(['userInfo', 'key']),
     apiKey() {
@@ -255,18 +251,18 @@ export default {
       this.$router.push({ name: 'Login' })
     },
     blacklistChange(val) {
-      this.options.blacklist = val;
+      this.options.blacklist = val
       this.optionsChange()
     },
     careChange(val) {
-      this.options.care = val;
+      this.options.care = val
       this.optionsChange()
     },
     optionsChange() {
-      let options = {...this.options}
+      let options = { ...this.options }
       this.$emit('syncOptions', this.options)
       options.blacklist = JSON.stringify(options.blacklist)
-      options.care  = JSON.stringify(options.care)
+      options.care = JSON.stringify(options.care)
       setSync({ [STORAGE.options]: options })
     },
   },
@@ -302,8 +298,9 @@ export default {
 .el-progress--without-text .el-progress__text {
   display: block !important;
 }
-.el-progress--circle .el-progress__text, .el-progress--dashboard .el-progress__text {
-  top: 26px !important
+.el-progress--circle .el-progress__text,
+.el-progress--dashboard .el-progress__text {
+  top: 26px !important;
 }
 .el-dropdown-menu,
 .el-drawer__body {
