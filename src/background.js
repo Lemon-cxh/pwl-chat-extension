@@ -39,13 +39,13 @@ getSync({ [STORAGE.options]: defaultOptions }, (result) => {
   options = result.options
 })
 
-window.openSocket = function () {
+window.openSocket = () => {
   store.dispatch('getUser').then(() => {
     initWebSocket()
   })
 }
 
-window.closeSocket = function () {
+window.closeSocket = () => {
   if (window.mySocket && window.mySocket.readyState !== WebSocket.CLOSED) {
     window.mySocket.close()
   }
@@ -56,7 +56,7 @@ window.openSocket()
 
 function initWebSocket() {
   window.closeSocket()
-  getLocal([STORAGE.key], function (result) {
+  getLocal([STORAGE.key], (result) => {
     if (!result[STORAGE.key]) {
       window.closeSocket()
       return
@@ -71,18 +71,13 @@ function initWebSocket() {
     window.mySocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
     if (intervalId) {
       clearInterval(intervalId)
-      intervalId = undefined
+      intervalId = setInterval(() => {
+        window.mySocket.send('-hb-')
+      }, 1000 * 60 * 3)
     }
     window.mySocket.onmessage = (event) => messageHandler(event)
     window.mySocket.onerror = () => {
-      intervalId = setInterval(() => {
-        window.openSocket()
-      }, 10000)
-    }
-    window.mySocket.onclose = () => {
-      intervalId = setInterval(() => {
-        window.openSocket()
-      }, 10000)
+      window.openSocket()
     }
     getMoreEvent()
   })
@@ -116,7 +111,7 @@ function messageHandler(event) {
   }
 }
 
-chrome.runtime.onConnect.addListener(function (p) {
+chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
   port = p
   let message = {
@@ -124,7 +119,7 @@ chrome.runtime.onConnect.addListener(function (p) {
     online: store.getters.online,
   }
   port.postMessage({ type: EVENT.loadMessage, data: message })
-  port.onMessage.addListener(function (msg) {
+  port.onMessage.addListener((msg) => {
     switch (msg.type) {
       case EVENT.getMore:
         getMoreEvent()
@@ -143,7 +138,7 @@ chrome.runtime.onConnect.addListener(function (p) {
         break
     }
   })
-  port.onDisconnect.addListener(function () {
+  port.onDisconnect.addListener(() => {
     port.disconnect()
     port = null
     if (pop_message) {
@@ -157,7 +152,7 @@ chrome.runtime.onConnect.addListener(function (p) {
   })
 })
 
-chrome.runtime.onMessage.addListener(function (request) {
+chrome.runtime.onMessage.addListener((request) => {
   if (TABS_EVENT.sendMessage === request.type) {
     send({ content: request.data, apiKey: store.getters.key }).then()
     return
