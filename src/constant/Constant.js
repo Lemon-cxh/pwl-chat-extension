@@ -60,7 +60,7 @@ export const defaultOptions = {
     enable: false,
     fontSize: 16,
     opacity: 0.5,
-    color: '#FFFFFF',
+    color: '#000000',
   },
   blacklist: '',
   care: ''
