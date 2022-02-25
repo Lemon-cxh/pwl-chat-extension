@@ -25,7 +25,6 @@
   width: fit-content;
   max-width: 40vw;
   margin-right: 50px;
-  text-shadow: #9f9f9f 0.1em 0.1em 0.2em;
 }
 .pwl-message-child audio, .pwl-message-child iframe {
   max-width: 100px;

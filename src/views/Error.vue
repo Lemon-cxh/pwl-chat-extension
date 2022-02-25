@@ -14,7 +14,7 @@ export default {
 
 <style scoped>
 .text {
-  text-align: center;
+  justify-content: center;
   font-size: 20px;
   color: white;
 }
