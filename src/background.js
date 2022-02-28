@@ -46,7 +46,7 @@ window.openSocket = () => {
 }
 
 window.closeSocket = () => {
-  if (window.mySocket && window.mySocket.readyState !== WebSocket.CLOSED) {
+  if (socketIsOpen()) {
     window.mySocket.close()
   }
   store.commit('clearMessage')
@@ -55,32 +55,42 @@ window.closeSocket = () => {
 window.openSocket()
 
 function initWebSocket() {
-  window.closeSocket()
   getLocal([STORAGE.key], (result) => {
     if (!result[STORAGE.key]) {
       window.closeSocket()
       return
     }
-    if (
-      window.mySocket &&
-      (window.mySocket.readyState === WebSocket.OPEN ||
-        window.mySocket.readyState === WebSocket.CONNECTING)
-    ) {
+    if (socketIsOpen()) {
       return
     }
     window.mySocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
-    if (intervalId) {
+    if (intervalId != undefined) {
       clearInterval(intervalId)
-      intervalId = setInterval(() => {
-        window.mySocket.send('-hb-')
-      }, 1000 * 60 * 3)
     }
+    intervalId = setInterval(() => {
+      if (!socketIsOpen()) {
+        window.openSocket()
+      }
+    }, 1000 * 60)
     window.mySocket.onmessage = (event) => messageHandler(event)
-    window.mySocket.onerror = () => {
+    window.mySocket.onerror = (e) => {
+      console.log('WebSocket error observed:', e)
+    }
+    window.mySocket.onclose = (e) => {
+      console.log('WebSocket close observed:', e)
+      window.closeSocket()
       window.openSocket()
     }
     getMoreEvent()
   })
+}
+
+function socketIsOpen() {
+  return (
+    window.mySocket &&
+    (window.mySocket.readyState === WebSocket.OPEN ||
+      window.mySocket.readyState === WebSocket.CONNECTING)
+  )
 }
 
 function messageHandler(event) {

@@ -187,11 +187,14 @@ export default createStore({
           }
           let key = result[STORAGE.key]
           let res = await getUserInfo({ apiKey: key })
-          if (!res) {
+          if (res.code === undefined) {
             return
           }
           if (res.code !== 0) {
             let r = await getKey(result[STORAGE.account])
+            if (res.code === undefined) {
+              return
+            }
             if (r.code !== 0) {
               setLocal({ [STORAGE.key]: '' })
               return
@@ -199,6 +202,9 @@ export default createStore({
             key = r.Key
             setLocal({ [STORAGE.key]: key })
             res = await getUserInfo({ apiKey: key })
+            if (res.code === undefined || r.code !== 0) {
+              return
+            }
           }
           context.commit('setUserInfo', res.data)
           context.commit('setKey', key)
