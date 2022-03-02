@@ -40,9 +40,14 @@ getSync({ [STORAGE.options]: defaultOptions }, (result) => {
 })
 
 window.openSocket = () => {
-  store.dispatch('getUser').then(() => {
-    initWebSocket()
-  })
+  store
+    .dispatch('getUser')
+    .then(() => {
+      initWebSocket()
+    })
+    .catch(() => {
+      window.mySocket.close()
+    })
 }
 
 window.closeSocket = () => {
@@ -64,9 +69,7 @@ function initWebSocket() {
       clearInterval(intervalId)
     }
     intervalId = setInterval(() => {
-      if (!socketIsOpen()) {
-        window.openSocket()
-      }
+      window.openSocket()
     }, 1000 * 60)
     window.mySocket.onmessage = (event) => messageHandler(event)
     window.mySocket.onerror = (e) => {

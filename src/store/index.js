@@ -180,29 +180,34 @@ export default createStore({
   },
   actions: {
     getUser(context) {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         getLocal([STORAGE.key, STORAGE.account], async (result) => {
           if (!result || !result[STORAGE.key]) {
+            reject()
             return
           }
           let key = result[STORAGE.key]
           let res = await getUserInfo({ apiKey: key })
           if (res.code === undefined) {
+            reject()
             return
           }
           if (res.code !== 0) {
             let r = await getKey(result[STORAGE.account])
             if (res.code === undefined) {
+              reject()
               return
             }
             if (r.code !== 0) {
               setLocal({ [STORAGE.key]: '' })
+              reject()
               return
             }
             key = r.Key
             setLocal({ [STORAGE.key]: key })
             res = await getUserInfo({ apiKey: key })
             if (res.code === undefined || r.code !== 0) {
+              reject()
               return
             }
           }
