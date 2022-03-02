@@ -55,14 +55,10 @@ window.closeSocket = () => {
 window.openSocket()
 
 function initWebSocket() {
+  if (socketIsOpen()) {
+    return
+  }
   getLocal([STORAGE.key], (result) => {
-    if (!result[STORAGE.key]) {
-      window.closeSocket()
-      return
-    }
-    if (socketIsOpen()) {
-      return
-    }
     window.mySocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
     if (intervalId != undefined) {
       clearInterval(intervalId)
@@ -239,40 +235,40 @@ function atNotifications(message) {
   }
 }
 
-function getMoreEvent() {
+async function getMoreEvent() {
   let pageParams = store.getters.pageParams
-  more({ page: pageParams.page, apiKey: store.getters.key }).then((res) => {
-    if (res.code === 0) {
-      let data = res.data.slice(res.data.length - pageParams.length).reverse()
-      let arr = []
-      for (let index = 0; index < data.length; index++) {
-        if (index === 0) {
-          markCareAndBlack(data[index])
-          arr.unshift(data[index])
-          continue
-        }
-        let e = data[index]
-        let last = arr[0]
-        if (last.content !== e.content) {
-          markCareAndBlack(e)
-          arr.unshift(e)
-          continue
-        }
-        let { users = [], oIds = [] } = last
-        users.push({
-          userName: e.userName,
-          userAvatarURL: e.userAvatarURL,
-        })
-        oIds.push(e.oId)
-        arr[0].users = users
-        arr[0].oIds = oIds
-      }
-      store.commit('concatMessage', { message: arr, size: data.length })
-      if (port) {
-        port.postMessage({ type: EVENT.more, data: arr })
-      }
+  let res = await more({ page: pageParams.page, apiKey: store.getters.key })
+  if (res.code !== 0) {
+    return
+  }
+  let data = res.data.slice(res.data.length - pageParams.length).reverse()
+  let arr = []
+  for (let index = 0; index < data.length; index++) {
+    if (index === 0) {
+      markCareAndBlack(data[index])
+      arr.unshift(data[index])
+      continue
     }
-  })
+    let e = data[index]
+    let last = arr[0]
+    if (last.content !== e.content) {
+      markCareAndBlack(e)
+      arr.unshift(e)
+      continue
+    }
+    let { users = [], oIds = [] } = last
+    users.push({
+      userName: e.userName,
+      userAvatarURL: e.userAvatarURL,
+    })
+    oIds.push(e.oId)
+    arr[0].users = users
+    arr[0].oIds = oIds
+  }
+  store.commit('concatMessage', { message: arr, size: data.length })
+  if (port) {
+    port.postMessage({ type: EVENT.more, data: arr })
+  }
 }
 
 function markCareAndBlack(message) {
