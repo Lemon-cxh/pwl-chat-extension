@@ -401,6 +401,7 @@ export default {
 }
 .menu-row {
   height: 30px;
+  padding: 0 5px;
   justify-content: space-between;
 }
 .menu {

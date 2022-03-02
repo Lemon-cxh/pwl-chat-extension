@@ -36,6 +36,7 @@
 }
 .pwl-message-child * {
   margin: 0px;
+  margin-right: 5px;
   padding: 0px;
   font-size: 1em;
 }

@@ -2,7 +2,6 @@
   <el-row class="avatar">
     <el-dropdown @command="handleCommand">
       <el-progress
-        class="progress"
         type="circle"
         :percentage="percentage"
         :width="50"
@@ -270,14 +269,9 @@ export default {
 </script>
 
 <style scoped>
-.progress {
-  left: -3px;
-  top: -5px;
-}
 .avatar {
   width: 60px;
   height: 40px;
-  margin-right: 5px;
 }
 .option-row {
   margin-bottom: 20px;
