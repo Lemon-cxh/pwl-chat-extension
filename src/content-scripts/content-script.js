@@ -163,8 +163,10 @@ function showImage(data) {
   img.setAttribute('alt', 'pwl-img')
   img.setAttribute('style', 'max-width: 60vw;')
   img.setAttribute('referrerpolicy', 'no-referrer')
-  img.setAttribute('onclick', 'this.style.display="none"')
   img.setAttribute('src', data.src)
+  img.addEventListener('click', () => {
+    img.style.display = 'none'
+  })
   let div = document.createElement('div')
   div.setAttribute('class', 'pwl-extension-img')
   document.body.appendChild(div)
