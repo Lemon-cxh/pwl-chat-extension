@@ -1,14 +1,14 @@
 <template>
   <el-popover placement="bottom" width="auto" trigger="focus">
     <template #reference>
-      <div tabindex="0">
+      <div tabindex="0" style="margin-right: 27px;">
         <el-badge
           id="online-badge"
           type="success"
           :value="online.onlineChatCnt"
           class="badge"
         >
-          <icon-svg class="icon" icon-class="whale" />
+          <icon-svg class="icon" icon-class="whale"  />
         </el-badge>
       </div>
     </template>

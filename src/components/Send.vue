@@ -89,6 +89,10 @@ export default {
         md: '',
         content: '',
       },
+      discuss: {
+        content: '',
+        enable: false,
+      },
     }
   },
   computed: {
@@ -160,6 +164,9 @@ export default {
       this.quoteForm = {}
       this.quoteVisible = false
     },
+    setDiscuss(discuss) {
+      this.discuss = discuss
+    },
     sendMessage(content) {
       send({ content: content, apiKey: this.key }).then()
     },
@@ -169,7 +176,10 @@ export default {
         let quoteForm = this.quoteForm
         form.content = `${form.content}\n\n---\n\n引用 ${this.buildAtUser(
           quoteForm.userName
-        )}:\n${quoteForm.md ? '> ' + quoteForm.md : quoteForm.content}`
+        )}:\n${quoteForm.md ? '> ' + quoteForm.md : quoteForm.content}\n`
+      }
+      if (this.discuss.enable) {
+        form.content += '\n*`# ' + this.discuss.content + ' #`*'
       }
       send(form).then((res) => {
         if (0 === res.code) {

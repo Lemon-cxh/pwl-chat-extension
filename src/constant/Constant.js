@@ -4,6 +4,7 @@ export const MESSAGE_TYPE = {
   online: 'online',
   revoke: 'revoke',
   redPacketStatus: 'redPacketStatus',
+  discussChanged: 'discussChanged'
 }
 
 // storage存储key
@@ -11,7 +12,8 @@ export const STORAGE = {
   key: 'keyStorage',
   account: 'accountStorage',
   liveness: 'livenessStorage',
-  options: 'options'
+  options: 'options',
+  discussEnable: 'discussEnable'
 }
 
 // background和popup通信类型
@@ -25,7 +27,8 @@ export const EVENT = {
   online: 7,
   syncUserInfo: 8,
   syncOptions: 9,
-  markRedPacket: 10
+  markRedPacket: 10,
+  discussChanged: 11,
 }
 
 export const TABS_EVENT = {

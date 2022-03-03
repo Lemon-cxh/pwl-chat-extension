@@ -8,6 +8,10 @@
     <!-- 菜单按钮 -->
     <el-row class="menu-row">
       <online :online="online" @show-user-card="showUserCard" />
+      <discuss
+        :discuss="discuss"
+        @discuss-change="discussChange"
+      />
       <el-row class="menu">
         <red-packet class="menu-item" />
         <emoji class="menu-item" @add-content="addContent" />
@@ -41,7 +45,10 @@
           "
         >
           <hint-message
-            v-if="item.type && type.redPacketStatus === item.type"
+            v-if="
+              type.redPacketStatus === item.type ||
+              type.discussChanged === item.type
+            "
             :message="item"
             @show-user-card="showUserCard"
             @show-redpacket-info="showRedpacketInfo"
@@ -117,6 +124,10 @@ export default {
         info: {},
       },
       online: {},
+      discuss: {
+        content: '',
+        enable: false
+      },
       redPacketVisible: false,
       type: MESSAGE_TYPE,
       avatarPendant: {},
@@ -204,6 +215,7 @@ export default {
             this.loading = false
           }
           this.online = msg.data.online
+          this.discuss.content = msg.data.discuss
           break
         case EVENT.message:
           this.messageEvent(msg.data)
@@ -220,6 +232,10 @@ export default {
           break
         case EVENT.online:
           this.online = msg.data
+          this.discuss.content = msg.data.discussing
+          break
+        case EVENT.discussChanged:
+          this.discuss.content = msg.data
           break
         default:
           break
@@ -347,7 +363,7 @@ export default {
         message.oIds.forEach((oId) => {
           revoke(oId).then((res) => (count += res.code === 0 ? 1 : 0))
         })
-        this.$message.success(`批量撤回${count }条消息`)
+        this.$message.success(`批量撤回${count}条消息`)
         return
       }
       revoke(message.oId).then((res) => {
@@ -392,6 +408,10 @@ export default {
     syncOptions(options) {
       port.postMessage({ type: EVENT.syncOptions, data: options })
     },
+    discussChange() {
+      this.discuss.enable = !this.discuss.enable
+      this.$refs.messageInput.setDiscuss(this.discuss)
+    },
   },
 }
 </script>
@@ -403,6 +423,7 @@ export default {
   height: 30px;
   padding: 0 5px;
   justify-content: space-between;
+  align-items: center;
 }
 .menu {
   font-size: 24px;

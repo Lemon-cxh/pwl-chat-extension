@@ -29,6 +29,7 @@ export default createStore({
     },
     message: [],
     messageTotal: 0,
+    discuss: '',
     online: {
       onlineChatCnt: 0,
       users: [],
@@ -53,6 +54,9 @@ export default createStore({
     },
     online: (state) => {
       return state.online
+    },
+    discuss: (state) => {
+      return state.discuss
     },
   },
   mutations: {
@@ -136,6 +140,10 @@ export default createStore({
         onlineChatCnt: online.onlineChatCnt,
         users: online.users,
       }
+      state.discuss = online.discussing
+    },
+    setDiscuss(state, discuss) {
+      state.discuss = discuss
     },
     markRedPacket(state, oId) {
       let msg
@@ -210,6 +218,7 @@ export default createStore({
               reject()
               return
             }
+            reject()
           }
           context.commit('setUserInfo', res.data)
           context.commit('setKey', key)

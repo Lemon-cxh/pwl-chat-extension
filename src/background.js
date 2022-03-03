@@ -115,6 +115,13 @@ function messageHandler(event) {
       }
       store.commit('updateRedPacket', data.oId)
       break
+    case MESSAGE_TYPE.discussChanged:
+      messageEvent(data, false)
+      if (port) {
+        port.postMessage({ type: EVENT.discussChanged, data: data.newDiscuss })
+      }
+      store.commit('setDiscuss', data.newDiscuss)
+      break
     default:
       messageEvent(data, true)
   }
@@ -126,6 +133,7 @@ chrome.runtime.onConnect.addListener((p) => {
   let message = {
     message: store.getters.message,
     online: store.getters.online,
+    discuss: store.getters.discuss
   }
   port.postMessage({ type: EVENT.loadMessage, data: message })
   port.onMessage.addListener((msg) => {
@@ -183,7 +191,9 @@ chrome.runtime.onMessage.addListener((request) => {
 })
 
 function messageEvent(message, isMsg) {
-  markCareAndBlack(message)
+  if (isMsg) {
+    markCareAndBlack(message)
+  }
   store.commit('addMessage', { message: message, isMsg: isMsg })
   if (port) {
     port.postMessage({ type: EVENT.message, data: message })

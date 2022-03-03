@@ -47,7 +47,7 @@
             <template #reference>
               <span
                 :id="'message_' + message.oId"
-                v-html="message.content"
+                v-html="modifyContent(message.content)"
               ></span>
             </template>
             <!-- 消息菜单 -->
@@ -85,7 +85,7 @@
     <el-row
       v-if="message.users"
       type="flex"
-      :class="[{'own-plus-one-box' : isOwn}, 'plus-one-box']"
+      :class="[{ 'own-plus-one-box': isOwn }, 'plus-one-box']"
     >
       <el-avatar
         v-for="(item, index) in message.users"
@@ -95,8 +95,7 @@
         class="plus-one-avatar"
         @click="$emit('showUserCard', item.userName)"
       />
-      <el-row
-        :class="[{'own-plus-one-text': isOwn}, 'plus-one-text']"
+      <el-row :class="[{ 'own-plus-one-text': isOwn }, 'plus-one-text']"
         >{{ message.users.length }} 人+1
       </el-row>
     </el-row>
@@ -185,6 +184,11 @@ export default {
         this.$emit('quote', form)
         this.closePopover()
       })
+    },
+    modifyContent(content) {
+      return content
+        .replaceAll('<em><code># ', '<span class="el-tag">')
+        .replaceAll(' #</code></em>', '</span>')
     },
     talkToHe() {
       this.$emit('addContent', this.userName)
