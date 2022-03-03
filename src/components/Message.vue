@@ -333,4 +333,7 @@ export default {
   border-left: 3px solid #6e6e6e;
   padding-left: 5px;
 }
+.message-content blockquote * {
+  max-width: 257px;
+}
 </style>
