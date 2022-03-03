@@ -17,7 +17,6 @@
         <emoji class="menu-item" @add-content="addContent" />
         <images
           ref="cloudImages"
-          class="menu-item"
           @send-message="sendMessage"
         />
       </el-row>

@@ -186,9 +186,10 @@ export default {
       })
     },
     modifyContent(content) {
-      return content
-        .replaceAll('<em><code># ', '<span class="el-tag">')
-        .replaceAll(' #</code></em>', '</span>')
+      return content.replaceAll(
+        /(<em><code>#\s)(.+)(\s#<\/code><\/em>)/g,
+        '<span class="el-tag">$2</span>'
+      )
     },
     talkToHe() {
       this.$emit('addContent', this.userName)
