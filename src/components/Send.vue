@@ -167,7 +167,7 @@ export default {
       let form = this.form
       if (this.quoteVisible) {
         let quoteForm = this.quoteForm
-        form.content = `${form.content}\n##### 引用 ${this.buildAtUser(
+        form.content = `${form.content}\n\n---\n\n引用 ${this.buildAtUser(
           quoteForm.userName
         )}:\n${quoteForm.md ? '> ' + quoteForm.md : quoteForm.content}`
       }

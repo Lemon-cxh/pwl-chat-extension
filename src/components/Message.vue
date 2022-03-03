@@ -325,4 +325,12 @@ export default {
   overflow: auto;
   margin: 0px;
 }
+.message-content hr {
+  margin: 3px 0;
+}
+.message-content blockquote {
+  margin-top: 5px;
+  border-left: 3px solid #6e6e6e;
+  padding-left: 5px;
+}
 </style>

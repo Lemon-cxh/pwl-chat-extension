@@ -53,11 +53,6 @@ body {
 p {
   margin: 0px;
 }
-blockquote {
-  margin: 0px 0px 0px 10px;
-  border-left: 3px solid #6e6e6e;
-  padding-left: 5px;
-}
 .back-top {
   position: absolute;
   bottom: 25px;
