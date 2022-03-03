@@ -186,9 +186,10 @@ export default {
       })
     },
     modifyContent(content) {
+      // <em><code># Yui女装呢 #</code></em>
       return content.replaceAll(
-        /(<em><code>#\s)(.+)(\s#<\/code><\/em>)/g,
-        '<span class="el-tag">$2</span>'
+        /(<em><code>#\s)(.{1,16})(\s#<\/code><\/em>)/g,
+        '<span class="el-tag" style="margin: 1px 0;">$2</span>'
       )
     },
     talkToHe() {
