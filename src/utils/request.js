@@ -17,11 +17,7 @@ service.interceptors.response.use(
     if (response.status === 200) {
       return response.data
     }
-    ElMessage.error({
-      message: response.data,
-      type: 'error',
-      duration: 2000
-    })
+    ElMessage.error(response.data)
   },
   error => {
     console.dir(error)
