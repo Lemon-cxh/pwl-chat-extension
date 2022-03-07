@@ -27,7 +27,7 @@
         >
           #{{ discuss.content }}
         </el-button>
-        <el-button :type="type" plain size="small" @click="click()">
+        <el-button :type="type" plain size="small" @click="changeDiscuss()">
           <comment class="svg-icon" />
         </el-button>
       </el-button-group>
@@ -39,7 +39,7 @@
 import { Comment } from '@element-plus/icons-vue'
 import { ObjectUtil } from '../utils/ObjectUtil'
 import { send } from '../api/chat'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'discuss',
@@ -47,16 +47,8 @@ export default {
     Comment,
   },
   emits: ['discussChange'],
-  props: {
-    discuss: {
-      type: Object,
-      default() {
-        return { content: '', enable: false }
-      },
-    },
-  },
   computed: {
-    ...mapGetters(['key']),
+    ...mapGetters(['key', 'discuss']),
     type() {
       return this.discuss.enable ? 'primary' : 'info'
     },
@@ -75,6 +67,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['changeDiscuss']),
     showInput() {
       this.inputVisible = true
       this.$nextTick(() => {
@@ -97,9 +90,6 @@ export default {
       send(this.form).then(() => {
         this.cancel()
       })
-    },
-    click() {
-      this.$emit('discussChange')
     },
   },
 }

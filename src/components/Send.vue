@@ -89,14 +89,10 @@ export default {
         md: '',
         content: '',
       },
-      discuss: {
-        content: '',
-        enable: false,
-      },
     }
   },
   computed: {
-    ...mapGetters(['key']),
+    ...mapGetters(['key', 'discuss']),
     form() {
       return { content: this.content, apiKey: this.key }
     },
@@ -163,9 +159,6 @@ export default {
     closeQuote() {
       this.quoteForm = {}
       this.quoteVisible = false
-    },
-    setDiscuss(discuss) {
-      this.discuss = discuss
     },
     sendMessage(content) {
       send({ content: content, apiKey: this.key }).then()

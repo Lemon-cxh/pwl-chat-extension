@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import store from './store'
+import store from './store/index'
 import { more, send, openRedPacket } from './api/chat'
 import {
   notifications,

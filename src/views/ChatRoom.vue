@@ -8,10 +8,7 @@
     <!-- 菜单按钮 -->
     <el-row class="menu-row">
       <online :online="online" @show-user-card="showUserCard" />
-      <discuss
-        :discuss="discuss"
-        @discuss-change="discussChange"
-      />
+      <discuss />
       <el-row class="menu">
         <red-packet class="menu-item" />
         <emoji class="menu-item" @add-content="addContent" />
@@ -101,7 +98,7 @@ import { ref, defineAsyncComponent } from 'vue'
 import { EVENT, MESSAGE_TYPE, TABS_EVENT } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
 import { sendTabsMessage } from '../utils/chromeUtil'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import { revoke } from '../api/chat'
 import { InfoFilled } from '@element-plus/icons-vue'
 
@@ -123,10 +120,6 @@ export default {
         info: {},
       },
       online: {},
-      discuss: {
-        content: '',
-        enable: false
-      },
       redPacketVisible: false,
       type: MESSAGE_TYPE,
       avatarPendant: {},
@@ -204,6 +197,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['setDiscussContent']),
     messageListener(msg) {
       switch (msg.type) {
         case EVENT.loadMessage:
@@ -214,7 +208,7 @@ export default {
             this.loading = false
           }
           this.online = msg.data.online
-          this.discuss.content = msg.data.discuss
+          this.setDiscussContent(msg.data.discuss)
           break
         case EVENT.message:
           this.messageEvent(msg.data)
@@ -231,10 +225,10 @@ export default {
           break
         case EVENT.online:
           this.online = msg.data
-          this.discuss.content = msg.data.discussing
+          this.setDiscussContent(msg.data.discussing)
           break
         case EVENT.discussChanged:
-          this.discuss.content = msg.data
+          this.setDiscussContent(msg.data)
           break
         default:
           break
@@ -406,11 +400,7 @@ export default {
     },
     syncOptions(options) {
       port.postMessage({ type: EVENT.syncOptions, data: options })
-    },
-    discussChange() {
-      this.discuss.enable = !this.discuss.enable
-      this.$refs.messageInput.setDiscuss(this.discuss)
-    },
+    }
   },
 }
 </script>

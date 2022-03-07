@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import store from '../store'
+import store from '../store/popup'
 import router from '../router'
 import IconSvg from '../components/Icon-svg'
 import { ElMessage } from 'element-plus'

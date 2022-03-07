@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 import { liveness, isCollectedLiveness, getLivenessReward } from '../api/user'
 import { countNotifications, makeReadNotifications } from '../api/notification'
 import { STORAGE, defaultOptions } from '../constant/Constant'
@@ -122,7 +122,7 @@ import { getDate } from '../utils/util'
 import { setLocal, getLocal, getSync, setSync } from '../utils/chromeUtil'
 import { Bell, Setting, SwitchButton } from '@element-plus/icons-vue'
 
-const REQUEST_INTERVAL = 30000
+const REQUEST_INTERVAL = 40000
 
 export default {
   name: 'userInfo',
@@ -183,7 +183,6 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['clearMessage']),
     init(storage) {
       this.percentage = storage.percentage ? storage.percentage : 0
       if (
@@ -246,7 +245,6 @@ export default {
     logout() {
       chrome.extension.getBackgroundPage().closeSocket()
       setLocal({ [STORAGE.key]: '' })
-      this.clearMessage()
       this.$router.push({ name: 'Login' })
     },
     blacklistChange(val) {

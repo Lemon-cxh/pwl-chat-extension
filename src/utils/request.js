@@ -21,11 +21,7 @@ service.interceptors.response.use(
   },
   error => {
     console.dir(error)
-    ElMessage.error({
-      message: error.message,
-      type: 'error',
-      duration: 2000
-    })
+    ElMessage.error(error.message)
     return Promise.reject(error)
   })
 

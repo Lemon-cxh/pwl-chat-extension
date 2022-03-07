@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import { user } from './module/user'
 import { getUserInfo, getKey } from '../api/login'
 import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
 import { setLocal, getLocal } from '../utils/chromeUtil'
@@ -6,27 +7,10 @@ import { isRedPacket } from '../utils/util'
 import { openRedPacket } from '../api/chat'
 
 export default createStore({
+  modules: {
+    user: user
+  },
   state: {
-    key: '',
-    userInfo: {
-      userCity: '',
-      userOnlineFlag: false,
-      userPoint: 0,
-      userAppRole: '',
-      userIntro: '',
-      userNo: '',
-      onlineMinute: 0,
-      userAvatarURL: '',
-      userNickname: '',
-      oId: '',
-      userName: '',
-      cardBg: '',
-      followingUserCount: 0,
-      sysMetal: '',
-      userRole: '',
-      followerCount: 0,
-      userURL: '',
-    },
     message: [],
     messageTotal: 0,
     discuss: '',
@@ -36,12 +20,6 @@ export default createStore({
     },
   },
   getters: {
-    key: (state) => {
-      return state.key
-    },
-    userInfo: (state) => {
-      return state.userInfo
-    },
     message: (state) => {
       return state.message
     },
@@ -60,12 +38,6 @@ export default createStore({
     },
   },
   mutations: {
-    setKey(state, key) {
-      state.key = key
-    },
-    setUserInfo(state, userInfo) {
-      state.userInfo = userInfo
-    },
     popMessage(state) {
       let m = state.message.pop()
       if (!m || m.revoke) {
