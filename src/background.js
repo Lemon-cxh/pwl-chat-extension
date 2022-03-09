@@ -22,6 +22,7 @@ const MAX_PAGE = 2
 let intervalId = undefined
 // 与popup页面的通信
 let port = null
+let deleteMessage = false
 // 未读消息数
 let count = 0
 let options = defaultOptions
@@ -122,6 +123,7 @@ function messageHandler(event) {
       break
     default:
       messageEvent(data, true)
+      clearMessage()
   }
 }
 
@@ -154,11 +156,8 @@ chrome.runtime.onConnect.addListener((p) => {
     }
   })
   port.onDisconnect.addListener(() => {
-    port.disconnect()
     port = null
-    while (store.getters.messageLength > MAX_PAGE * MESSAGE_LIMIT) {
-      store.commit('popMessage')
-    }
+    clearMessage()
   })
 })
 
@@ -287,6 +286,17 @@ function markCareAndBlack(message) {
 function clearBadgeText() {
   count = 0
   chrome.browserAction.setBadgeText({ text: '' })
+}
+
+function clearMessage() {
+  if (port || deleteMessage) {
+    return
+  }
+  deleteMessage = true
+  while (store.getters.messageLength > MAX_PAGE * MESSAGE_LIMIT) {
+    store.commit('popMessage')
+  }
+  deleteMessage = false
 }
 
 createApp().use(store)
