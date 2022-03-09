@@ -8,7 +8,7 @@ import { openRedPacket } from '../api/chat'
 
 export default createStore({
   modules: {
-    user: user
+    user: user,
   },
   state: {
     message: [],
@@ -26,6 +26,9 @@ export default createStore({
     messageTotal: (state) => {
       return state.messageTotal
     },
+    messageLength: (state) => {
+      return state.message.length
+    },
     pageParams: (state) => {
       let page = parseInt(state.messageTotal / MESSAGE_LIMIT) + 1
       return { page: page, length: page * MESSAGE_LIMIT - state.messageTotal }
@@ -40,13 +43,8 @@ export default createStore({
   mutations: {
     popMessage(state) {
       let m = state.message.pop()
-      if (!m || m.revoke) {
-        return
-      }
-      state.messageTotal -= 1
-      if (m.type && m.type === MESSAGE_TYPE.msg) {
-        state.messageTotal -= m.users ? m.users.length : 0
-        return
+      if (m && !m.revoke && m.content) {
+        state.messageTotal -= m.users ? m.users.length + 1 : 1
       }
     },
     addMessage(state, message) {

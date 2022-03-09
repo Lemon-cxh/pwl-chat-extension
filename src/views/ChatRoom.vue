@@ -145,9 +145,13 @@ export default {
     }
     const pushMessage = (msg) => {
       let index = messageArray.value.length - 1
+      if (index < 0) {
+        messageArray.value.push(...msg)
+        return
+      }
       let last = messageArray.value[index]
       let message = msg[0]
-      if (!last || last.content !== message.content) {
+      if (last.content !== message.content) {
         messageArray.value.push(...msg)
         return
       }

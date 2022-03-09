@@ -24,8 +24,6 @@ let intervalId = undefined
 let port = null
 // 未读消息数
 let count = 0
-// 是否删除多余消息
-let pop_message = false
 let options = defaultOptions
 let careOnline = []
 
@@ -158,14 +156,9 @@ chrome.runtime.onConnect.addListener((p) => {
   port.onDisconnect.addListener(() => {
     port.disconnect()
     port = null
-    if (pop_message) {
-      return
-    }
-    pop_message = true
-    while (store.getters.messageTotal > MAX_PAGE * MESSAGE_LIMIT) {
+    while (store.getters.messageLength > MAX_PAGE * MESSAGE_LIMIT) {
       store.commit('popMessage')
     }
-    pop_message = false
   })
 })
 
