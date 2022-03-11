@@ -17,7 +17,7 @@ export default {
 }
 body {
   background: #333333;
-  margin: 0;
+  margin: 1px;
 }
 .el-popover {
   --el-popover-bg-color: #333333 !important;
@@ -67,6 +67,16 @@ p {
   animation: rotate 1s linear infinite;
   font-size: 30px;
   color: #f79533;
+}
+.content-background .extension-message::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  bottom: 16px;
+  right: -16px;
+  background-size: cover;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB0PSIxNjQ2OTg3MDAwMjM5IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjcwNDgiIGRhdGEtZGFya3JlYWRlci1pbmxpbmUtZmlsbD0iIiB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCI+PHBhdGggZD0iTTI1OC4wMTYgNDQ3LjAwOEwxMTIgMTkyLjk5MlExODMuMDA4IDEwMi45NzYgMjg4IDUxLjQ4OFQ1MTIgMHExMzguMDE2IDAgMjU1LjQ4OCA2OHQxODUuNTA0IDE4My4wMDhINTM0Ljk3NnEtMTEuMDA4LTAuOTkyLTIzLjAwOC0wLjk5Mi05MC4wMTYgMC0xNjAuOTkyIDU1LjQ4OHQtOTIuOTkyIDE0MS41MDR6IG00MzYuOTkyLTEyMi4wMTZoMjk0LjAxNnEzNS4wMDggOTAuMDE2IDM1LjAwOCAxODcuMDA4IDAgMTAzLjAwOC00MCAxOTcuNTA0dC0xMDcuNDg4IDE2My4wMDgtMTYxLjUwNCAxMDkuNTA0LTE5Ni45OTIgNDIuMDE2bDIwOC45OTItMzYzLjAwOHE0Ny4wMDgtNjcuMDA4IDQ3LjAwOC0xNDguOTkyIDAtMTEwLjAxNi03OS4wMDgtMTg3LjAwOHpNMzI2LjAxNiA1MTJxMC03Ni45OTIgNTQuNDk2LTEzMS40ODhUNTEyIDMyNi4wMTZ0MTMxLjQ4OCA1NC40OTZUNjk3Ljk4NCA1MTJ0LTU0LjQ5NiAxMzEuNDg4VDUxMiA2OTcuOTg0dC0xMzEuNDg4LTU0LjQ5NlQzMjYuMDE2IDUxMnogbTI1NiAyNTIuOTkybC0xNDYuMDE2IDI1Mi45OTJxLTEyMi4wMTYtMTguMDE2LTIyMi4wMTYtODguOTkydC0xNTYuOTkyLTE4MC45OTJUMCA1MTJxMC0xMzUuMDA4IDY2LjAxNi0yNTEuMDA4bDIwOC45OTIgMzYyLjAxNnEzMiA2OCA5NiAxMDkuNTA0VDUxMiA3NzQuMDE2cTM2IDAgNzAuMDE2LTguOTkyeiIgcC1pZD0iNzA0OSIgZmlsbD0iIzhhOGE4YSIgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1maWxsPSIiIHN0eWxlPSItLWRhcmtyZWFkZXItaW5saW5lLWZpbGw6IzVjNjI2NDsiPjwvcGF0aD48L3N2Zz4=')
 }
 @keyframes rotate {
   from {

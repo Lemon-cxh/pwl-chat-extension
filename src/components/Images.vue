@@ -81,7 +81,7 @@ export default {
       })
     },
     selectImage(image) {
-      this.$emit('sendMessage', `![image.png](${image})`)
+      this.$emit('sendMessage', `![image.png](${image})<span class="extension-message"/>`)
     },
     syncCloudImage(url) {
       let that = this

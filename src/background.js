@@ -17,6 +17,8 @@ import {
 } from './constant/Constant'
 
 const URL = 'wss://fishpi.cn/chat-room-channel'
+let socketLock = false
+let webSocket
 // 最大保留两页消息
 const MAX_PAGE = 2
 let intervalId = undefined
@@ -42,52 +44,52 @@ window.openSocket = () => {
   store
     .dispatch('getUser')
     .then(() => {
-      initWebSocket()
+      if (!socketLock) {
+        initWebSocket()
+      }
     })
     .catch(() => {
-      window.mySocket.close()
+      webSocket && webSocket.close()
     })
 }
 
 window.closeSocket = () => {
-  if (socketIsOpen()) {
-    window.mySocket.close()
-  }
+  webSocket && webSocket.close()
   store.commit('clearMessage')
 }
 
 window.openSocket()
 
 function initWebSocket() {
-  if (socketIsOpen()) {
-    return
-  }
+  socketLock = true
+  window.closeSocket()
   getLocal([STORAGE.key], (result) => {
-    window.mySocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
+    webSocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
     if (intervalId != undefined) {
       clearInterval(intervalId)
     }
     intervalId = setInterval(() => {
-      window.openSocket()
+      webSocket.send('-hb-')
+      if (!socketIsOpen()) {
+        window.openSocket()
+      }
     }, 1000 * 60)
-    window.mySocket.onmessage = (event) => messageHandler(event)
-    window.mySocket.onerror = (e) => {
+    webSocket.onmessage = (event) => messageHandler(event)
+    webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
     }
-    window.mySocket.onclose = (e) => {
+    webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
-      window.closeSocket()
-      window.openSocket()
     }
+    socketLock = false
     getMoreEvent()
   })
 }
 
 function socketIsOpen() {
   return (
-    window.mySocket &&
-    (window.mySocket.readyState === WebSocket.OPEN ||
-      window.mySocket.readyState === WebSocket.CONNECTING)
+    webSocket.readyState === WebSocket.OPEN ||
+    webSocket.readyState === WebSocket.CONNECTING
   )
 }
 
@@ -133,7 +135,7 @@ chrome.runtime.onConnect.addListener((p) => {
   let message = {
     message: store.getters.message,
     online: store.getters.online,
-    discuss: store.getters.discuss
+    discuss: store.getters.discuss,
   }
   port.postMessage({ type: EVENT.loadMessage, data: message })
   port.onMessage.addListener((msg) => {
@@ -163,7 +165,7 @@ chrome.runtime.onConnect.addListener((p) => {
 
 chrome.runtime.onMessage.addListener((request) => {
   if (TABS_EVENT.sendMessage === request.type) {
-    send({ content: request.data, apiKey: store.getters.key }).then()
+    send({ content: `${request.data}<span class="extension-message"/>`, apiKey: store.getters.key }).then()
     return
   }
   if (TABS_EVENT.openRedPacket === request.type) {

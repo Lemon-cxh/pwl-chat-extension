@@ -174,6 +174,7 @@ export default {
       if (this.discuss.enable) {
         form.content += '\n*`# ' + this.discuss.content + ' #`*'
       }
+      form.content += '<span class="extension-message"/>'
       send(form).then((res) => {
         if (0 === res.code) {
           this.quoteVisible = false
