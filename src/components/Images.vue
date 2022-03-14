@@ -46,6 +46,7 @@
 
 <script>
 import { getCloudImage, syncCloudImage } from '../api/chat'
+import { getMessageMark } from '../utils/util'
 import { mapGetters } from 'vuex'
 import { CircleCloseFilled } from '@element-plus/icons-vue'
 
@@ -81,7 +82,7 @@ export default {
       })
     },
     selectImage(image) {
-      this.$emit('sendMessage', `![image.png](${image})<span class="extension-message"/>`)
+      this.$emit('sendMessage', `![image.png](${image})${getMessageMark()}`)
     },
     syncCloudImage(url) {
       let that = this

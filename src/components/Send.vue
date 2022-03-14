@@ -69,6 +69,7 @@
 import { send, upload } from '../api/chat'
 import { getUserName } from '../api/user'
 import { mapGetters } from 'vuex'
+import { getMessageMark } from '../utils/util'
 import { Promotion, CircleCloseFilled } from '@element-plus/icons-vue'
 
 export default {
@@ -174,7 +175,7 @@ export default {
       if (this.discuss.enable) {
         form.content += '\n*`# ' + this.discuss.content + ' #`*'
       }
-      form.content += '<span class="extension-message"/>'
+      form.content += getMessageMark()
       send(form).then((res) => {
         if (0 === res.code) {
           this.quoteVisible = false

@@ -254,6 +254,7 @@ export default {
   width: fit-content;
   word-wrap: break-word;
   max-width: 265px;
+  position: relative;
 }
 .content-background {
   background-color: #a3db92;
@@ -261,7 +262,7 @@ export default {
 .content-background::after {
   content: '';
   position: absolute;
-  top: 22px;
+  top: 4px;
   left: -14px;
   width: 0;
   height: 0;
@@ -274,7 +275,7 @@ export default {
 .own-content-background::after {
   content: '';
   position: absolute;
-  top: 22px;
+  top: 4px;
   right: -14px;
   width: 0;
   height: 0;

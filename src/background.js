@@ -7,6 +7,7 @@ import {
   sendTabsMessage,
   getSync,
 } from './utils/chromeUtil'
+import { getMessageMark } from './utils/util'
 import {
   MESSAGE_TYPE,
   STORAGE,
@@ -165,7 +166,7 @@ chrome.runtime.onConnect.addListener((p) => {
 
 chrome.runtime.onMessage.addListener((request) => {
   if (TABS_EVENT.sendMessage === request.type) {
-    send({ content: `${request.data}<span class="extension-message"/>`, apiKey: store.getters.key }).then()
+    send({ content: request.data + getMessageMark(), apiKey: store.getters.key }).then()
     return
   }
   if (TABS_EVENT.openRedPacket === request.type) {

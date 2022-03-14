@@ -17,6 +17,11 @@ export function isRedPacket(message) {
   )
 }
 
+export function getMessageMark() {
+  let userAgent = window.navigator.userAgent
+  return `\n<span class="${userAgent.indexOf('Edg') > -1 ? 'edge' : 'chrome'}-extension-message"/>`
+}
+
 function repair(s) {
   return s < 10 ? '0' + s : s
 }
