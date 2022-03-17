@@ -19,9 +19,9 @@
             @keyup.enter="sendHandler"
           >
             <template #append>
-              <el-button @click="sendHandler" :disabled="disabled"
-                ><promotion class="svg-icon"
-              /></el-button>
+              <el-button @click="sendHandler" :loading="disabled">
+                <promotion v-if='!disabled' class="svg-icon"/>
+              </el-button>
             </template>
           </el-input>
         </template>

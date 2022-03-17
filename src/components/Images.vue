@@ -126,7 +126,6 @@ export default {
     },
     syncCloud(images) {
       let form = this.form
-      images = images.reverse()
       form.data = JSON.stringify(images)
       syncCloudImage(form).then((r) => {
         if (0 === r.code) {

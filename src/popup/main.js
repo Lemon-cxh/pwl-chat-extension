@@ -15,7 +15,7 @@ import { STORAGE } from '../constant/Constant'
     return ElMessage({
       message: msg,
       type: type,
-      duration: 2000,
+      duration: 1500,
     })
   }
 })
