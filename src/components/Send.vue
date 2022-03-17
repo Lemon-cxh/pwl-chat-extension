@@ -11,7 +11,7 @@
           <el-input
             size="large"
             placeholder="说点什么吧!"
-            v-model="content"
+            v-model.trim="content"
             v-focus
             ref="contentInput"
             class="dark-mode"
@@ -19,7 +19,7 @@
             @keyup.enter="sendHandler"
           >
             <template #append>
-              <el-button @click="sendHandler"
+              <el-button @click="sendHandler" :disabled="disabled"
                 ><promotion class="svg-icon"
               /></el-button>
             </template>
@@ -82,6 +82,7 @@ export default {
   data() {
     return {
       content: '',
+      disabled: false,
       visible: false,
       userList: [],
       quoteVisible: false,
@@ -137,13 +138,14 @@ export default {
       this.$refs.contentInput.focus()
     },
     sendHandler(event) {
-      if (this.content === '') {
+      if (this.disabled || this.content === '') {
         return
       }
       if (event.ctrlKey) {
         this.content += '<br/>'
         return
       }
+      this.disabled = true
       this.send()
     },
     addContent(content) {
@@ -168,7 +170,7 @@ export default {
       let form = this.form
       if (this.quoteVisible) {
         let quoteForm = this.quoteForm
-        form.content = `${form.content}\n\n---\n\n引用 ${this.buildAtUser(
+        form.content = `${form.content}\n\n---\n\n引用 @${this.buildAtUser(
           quoteForm.userName
         )}:\n${quoteForm.md ? '> ' + quoteForm.md : quoteForm.content}\n`
       }
@@ -177,6 +179,7 @@ export default {
       }
       form.content += getMessageMark()
       send(form).then((res) => {
+        this.disabled = false
         if (0 === res.code) {
           this.quoteVisible = false
           this.content = ''
