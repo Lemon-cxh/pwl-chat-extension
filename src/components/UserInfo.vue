@@ -43,7 +43,7 @@
     >
       <el-tabs>
         <el-tab-pane label="基础设置">
-          <el-row justify="space-around">
+          <el-row justify="space-between" class="option-row">
             <el-row class="option-item">
               <el-switch
                 v-model="options.atNotification"
@@ -59,6 +59,14 @@
                 @change="optionsChange"
               />
               <span class="option-text">弹幕消息</span>
+            </el-row>
+            <el-row class="option-item">
+              <el-switch
+                v-model="options.hideRedPacketMessage"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">隐藏红包领取</span>
             </el-row>
           </el-row>
         </el-tab-pane>
@@ -132,7 +140,6 @@ export default {
     Setting,
     SwitchButton,
   },
-  emits: ['syncOptions'],
   data() {
     return {
       percentage: 0,
@@ -257,7 +264,6 @@ export default {
     },
     optionsChange() {
       let options = { ...this.options }
-      this.$emit('syncOptions', this.options)
       options.blacklist = JSON.stringify(options.blacklist)
       options.care = JSON.stringify(options.care)
       setSync({ [STORAGE.options]: options })

@@ -32,13 +32,14 @@ let options = defaultOptions
 let careOnline = []
 
 getSync({ [STORAGE.options]: defaultOptions }, (result) => {
-  if (result.options.blacklist) {
-    result.options.blacklist = JSON.parse(result.options.blacklist)
+  options = formatOptions(result.options)
+})
+
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.options) {
+    options = formatOptions(changes.options.newValue)
+    sendTabsMessage({ type: TABS_EVENT.syncOptions, data: options })
   }
-  if (result.options.care) {
-    result.options.care = JSON.parse(result.options.care)
-  }
-  options = result.options
 })
 
 window.openSocket = () => {
@@ -111,9 +112,11 @@ function messageHandler(event) {
       store.commit('revoke', data.oId)
       break
     case MESSAGE_TYPE.redPacketStatus:
-      messageEvent(data, false)
-      if (port) {
-        port.postMessage({ type: EVENT.redPacketStatus, data: data.oId })
+      if (!options.hideRedPacketMessage) {
+        messageEvent(data, false)
+        if (port) {
+          port.postMessage({ type: EVENT.redPacketStatus, data: data.oId })
+        }
       }
       store.commit('updateRedPacket', data.oId)
       break
@@ -148,8 +151,7 @@ chrome.runtime.onConnect.addListener((p) => {
         store.commit('setUserInfo', msg.data)
         break
       case EVENT.syncOptions:
-        options = msg.data
-        sendTabsMessage({ type: TABS_EVENT.syncOptions, data: msg.data })
+        
         break
       case EVENT.markRedPacket:
         store.commit('markRedPacket', msg.data)
@@ -300,6 +302,16 @@ function clearMessage() {
     store.commit('popMessage')
   }
   deleteMessage = false
+}
+
+function formatOptions(options) {
+  if (options.blacklist) {
+    options.blacklist = JSON.parse(options.blacklist)
+  }
+  if (options.care) {
+    options.care = JSON.parse(options.care)
+  }
+  return options
 }
 
 createApp().use(store)

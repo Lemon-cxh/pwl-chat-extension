@@ -2,7 +2,7 @@
   <div id="chatRoom">
     <!-- 活跃度，头像，输入框 -->
     <el-row class="user-box">
-      <user-info @sync-options="syncOptions" />
+      <user-info />
       <send ref="messageInput" />
     </el-row>
     <!-- 菜单按钮 -->
@@ -402,9 +402,6 @@ export default {
     closeRedapcket() {
       this.redPacketVisible = false
     },
-    syncOptions(options) {
-      port.postMessage({ type: EVENT.syncOptions, data: options })
-    }
   },
 }
 </script>

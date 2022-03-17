@@ -26,7 +26,6 @@ export const EVENT = {
   revoke: 6,
   online: 7,
   syncUserInfo: 8,
-  syncOptions: 9,
   markRedPacket: 10,
   discussChanged: 11,
 }
@@ -59,12 +58,14 @@ export const TABS_EVENT = {
 }
 
 export const defaultOptions = {
-  atNotification: true, barrageOptions: {
+  atNotification: true,
+  barrageOptions: {
     enable: false,
     fontSize: 16,
     opacity: 0.5,
     color: '#000000',
   },
+  hideRedPacketMessage: true,
   blacklist: '',
   care: ''
 }
