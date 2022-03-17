@@ -372,19 +372,7 @@ export default {
     showRedpacketInfo(info) {
       this.redPacketVisible = true
       this.redPacketInfo = info
-      if (info.info.got >= info.info.count) {
-        return
-      }
-      let msg
-      this.messageArray.some((e, index) => {
-        if (e.oId == info.oId && (!e.type || e.type === MESSAGE_TYPE.msg)) {
-          msg = JSON.parse(e.content)
-          msg.got = msg.count
-          this.updateMessage(index, 'content', JSON.stringify(msg))
-          return true
-        }
-        return false
-      })
+      this.updateRedPacket(info.oId)
       port.postMessage({ type: EVENT.markRedPacket, data: info.oId })
     },
     sendMessage(content) {
