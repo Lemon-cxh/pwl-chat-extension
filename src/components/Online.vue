@@ -1,5 +1,5 @@
 <template>
-  <el-popover placement="bottom" width="auto" trigger="focus">
+  <el-popover placement="bottom" width="auto" trigger="click">
     <template #reference>
       <div tabindex="0" style="margin-right: 27px;">
         <el-badge

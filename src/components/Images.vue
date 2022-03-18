@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-popover placement="left-start" width="auto" trigger="focus">
+    <el-popover placement="left-start" width="auto" trigger="click">
       <template #reference>
         <div tabindex="0"><icon-svg icon-class="imageBtn" /></div>
       </template>
