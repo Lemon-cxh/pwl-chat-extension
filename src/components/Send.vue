@@ -11,16 +11,17 @@
           <el-input
             size="large"
             placeholder="说点什么吧!"
-            v-model.trim="content"
+            v-model="content"
             v-focus
             ref="contentInput"
             class="dark-mode"
             @paste.capture.prevent="pasteHandler"
+            @blur="handleInputBlur"
             @keyup.enter="sendHandler"
           >
             <template #append>
               <el-button @click="sendHandler" :loading="disabled">
-                <promotion v-if='!disabled' class="svg-icon"/>
+                <promotion v-if="!disabled" class="svg-icon" />
               </el-button>
             </template>
           </el-input>
@@ -82,6 +83,7 @@ export default {
   data() {
     return {
       content: '',
+      cursor: 0,
       disabled: false,
       visible: false,
       userList: [],
@@ -137,19 +139,27 @@ export default {
       this.visible = false
       this.$refs.contentInput.focus()
     },
+    handleInputBlur(e) {
+      this.cursor = e.srcElement.selectionStart
+    },
     sendHandler(event) {
-      if (this.disabled || this.content === '') {
+      if (this.disabled) {
+        return
+      }
+      this.content = this.content.trim()
+      if (this.content === '') {
         return
       }
       if (event.ctrlKey) {
-        this.content += '<br/>'
+        this.handleInputBlur(event)
+        this.buildContent(this.content, '<br/>')
         return
       }
       this.disabled = true
       this.send()
     },
     addContent(content) {
-      this.content += content
+      this.buildContent(this.content, content)
       this.$refs.contentInput.focus()
     },
     quote(quoteForm) {
@@ -190,6 +200,10 @@ export default {
     },
     buildAtUser(userName) {
       return `<a href="${process.env.VUE_APP_BASE_URL}/member/${userName}" class="name-at" aria-label="${userName}" rel="nofollow">${userName}</a>`
+    },
+    buildContent(content, str) {
+      this.content =
+        content.substring(0, this.cursor) + str + content.substring(this.cursor)
     },
   },
 }
