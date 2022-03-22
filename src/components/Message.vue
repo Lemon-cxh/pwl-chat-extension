@@ -321,6 +321,7 @@ export default {
   font-size: 26px;
   color: yellow;
   align-self: center;
+  margin-left: 12px;
 }
 </style>
 <style>
