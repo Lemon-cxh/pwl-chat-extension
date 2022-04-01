@@ -36,7 +36,7 @@
             }}</span>
             <span>{{ userInfo.userNickname ? userInfo.userName : '' }}</span>
           </el-row>
-          <el-row style="height: 20px; margin: 3px 5px">
+          <el-row style="height: 20px; margin: 3px 5px;flex-grow:2">
             <template v-if="userInfo.sysMetal">
               <img
                 v-for="(item, index) in userInfo.sysMetal.list"
@@ -173,12 +173,15 @@ export default {
 .column {
   height: 20px;
   margin: 2px 0;
-  padding: 0 10px;
+  padding: 0 5px;
   justify-content: space-between;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display:-webkit-box;
 }
 .intro {
-  height: 60px;
-  overflow: hidden;
+  flex-grow: 1;
 }
 </style>
 <style>
