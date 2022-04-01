@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row class="message">
+    <el-row class="message" v-if="!message.hidden">
       <div v-if="type.redPacketStatus === message.type" class="message-box">
         <span class="text" @click="showUserCard(message.whoGot)">
           {{ message.whoGot }}

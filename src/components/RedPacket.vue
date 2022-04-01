@@ -40,7 +40,10 @@
         ></el-input-number>
       </el-form-item>
       <el-form-item
-        v-if="'specify' !== redPacketForm.type"
+        v-if="
+          'specify' !== redPacketForm.type &&
+          'rockPaperScissors' !== redPacketForm.type
+        "
         prop="count"
         label="个数"
       >
@@ -49,7 +52,22 @@
           :min="1"
         ></el-input-number>
       </el-form-item>
-      <el-form-item label="专属" v-else prop="recivers">
+      <el-form-item
+        label="出拳"
+        v-if="'rockPaperScissors' === redPacketForm.type"
+        prop="gesture"
+      >
+        <el-radio-group v-model="redPacketForm.gesture">
+          <el-radio :label="0">石头</el-radio>
+          <el-radio :label="1">剪刀</el-radio>
+          <el-radio :label="2">布</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item
+        label="专属"
+        v-if="'specify' === redPacketForm.type"
+        prop="recivers"
+      >
         <el-select
           v-model="redPacketForm.recivers"
           class="option"
@@ -80,10 +98,7 @@
           v-model.trim="redPacketForm.msg"
         ></el-input>
       </el-form-item>
-      <el-form-item label-width="24px">
-        <el-button type="primary" @click="continuesSendRedPacket"
-          >十连发</el-button
-        >
+      <el-form-item label-width="65px">
         <el-button type="primary" @click="sendRedPacket">发 送</el-button>
       </el-form-item>
     </el-form>
@@ -112,6 +127,7 @@ export default {
         msg: redPacketTypeMap.get(defaultType).msg,
         type: defaultType,
         recivers: undefined,
+        gesture: undefined,
       },
       redPacketDialogVisible: false,
       redPacketTypeMap: redPacketTypeMap,
@@ -124,6 +140,7 @@ export default {
         msg: inputRule('内容'),
         type: selectRule('类型'),
         recivers: selectRule('你的偏爱'),
+        gesture: selectRule('出拳'),
       },
     }
   },
@@ -148,13 +165,6 @@ export default {
       if (this.$refs['form']) {
         this.$refs['form'].resetFields()
       }
-    },
-    continuesSendRedPacket() {
-      this.validate(() => {
-        for (let index = 0; index < 10; index++) {
-          this.send()
-        }
-      })
     },
     sendRedPacket() {
       this.validate(() => this.send())
@@ -191,6 +201,7 @@ export default {
       this.redPacketForm.count = map.count
       this.redPacketForm.msg = map.msg
       this.redPacketForm.recivers = undefined
+      this.redPacketForm.gesture = value === 'rockPaperScissors' ? 0 : undefined
     },
   },
 }

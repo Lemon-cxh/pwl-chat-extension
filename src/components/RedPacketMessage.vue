@@ -5,7 +5,7 @@
         'red-packet',
         { 'red-packet-mask': redPacket.got >= redPacket.count },
       ]"
-      @click="openRedPacket"
+      @click="clickRedPacket"
     >
       <el-row class="flex-colunmn icon-box">
         <icon-svg class="icon" icon-class="redPacketMessage" />
@@ -15,6 +15,26 @@
         <el-row>{{ redPacket.msg }}</el-row>
       </el-row>
     </el-row>
+
+    <el-dialog
+      v-if="dialogGestureVisible"
+      v-model="dialogGestureVisible"
+      width="60%"
+      center
+      :show-close="false"
+      title="出拳"
+    >
+      <el-radio-group v-model="gesture" style="margin: 0 15px">
+        <el-radio :label="0">石头</el-radio>
+        <el-radio :label="1">剪刀</el-radio>
+        <el-radio :label="2">布</el-radio>
+      </el-radio-group>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="selectGesture"> 出拳 </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -34,6 +54,8 @@ export default {
     return {
       dialogVisible: false,
       redPacketTypeMap: redPacketTypeMap,
+      dialogGestureVisible: false,
+      gesture: 0,
     }
   },
   computed: {
@@ -46,8 +68,25 @@ export default {
     },
   },
   methods: {
-    openRedPacket() {
-      openRedPacket(this.form).then((res) => {
+    clickRedPacket() {
+      let redPacket = this.redPacket
+      if (
+        redPacket.type === 'rockPaperScissors' &&
+        redPacket.got < redPacket.count
+      ) {
+        this.dialogGestureVisible = true
+        return
+      }
+      this.openRedPacket(this.form)
+    },
+    selectGesture() {
+      let form = this.form
+      form.gesture = this.gesture
+      this.openRedPacket(form)
+      this.dialogGestureVisible = false
+    },
+    openRedPacket(form) {
+      openRedPacket(form).then((res) => {
         res.oId = this.oId
         this.$emit('showRedpacketInfo', res)
       })

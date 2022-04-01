@@ -112,11 +112,12 @@ function messageHandler(event) {
       store.commit('revoke', data.oId)
       break
     case MESSAGE_TYPE.redPacketStatus:
-      if (!options.hideRedPacketMessage) {
-        messageEvent(data, false)
-        if (port) {
-          port.postMessage({ type: EVENT.redPacketStatus, data: data.oId })
-        }
+      if (options.hideRedPacketMessage) {
+        data.hidden = true
+      }
+      messageEvent(data, false)
+      if (port) {
+        port.postMessage({ type: EVENT.redPacketStatus, data: data.oId })
       }
       store.commit('updateRedPacket', data.oId)
       break
@@ -149,9 +150,6 @@ chrome.runtime.onConnect.addListener((p) => {
         break
       case EVENT.syncUserInfo:
         store.commit('setUserInfo', msg.data)
-        break
-      case EVENT.syncOptions:
-        
         break
       case EVENT.markRedPacket:
         store.commit('markRedPacket', msg.data)
@@ -196,7 +194,7 @@ function messageEvent(message, isMsg) {
     port.postMessage({ type: EVENT.message, data: message })
     return
   }
-  if (!isMsg || message.isBlack) {
+  if (!isMsg || message.hidden) {
     return
   }
   if (!options.barrageOptions.enable) {
@@ -284,7 +282,7 @@ async function getMoreEvent() {
 function markCareAndBlack(message) {
   message.isCare =
     options.care && options.care.some((e) => e === message.userName)
-  message.isBlack =
+  message.hidden =
     options.blacklist && options.blacklist.some((e) => e === message.userName)
 }
 

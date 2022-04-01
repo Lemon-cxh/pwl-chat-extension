@@ -51,7 +51,7 @@
           />
           <div v-else-if="!item.type || type.msg === item.type">
             <message
-              v-if="!item.revoke && !item.isBlack"
+              v-if="!item.revoke && !item.hidden"
               class="list-complete-item"
               :ref="'message_' + item.oId"
               :message="item"
@@ -222,7 +222,7 @@ export default {
           this.loading = false
           break
         case EVENT.redPacketStatus:
-          this.updateRedPacket(msg.data)
+          this.updateRedPacket(msg.data, false)
           break
         case EVENT.revoke:
           this.revoke(msg.data)
@@ -329,7 +329,7 @@ export default {
       this.userName = name
       this.dialogVisible = true
     },
-    updateRedPacket(oId) {
+    updateRedPacket(oId, byMe) {
       let msg
       this.messageArray.some((e, index) => {
         if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
@@ -337,7 +337,7 @@ export default {
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got += 1
+          msg.got = byMe ? msg.count : (msg.got + 1)
           this.updateMessage(index, 'content', JSON.stringify(msg))
           return true
         }
@@ -372,7 +372,7 @@ export default {
     showRedpacketInfo(info) {
       this.redPacketVisible = true
       this.redPacketInfo = info
-      this.updateRedPacket(info.oId)
+      this.updateRedPacket(info.oId, true)
       port.postMessage({ type: EVENT.markRedPacket, data: info.oId })
     },
     sendMessage(content) {

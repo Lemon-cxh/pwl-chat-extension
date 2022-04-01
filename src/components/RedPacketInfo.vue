@@ -13,6 +13,16 @@
       <el-row class="count">{{
         (info.info.got >= info.info.count ? '总计: ' : '已抢: ') + count
       }}</el-row>
+      <el-row v-if="info.info.gesture != undefined">
+        {{ info.info.userName }} 出了:
+        {{
+          info.info.gesture === 0
+            ? '石头'
+            : info.info.gesture === 1
+            ? '剪刀'
+            : '布'
+        }}
+      </el-row>
       <el-row v-if="message">
         {{ message }}
       </el-row>

@@ -1,5 +1,5 @@
 <template>
-  <el-popover placement="left-start" width="211px" trigger="hover">
+  <el-popover placement="left-start" width="211px" trigger="focus">
     <template #reference>
       <div tabindex="0">
         <icon-svg icon-class="emojiBtn" />
