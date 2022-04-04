@@ -66,7 +66,18 @@
 npm run serve
 ```
 
+在谷歌浏览器中选择`拓展程序` -> `管理拓展程序` -> `加载已解压的拓展程序` 然后选择当前目录下的`dist`目录打开。
+
+
+
 #### 打包
 ```
 npm run build
 ```
+
+进入`artifacts`目录解压zip包
+```
+unzip pwl-chat-extension-v1.0.19-production.zip
+```
+
+在谷歌浏览器中选择`拓展程序` -> `管理拓展程序` -> `加载已解压的拓展程序` 然后选择当前目录下的`artifacts`目录打开。
