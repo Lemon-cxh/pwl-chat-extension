@@ -15,3 +15,8 @@ export const redPacketTypeMap = new Map([
   ['average', { label: '平分红包', count: 2, msg: '平分红包，人人有份!' }],
   ['rockPaperScissors', { label: '石头剪刀布', count: 1, msg: '石头剪刀布!' }],
 ])
+
+export const redPacketType = {
+  rockPaperScissors: 'rockPaperScissors',
+  heartbeat: 'heartbeat'
+}

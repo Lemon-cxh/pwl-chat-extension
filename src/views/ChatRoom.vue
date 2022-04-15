@@ -329,15 +329,15 @@ export default {
       this.userName = name
       this.dialogVisible = true
     },
-    updateRedPacket(oId, byMe) {
+    updateRedPacket(message, byMe) {
       let msg
       this.messageArray.some((e, index) => {
-        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
+        if (e.oId == message.oId && e.type === MESSAGE_TYPE.msg) {
           msg = JSON.parse(e.content)
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got = byMe ? msg.count : (msg.got + 1)
+          msg.got = byMe ? msg.count : message.got
           this.updateMessage(index, 'content', JSON.stringify(msg))
           return true
         }

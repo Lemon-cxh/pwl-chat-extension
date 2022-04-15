@@ -117,9 +117,9 @@ function messageHandler(event) {
       }
       messageEvent(data, false)
       if (port) {
-        port.postMessage({ type: EVENT.redPacketStatus, data: data.oId })
+        port.postMessage({ type: EVENT.redPacketStatus, data: data })
       }
-      store.commit('updateRedPacket', data.oId)
+      store.commit('updateRedPacket', data)
       break
     case MESSAGE_TYPE.discussChanged:
       messageEvent(data, false)

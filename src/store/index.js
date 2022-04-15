@@ -2,6 +2,7 @@ import { createStore } from 'vuex'
 import { user } from './module/user'
 import { getUserInfo, getKey } from '../api/login'
 import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
+import { redPacketType } from '../constant/RedPacketConstant'
 import { setLocal, getLocal } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
 import { openRedPacket } from '../api/chat'
@@ -54,10 +55,16 @@ export default createStore({
       }
       state.messageTotal += 1
       if (isRedPacket(message.message)) {
+        state.message.unshift(message.message)
+        if (
+          message.message.type === redPacketType.rockPaperScissors ||
+          message.message.type === redPacketType.heartbeat
+        ) {
+          return
+        }
         setTimeout(() => {
           openRedPacket({ oId: message.message.oId, apiKey: state.key }).then()
         }, 3000 + Math.ceil(Math.random() * 1000))
-        state.message.unshift(message.message)
         return
       }
       // +1 消息折叠
@@ -127,16 +134,18 @@ export default createStore({
         return false
       })
     },
-    updateRedPacket(state, oId) {
+    updateRedPacket(state, message) {
       let msg
       state.message.some((e) => {
-        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
+        if (e.oId == message.oId && e.type === MESSAGE_TYPE.msg) {
           msg = JSON.parse(e.content)
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got += 1
-          e.content = JSON.stringify(msg)
+          if (message.got > msg.got) {
+            msg.got = message.got
+            e.content = JSON.stringify(msg)
+          }    
           return true
         }
         return false
