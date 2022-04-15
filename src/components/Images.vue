@@ -1,10 +1,15 @@
 <template>
   <div>
-    <el-popover placement="left-start" width="auto" trigger="focus">
+    <el-popover placement="left-start" width="auto" trigger="hover">
       <template #reference>
         <div tabindex="0"><icon-svg icon-class="imageBtn" /></div>
       </template>
       <el-row class="image-box">
+        <icon-svg
+          class="image-add"
+          icon-class="imageAdd"
+          @click=";(url = ''), (drawer = true)"
+        />
         <div v-for="(item, index) in images" :key="index" class="image">
           <div class="image-item">
             <img :src="item" class="image" @click="selectImage(item)" />
@@ -14,11 +19,6 @@
             />
           </div>
         </div>
-        <icon-svg
-          class="image-add"
-          icon-class="imageAdd"
-          @click=";(url = ''), (drawer = true)"
-        />
       </el-row>
     </el-popover>
     <el-drawer
@@ -77,7 +77,7 @@ export default {
     getCloudImage() {
       getCloudImage(this.form).then((res) => {
         if (0 === res.code) {
-          this.images = JSON.parse(res.data)
+          this.images = JSON.parse(res.data).reverse()
         }
       })
     },
