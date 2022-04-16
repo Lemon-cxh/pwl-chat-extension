@@ -43,16 +43,19 @@ chrome.storage.onChanged.addListener((changes) => {
 })
 
 window.openSocket = () => {
+  if (socketLock) {
+    return
+  }
+  socketLock = true
   store
     .dispatch('getUser')
     .then(() => {
-      if (!socketLock) {
-        initWebSocket()
-      }
+      initWebSocket()
     })
     .catch(() => {
       webSocket && webSocket.close()
     })
+  socketLock = false
 }
 
 window.closeSocket = () => {
@@ -63,7 +66,6 @@ window.closeSocket = () => {
 window.openSocket()
 
 function initWebSocket() {
-  socketLock = true
   window.closeSocket()
   getLocal([STORAGE.key], (result) => {
     webSocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
@@ -72,27 +74,18 @@ function initWebSocket() {
     }
     intervalId = setInterval(() => {
       webSocket.send('-hb-')
-      if (!socketIsOpen()) {
-        window.openSocket()
-      }
     }, 1000 * 60)
     webSocket.onmessage = (event) => messageHandler(event)
     webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
+      window.openSocket()
     }
     webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
+      window.openSocket()
     }
-    socketLock = false
     getMoreEvent()
   })
-}
-
-function socketIsOpen() {
-  return (
-    webSocket.readyState === WebSocket.OPEN ||
-    webSocket.readyState === WebSocket.CONNECTING
-  )
 }
 
 function messageHandler(event) {
@@ -166,7 +159,10 @@ chrome.runtime.onConnect.addListener((p) => {
 
 chrome.runtime.onMessage.addListener((request) => {
   if (TABS_EVENT.sendMessage === request.type) {
-    send({ content: request.data + getMessageMark(), apiKey: store.getters.key }).then()
+    send({
+      content: request.data + getMessageMark(),
+      apiKey: store.getters.key,
+    }).then()
     return
   }
   if (TABS_EVENT.openRedPacket === request.type) {
