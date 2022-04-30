@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 import { user } from './module/user'
 import { getUserInfo, getKey } from '../api/login'
-import { MESSAGE_LIMIT, STORAGE, MESSAGE_TYPE } from '../constant/Constant'
+import { STORAGE, MESSAGE_TYPE } from '../constant/Constant'
 import { setLocal, getLocal } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
 
@@ -11,7 +11,6 @@ export default createStore({
   },
   state: {
     message: [],
-    messageTotal: 0,
     discuss: '',
     online: {
       onlineChatCnt: 0,
@@ -22,15 +21,12 @@ export default createStore({
     message: (state) => {
       return state.message
     },
-    messageTotal: (state) => {
-      return state.messageTotal
-    },
     messageLength: (state) => {
       return state.message.length
     },
-    pageParams: (state) => {
-      let page = parseInt(state.messageTotal / MESSAGE_LIMIT) + 1
-      return { page: page, length: page * MESSAGE_LIMIT - state.messageTotal }
+    lastMessageId: (state) => {
+      let length = state.message.length;
+      return length > 0 ? state.message[length - 1].oId : 0
     },
     online: (state) => {
       return state.online
@@ -41,17 +37,13 @@ export default createStore({
   },
   mutations: {
     popMessage(state) {
-      let m = state.message.pop()
-      if (m && !m.revoke && m.content) {
-        state.messageTotal -= m.users ? m.users.length + 1 : 1
-      }
+      state.message.pop()
     },
     addMessage(state, message) {
       if (!message.isMsg) {
         state.message.unshift(message.message)
         return
       }
-      state.messageTotal += 1
       if (isRedPacket(message.message)) {
         state.message.unshift(message.message)
         return
@@ -72,13 +64,12 @@ export default createStore({
       state.message[0].oIds = oIds
     },
     concatMessage(state, data) {
-      state.messageTotal += data.size
       let index = state.message.length - 1
       let last = state.message[index]
-      let message = data.message[0]
+      let message = data[0]
       // +1 消息折叠
       if (!last || last.content !== message.content) {
-        state.message = state.message.concat(data.message)
+        state.message = state.message.concat(data)
         return
       }
       let { users = [], oIds = [] } = message
@@ -95,11 +86,10 @@ export default createStore({
         message.oIds = oIds
       }
       state.message[index] = message
-      state.message = state.message.concat(data.message.slice(1))
+      state.message = state.message.concat(data.slice(1))
     },
     clearMessage(state) {
       state.message = []
-      state.messageTotal = 0
     },
     setOnline(state, online) {
       state.online = {
@@ -147,7 +137,6 @@ export default createStore({
           (e.oId == oId || (e.oIds && e.oIds.some((e) => e === oId)))
         ) {
           e.revoke = true
-          state.messageTotal -= 1
           return true
         }
         return false

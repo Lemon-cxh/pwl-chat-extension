@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import store from './store/index'
-import { more, send, openRedPacket } from './api/chat'
+import { more, getMessages, send, openRedPacket } from './api/chat'
 import {
   notifications,
   getLocal,
@@ -19,7 +19,6 @@ import {
 
 const URL = 'wss://fishpi.cn/chat-room-channel'
 let socketLock = false
-let webSocket
 // 最大保留两页消息
 const MAX_PAGE = 2
 let intervalId = undefined
@@ -53,13 +52,13 @@ window.openSocket = () => {
       initWebSocket()
     })
     .catch(() => {
-      webSocket && webSocket.close()
+      window.webSocket && window.webSocket.close()
     })
   socketLock = false
 }
 
 window.closeSocket = () => {
-  webSocket && webSocket.close()
+  window.webSocket && window.webSocket.close()
   store.commit('clearMessage')
 }
 
@@ -68,19 +67,19 @@ window.openSocket()
 function initWebSocket() {
   window.closeSocket()
   getLocal([STORAGE.key], (result) => {
-    webSocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
+    window.webSocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
     if (intervalId != undefined) {
       clearInterval(intervalId)
     }
     intervalId = setInterval(() => {
-      webSocket.send('-hb-')
+      window.webSocket.send('-hb-')
     }, 1000 * 60)
-    webSocket.onmessage = (event) => messageHandler(event)
-    webSocket.onerror = (e) => {
+    window.webSocket.onmessage = (event) => messageHandler(event)
+    window.webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
       window.openSocket()
     }
-    webSocket.onclose = (e) => {
+    window.webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
       window.openSocket()
     }
@@ -129,6 +128,14 @@ function messageHandler(event) {
 
 chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
+  if (
+    window.webSocket &&
+    (window.webSocket.readyState === WebSocket.CLOSING ||
+      window.webSocket.readyState === WebSocket.CLOSED)
+  ) {
+    window.openSocket()
+    console.log('重新连接了')
+  }
   port = p
   let message = {
     message: store.getters.message,
@@ -240,12 +247,21 @@ function atNotifications(message) {
 }
 
 async function getMoreEvent() {
-  let pageParams = store.getters.pageParams
-  let res = await more({ page: pageParams.page, apiKey: store.getters.key })
+  let lastId = store.getters.lastMessageId
+  let res = lastId
+    ? await getMessages({
+        apiKey: store.getters.key,
+        oId: lastId,
+        mode: 1,
+        size: MESSAGE_LIMIT,
+      })
+    : await more({ apiKey: store.getters.key, page: 1 })
   if (res.code !== 0) {
     return
   }
-  let data = res.data.slice(res.data.length - pageParams.length).reverse()
+  let data = lastId
+    ? res.data.slice(1).reverse()
+    : res.data.reverse()
   let arr = []
   for (let index = 0; index < data.length; index++) {
     if (index === 0) {
@@ -269,7 +285,7 @@ async function getMoreEvent() {
     arr[0].users = users
     arr[0].oIds = oIds
   }
-  store.commit('concatMessage', { message: arr, size: data.length })
+  store.commit('concatMessage', arr)
   if (port) {
     port.postMessage({ type: EVENT.more, data: arr })
   }
