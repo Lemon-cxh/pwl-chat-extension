@@ -30,7 +30,6 @@
           v-model.trim="form.mfaCode"
           @keyup.enter="onSubmit"
           placeholder="未开启请留空"
-          ref="mfaCode"
         ></el-input>
       </el-form-item>
       <el-form-item label-width="140px">
@@ -63,9 +62,6 @@ export default {
         ],
         userPassword: [
           { required: true, message: '请输入密码', trigger: 'blur' },
-        ],
-        mfaCode: [
-          { required: false, trigger: 'blur' },
         ],
       },
     }

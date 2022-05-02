@@ -77,11 +77,15 @@ function initWebSocket() {
     window.webSocket.onmessage = (event) => messageHandler(event)
     window.webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
-      window.openSocket()
+      if (isClosed()) {
+        window.openSocket()
+      }
     }
     window.webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
-      window.openSocket()
+      if (isClosed()) {
+        window.openSocket()
+      }
     }
     getMoreEvent()
   })
@@ -128,11 +132,7 @@ function messageHandler(event) {
 
 chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
-  if (
-    window.webSocket &&
-    (window.webSocket.readyState === WebSocket.CLOSING ||
-      window.webSocket.readyState === WebSocket.CLOSED)
-  ) {
+  if (isClosed()) {
     window.openSocket()
     console.log('重新连接了')
   }
@@ -259,9 +259,7 @@ async function getMoreEvent() {
   if (res.code !== 0) {
     return
   }
-  let data = lastId
-    ? res.data.slice(1).reverse()
-    : res.data.reverse()
+  let data = lastId ? res.data.slice(1).reverse() : res.data.reverse()
   let arr = []
   for (let index = 0; index < data.length; index++) {
     if (index === 0) {
@@ -322,6 +320,12 @@ function formatOptions(options) {
     options.care = JSON.parse(options.care)
   }
   return options
+}
+
+function isClosed() {
+  return !window.webSocket ||
+  window.webSocket.readyState === WebSocket.CLOSING ||
+  window.webSocket.readyState === WebSocket.CLOSED
 }
 
 createApp().use(store)
