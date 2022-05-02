@@ -24,6 +24,15 @@
           show-password
         ></el-input>
       </el-form-item>
+      <el-form-item label="两步验证码" prop="mfaCode">
+        <el-input
+          class="input"
+          v-model.trim="form.mfaCode"
+          @keyup.enter="onSubmit"
+          placeholder="未开启请留空"
+          ref="mfaCode"
+        ></el-input>
+      </el-form-item>
       <el-form-item label-width="140px">
         <el-button type="info" @click="register">注册</el-button>
         <el-button type="primary" @click="onSubmit">登录</el-button>
@@ -46,6 +55,7 @@ export default {
       form: {
         nameOrEmail: '',
         userPassword: '',
+        mfaCode: '',
       },
       rules: {
         nameOrEmail: [
@@ -53,6 +63,9 @@ export default {
         ],
         userPassword: [
           { required: true, message: '请输入密码', trigger: 'blur' },
+        ],
+        mfaCode: [
+          { required: false, trigger: 'blur' },
         ],
       },
     }
