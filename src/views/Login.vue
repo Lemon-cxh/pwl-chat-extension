@@ -69,6 +69,15 @@ export default {
   inject: ['$message'],
   created() {
     let that = this
+
+    const name = this.$route.params.nameOrEmail
+    const password = this.$route.params.userPassword
+    if (name != null && password != null) {
+        that.form.nameOrEmail = name
+        that.form.userPassword = password
+        return
+    }
+
     getLocal([STORAGE.account], function (result) {
       if (result[STORAGE.account]) {
         that.form.nameOrEmail = result[STORAGE.account].nameOrEmail
@@ -104,7 +113,7 @@ export default {
       })
     },
     register() {
-      window.open(process.env.VUE_APP_BASE_URL + '/register?r=Lemon')
+      this.$router.push({ name: 'Register' })
     },
   },
 }
