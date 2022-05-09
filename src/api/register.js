@@ -21,6 +21,6 @@ export function register2(data) {
     url: '/register2',
     method: 'post',
     data: data,
-    params: {'r':'Lemon'}
+    params: {'r': process.env.VUE_APP_INVITE}
   })
 }
