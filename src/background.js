@@ -77,15 +77,9 @@ function initWebSocket() {
     window.webSocket.onmessage = (event) => messageHandler(event)
     window.webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
-      if (isClosed()) {
-        window.openSocket()
-      }
     }
     window.webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
-      if (isClosed()) {
-        window.openSocket()
-      }
     }
     getMoreEvent()
   })

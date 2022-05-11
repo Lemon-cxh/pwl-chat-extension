@@ -11,7 +11,7 @@ export function register(data) {
 export function verify(code) {
   return request({
     url: '/verify',
-    method: 'post',
+    method: 'get',
     params: {'code':code}
   })
 }
