@@ -12,10 +12,7 @@
       <el-row class="menu">
         <red-packet class="menu-item" />
         <emoji class="menu-item" @add-content="addContent" />
-        <images
-          ref="cloudImages"
-          @send-message="sendMessage"
-        />
+        <images ref="cloudImages" @send-message="sendMessage" />
       </el-row>
     </el-row>
     <!-- 消息列表 -->
@@ -205,12 +202,8 @@ export default {
     messageListener(msg) {
       switch (msg.type) {
         case EVENT.loadMessage:
-          if (msg.data.message.length === 0) {
-            this.load()
-          } else {
-            this.pushMessage(msg.data.message)
-            this.loading = false
-          }
+          this.pushMessage(msg.data.message)
+          this.loading = false
           this.online = msg.data.online
           this.setDiscussContent(msg.data.discuss)
           break

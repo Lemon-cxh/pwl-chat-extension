@@ -227,6 +227,7 @@ function onlineEvent(data) {
 
 function atNotifications(message) {
   chrome.browserAction.setBadgeText({ text: '' + ++count })
+  chrome.browserAction.setBadgeBackgroundColor({ color: [64, 158, 255, 1] })
   if (message.isCare) {
     notifications(message.userName, message.md)
     return
@@ -317,9 +318,11 @@ function formatOptions(options) {
 }
 
 function isClosed() {
-  return !window.webSocket ||
-  window.webSocket.readyState === WebSocket.CLOSING ||
-  window.webSocket.readyState === WebSocket.CLOSED
+  return (
+    !window.webSocket ||
+    window.webSocket.readyState === WebSocket.CLOSING ||
+    window.webSocket.readyState === WebSocket.CLOSED
+  )
 }
 
 createApp().use(store)

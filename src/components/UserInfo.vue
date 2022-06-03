@@ -14,6 +14,11 @@
       </el-progress>
       <template #dropdown>
         <el-dropdown-menu>
+          <el-dropdown-item command="openHome">
+            <bell class="svg-icon" />
+            主 页
+            <el-badge> </el-badge>
+          </el-dropdown-item>
           <el-dropdown-item command="openNotifications">
             <bell class="svg-icon" />
             通 知
@@ -242,6 +247,9 @@ export default {
     },
     handleCommand(command) {
       this[command]()
+    },
+    openHome() {
+      window.open(process.env.VUE_APP_BASE_URL)
     },
     openNotifications() {
       this.$router.push({ name: 'Notification' })
