@@ -77,7 +77,7 @@ export default {
     getCloudImage() {
       getCloudImage(this.form).then((res) => {
         if (0 === res.code) {
-          this.images = JSON.parse(res.data).reverse()
+          this.images = res.data ? JSON.parse(res.data).reverse() : []
         }
       })
     },
@@ -120,7 +120,7 @@ export default {
     getCloud(fun) {
       getCloudImage(this.form).then((res) => {
         if (0 === res.code) {
-          fun(JSON.parse(res.data))
+          fun(res.data ? JSON.parse(res.data) : [])
         }
       })
     },
