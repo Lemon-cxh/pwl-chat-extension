@@ -42,10 +42,6 @@ chrome.storage.onChanged.addListener((changes) => {
 })
 
 window.openSocket = () => {
-  if (socketLock) {
-    return
-  }
-  socketLock = true
   store
     .dispatch('getUser')
     .then(() => {
@@ -54,7 +50,6 @@ window.openSocket = () => {
     .catch(() => {
       window.webSocket && window.webSocket.close()
     })
-  socketLock = false
 }
 
 window.closeSocket = () => {
@@ -77,9 +72,11 @@ function initWebSocket() {
     window.webSocket.onmessage = (event) => messageHandler(event)
     window.webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
+      reconnect()
     }
     window.webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
+      reconnect()
     }
     getMoreEvent()
   })
@@ -127,8 +124,7 @@ function messageHandler(event) {
 chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
   if (isClosed()) {
-    window.openSocket()
-    console.log('重新连接了')
+    reconnect()
   }
   port = p
   let message = {
@@ -323,6 +319,18 @@ function isClosed() {
     window.webSocket.readyState === WebSocket.CLOSING ||
     window.webSocket.readyState === WebSocket.CLOSED
   )
+}
+
+function reconnect() {
+  if (socketLock) {
+    return
+  }
+  socketLock = true
+  if (isClosed()) {
+    window.openSocket()
+    console.log('重新连接了')
+  }
+  socketLock = false
 }
 
 createApp().use(store)
