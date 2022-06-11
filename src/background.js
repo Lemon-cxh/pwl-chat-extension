@@ -133,6 +133,7 @@ chrome.runtime.onConnect.addListener((p) => {
     discuss: store.getters.discuss,
   }
   port.postMessage({ type: EVENT.loadMessage, data: message })
+  port.postMessage({ type: EVENT.userInfo, data: store.getters.userInfo })
   port.onMessage.addListener((msg) => {
     switch (msg.type) {
       case EVENT.getMore:
@@ -143,6 +144,9 @@ chrome.runtime.onConnect.addListener((p) => {
         break
       case EVENT.markRedPacket:
         store.commit('markRedPacket', msg.data)
+        break
+      case EVENT.sendMessage:
+        sendMessage(msg.data)
         break
       default:
         break
@@ -156,10 +160,7 @@ chrome.runtime.onConnect.addListener((p) => {
 
 chrome.runtime.onMessage.addListener((request) => {
   if (TABS_EVENT.sendMessage === request.type) {
-    send({
-      content: request.data + getMessageMark(),
-      apiKey: store.getters.key,
-    }).then()
+    sendMessage(request.data)
     return
   }
   if (TABS_EVENT.openRedPacket === request.type) {
@@ -278,6 +279,13 @@ async function getMoreEvent() {
   if (port) {
     port.postMessage({ type: EVENT.more, data: arr })
   }
+}
+
+function sendMessage(data) {
+  send({
+    content: data + getMessageMark(),
+    apiKey: store.getters.key,
+  }).then()
 }
 
 function markCareAndBlack(message) {

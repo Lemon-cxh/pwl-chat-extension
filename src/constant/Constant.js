@@ -4,7 +4,7 @@ export const MESSAGE_TYPE = {
   online: 'online',
   revoke: 'revoke',
   redPacketStatus: 'redPacketStatus',
-  discussChanged: 'discussChanged'
+  discussChanged: 'discussChanged',
 }
 
 // storage存储key
@@ -13,7 +13,7 @@ export const STORAGE = {
   account: 'accountStorage',
   liveness: 'livenessStorage',
   options: 'options',
-  discussEnable: 'discussEnable'
+  discussEnable: 'discussEnable',
 }
 
 // background和popup通信类型
@@ -28,6 +28,8 @@ export const EVENT = {
   syncUserInfo: 8,
   markRedPacket: 10,
   discussChanged: 11,
+  sendMessage: 12,
+  userInfo: 13,
 }
 
 export const TABS_EVENT = {
@@ -54,7 +56,7 @@ export const TABS_EVENT = {
   /**
    * 标记红包领取状态
    */
-  markRedPacket: 6
+  markRedPacket: 6,
 }
 
 export const defaultOptions = {
@@ -67,7 +69,7 @@ export const defaultOptions = {
   },
   hideRedPacketMessage: true,
   blacklist: '',
-  care: ''
+  care: '',
 }
 
-export const MESSAGE_LIMIT = 25;
+export const MESSAGE_LIMIT = 25

@@ -1,18 +1,51 @@
 <template>
-  <div id="app">
-    <template v-for="(item, index) in messageArray" :key="index">
-      <div>{{ item.md }}</div>
-    </template>
+  <div class="app">
+    <div class="chat-room">
+      <el-scrollbar height="96vh">
+        <el-affix :offset="0">
+          <el-input
+            v-focus
+            v-model="input"
+            @keyup.enter="sendHandler"
+            style="width: 50%"
+          />
+        </el-affix>
+
+        <el-row
+          class="message"
+          v-for="(item, index) in messageArray"
+          :key="index"
+        >
+          <div class="name">
+            {{ item.userNickname ? item.userNickname : item.userName }}
+            {{ item.userNickname ? `(${item.userName})` : '' }}
+          </div>
+          <div class="content" v-html="item.content"></div>
+        </el-row>
+      </el-scrollbar>
+    </div>
+    <xiao-ice :userInfo="userInfo" />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
 import { EVENT } from '../constant/Constant'
+import XiaoIce from './XiaoIce.vue'
+
+let port
+
 export default {
   name: 'app',
   data() {
-    return {}
+    return {
+      port: undefined,
+      userInfo: '',
+      input: '',
+    }
+  },
+  components: {
+    'xiao-ice': XiaoIce,
   },
   setup() {
     const messageArray = ref([])
@@ -46,7 +79,7 @@ export default {
   },
   created() {
     chrome.devtools.panels.create('finsh', 'icons/128.png', 'devtools.html')
-    let port = chrome.runtime.connect({ name: 'pwl-chat' })
+    port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.onMessage.addListener((msg) => this.messageListener(msg))
   },
   methods: {
@@ -62,13 +95,20 @@ export default {
           this.pushMessage(msg.data)
           this.loading = false
           break
-        // case EVENT.revoke:
-        //   this.revoke(msg.data)
-        //   break
+        case EVENT.userInfo:
+          this.userInfo = msg.data
+          console.log(msg.data)
+          break
         default:
           break
       }
-      console.log(this.messageArray)
+    },
+    sendHandler() {
+      port.postMessage({
+        type: EVENT.sendMessage,
+        data: this.input,
+      })
+      this.input = ''
     },
   },
 }
@@ -77,5 +117,33 @@ export default {
 body {
   background: #3a3a3a;
   color: white;
+}
+.app {
+  display: flex;
+}
+.chat-room {
+  flex: 1;
+}
+.el-input {
+  --el-input-bg-color: #3a3a3a;
+}
+.message {
+  margin: 3px;
+}
+.name {
+  font-weight: bold;
+  margin-right: 10px;
+}
+.contnet {
+  border-bottom: 1px solid black;
+}
+.content p {
+  margin: 0;
+}
+.content a {
+  color: white;
+}
+.content img {
+  height: 40px;
 }
 </style>
