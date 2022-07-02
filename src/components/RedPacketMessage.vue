@@ -13,6 +13,7 @@
       </el-row>
       <el-row class="flex-colunmn content-box">
         <el-row>{{ redPacket.msg }}</el-row>
+        <el-row>{{ redPacket.money }}积分</el-row>
       </el-row>
     </el-row>
 
