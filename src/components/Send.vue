@@ -26,6 +26,7 @@
             </template>
           </el-input>
         </template>
+        <!-- @用户时的用户列表 -->
         <div class="at-box">
           <el-row
             v-for="item in userList"
@@ -41,6 +42,7 @@
         </div>
       </el-popover>
     </div>
+    <!-- 引用消息显示 -->
     <el-popover
       popper-class="quote-popover"
       placement="bottom-start"
@@ -180,7 +182,7 @@ export default {
       let form = this.form
       if (this.quoteVisible) {
         let quoteForm = this.quoteForm
-        form.content = `${form.content}\n\n---\n\n引用 @${this.buildAtUser(
+        form.content = `${form.content}\n\n*引用* @${this.buildAtUser(
           quoteForm.userName
         )}:\n${quoteForm.md ? '> ' + quoteForm.md : quoteForm.content}\n`
       }

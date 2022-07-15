@@ -15,12 +15,13 @@
         <images ref="cloudImages" @send-message="sendMessage" />
       </el-row>
     </el-row>
-    <!-- 消息列表 -->
+    <!-- 新消息提示 -->
     <transition name="fade">
       <div v-show="hasNewMessage" class="new-message-tip">
         <info-filled class="svg-icon" />有新消息啦
       </div>
     </transition>
+    <!-- 消息列表 -->
     <el-scrollbar
       id="messageList"
       ref="messageScrollbar"
@@ -37,6 +38,7 @@
             type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
           "
         >
+          <!-- 提示类消息 -->
           <hint-message
             v-if="
               type.redPacketStatus === item.type ||
@@ -46,6 +48,7 @@
             @show-user-card="showUserCard"
             @show-redpacket-info="showRedpacketInfo"
           />
+          <!-- 聊天消息 -->
           <div v-else-if="!item.type || type.msg === item.type">
             <message
               v-if="!item.revoke && !item.hidden"
@@ -69,6 +72,7 @@
       <div class="loading-box">
         <icon-svg icon-class="loading" class="loading" v-if="loading" />
       </div>
+      <!-- 回到顶部 -->
       <icon-svg
         icon-class="top"
         class="back-top"
@@ -76,11 +80,13 @@
         @click="backTop()"
       />
     </el-scrollbar>
+    <!-- 用户信息卡片 -->
     <user-card
       :user-name="userName"
       :dialog-visible="dialogVisible"
       @close-dialog="dialogVisible = false"
     />
+    <!-- 领取红包信息 -->
     <red-packet-info
       :user-info="userInfo"
       :info="redPacketInfo"
@@ -215,7 +221,7 @@ export default {
           this.loading = false
           break
         case EVENT.redPacketStatus:
-          this.updateRedPacket(msg.data, false)
+          this.updateRedPacket(msg.data)
           break
         case EVENT.revoke:
           this.revoke(msg.data)
@@ -322,15 +328,15 @@ export default {
       this.userName = name
       this.dialogVisible = true
     },
-    updateRedPacket(message, byMe) {
+    updateRedPacket(data) {
       let msg
       this.messageArray.some((e, index) => {
-        if (e.oId == message.oId && e.type === MESSAGE_TYPE.msg) {
+        if (e.oId == data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
           msg = JSON.parse(e.content)
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got = byMe ? msg.count : message.got
+          msg.got = data.got
           this.updateMessage(index, 'content', JSON.stringify(msg))
           return true
         }
@@ -365,8 +371,9 @@ export default {
     showRedpacketInfo(info) {
       this.redPacketVisible = true
       this.redPacketInfo = info
-      this.updateRedPacket(info.oId, true)
-      port.postMessage({ type: EVENT.markRedPacket, data: info.oId })
+      let data = { oId: info.oId, got: info.info.count }
+      this.updateRedPacket(data)
+      port.postMessage(data)
     },
     sendMessage(content) {
       this.$refs.messageInput.sendMessage(content)

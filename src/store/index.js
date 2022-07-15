@@ -25,7 +25,7 @@ export default createStore({
       return state.message.length
     },
     lastMessageId: (state) => {
-      let length = state.message.length;
+      let length = state.message.length
       return length > 0 ? state.message[length - 1].oId : 0
     },
     online: (state) => {
@@ -116,15 +116,13 @@ export default createStore({
     updateRedPacket(state, message) {
       let msg
       state.message.some((e) => {
-        if (e.oId == message.oId && e.type === MESSAGE_TYPE.msg) {
+        if (e.oId == message.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
           msg = JSON.parse(e.content)
           if (msg.got >= msg.count) {
             return true
           }
-          if (message.got > msg.got) {
-            msg.got = message.got
-            e.content = JSON.stringify(msg)
-          }    
+          msg.got = message.got
+          e.content = JSON.stringify(msg)
           return true
         }
         return false

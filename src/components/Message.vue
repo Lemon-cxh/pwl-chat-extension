@@ -248,6 +248,7 @@ export default {
   margin-left: 5px;
 }
 .message-content {
+  color: black;
   padding: 5px;
   border-radius: 5px;
   font-size: 14px;
