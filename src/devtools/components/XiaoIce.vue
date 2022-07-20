@@ -46,6 +46,7 @@ export default {
         JSON.stringify({
           type: 'setUser',
           user: this.userInfo.userName,
+          uid: this.userInfo.oId,
         })
       )
     }

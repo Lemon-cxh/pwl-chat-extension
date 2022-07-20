@@ -37,7 +37,7 @@
 import { ref } from 'vue'
 import { EVENT, TABS_EVENT } from '../constant/Constant'
 import { isRedPacket } from '../utils/util'
-import XiaoIce from './XiaoIce.vue'
+import XiaoIce from './components/XiaoIce.vue'
 
 let port
 
