@@ -101,18 +101,6 @@ export default createStore({
     setDiscuss(state, discuss) {
       state.discuss = discuss
     },
-    markRedPacket(state, oId) {
-      let msg
-      state.message.some((e) => {
-        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
-          msg = JSON.parse(e.content)
-          msg.got = msg.count
-          e.content = JSON.stringify(msg)
-          return true
-        }
-        return false
-      })
-    },
     updateRedPacket(state, message) {
       let msg
       state.message.some((e) => {
@@ -121,7 +109,7 @@ export default createStore({
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got = message.got
+          msg.got = message.got ? message.got : msg.count
           e.content = JSON.stringify(msg)
           return true
         }

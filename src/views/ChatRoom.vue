@@ -98,9 +98,9 @@
 
 <script>
 import { ref, defineAsyncComponent } from 'vue'
-import { EVENT, MESSAGE_TYPE, TABS_EVENT } from '../constant/Constant'
+import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
-import { sendTabsMessage } from '../utils/chromeUtil'
+import { clickEventListener } from '../utils/commonUtil'
 import { mapGetters, mapMutations } from 'vuex'
 import { revoke } from '../api/chat'
 import { InfoFilled } from '@element-plus/icons-vue'
@@ -186,17 +186,10 @@ export default {
       this.showMessageMenu(event)
       return false
     }
-    document
-      .getElementById('messageList')
-      .addEventListener('click', (event) => {
-        let dom = event.target
-        if (dom.tagName === 'IMG' && dom.className !== 'emoji') {
-          this.showImage(dom, event)
-        }
-        if (dom.tagName === 'A') {
-          this.clickA(dom)
-        }
-      })
+    clickEventListener((name) => {
+      this.userName = name
+      this.dialogVisible = true
+    })
   },
   beforeUnmount() {
     if (port) {
@@ -296,34 +289,6 @@ export default {
         )
       }
     },
-    showImage(dom, event) {
-      let message = event.path.find(
-        (e) => e.id && -1 !== e.id.indexOf('message_')
-      )
-      if (!message) {
-        return false
-      }
-      sendTabsMessage({
-        type: TABS_EVENT.showImage,
-        data: {
-          src: dom.src,
-          width: dom.naturalWidth,
-          height: dom.naturalHeight,
-        },
-      })
-    },
-    clickA(dom) {
-      if (dom.className === 'name-at') {
-        this.showUserCard(dom.innerText)
-      } else {
-        let href = dom.href.replace(
-          `${process.env.VUE_APP_BASE_URL}/forward?goto=`,
-          ''
-        )
-        dom.target = '_blank'
-        dom.href = decodeURIComponent(href)
-      }
-    },
     showUserCard(name) {
       this.userName = name
       this.dialogVisible = true
@@ -336,7 +301,7 @@ export default {
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got = data.got
+          msg.got = data.got ? data.got : msg.count
           this.updateMessage(index, 'content', JSON.stringify(msg))
           return true
         }
@@ -373,7 +338,7 @@ export default {
       this.redPacketInfo = info
       let data = { oId: info.oId, got: info.info.count }
       this.updateRedPacket(data)
-      port.postMessage(data)
+      port.postMessage({ type: EVENT.markRedPacket, data: data })
     },
     sendMessage(content) {
       this.$refs.messageInput.sendMessage(content)

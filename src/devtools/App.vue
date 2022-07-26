@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <div class="chat-room">
-      <el-scrollbar height="96vh">
+      <el-scrollbar id="messageList" height="96vh">
         <el-affix :offset="0">
           <el-input
             v-focus
@@ -18,11 +18,8 @@
               {{ item.userNickname ? `(${item.userName})` : '' }}
             </div>
             <span style="margin: 0 10px 0 5px">:</span>
-            <div
-              v-if="isRedPacket(item.content)"
-              @click="clickRedPacket(item.oId)"
-            >
-              [🧧红包来了]
+            <div v-if="isRedPacket(item)" @click="clickRedPacket(item.oId)">
+              {{ getRedPacketMsg(item) }}
             </div>
             <div v-else class="content" v-html="item.content"></div>
           </el-row>
@@ -35,7 +32,8 @@
 
 <script>
 import { ref } from 'vue'
-import { EVENT, TABS_EVENT } from '../constant/Constant'
+import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
+import { clickEventListener } from '../utils/commonUtil'
 import { isRedPacket } from '../utils/util'
 import XiaoIce from './components/XiaoIce.vue'
 
@@ -88,6 +86,9 @@ export default {
     port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.onMessage.addListener((msg) => this.messageListener(msg))
   },
+  mounted() {
+    clickEventListener()
+  },
   methods: {
     messageListener(msg) {
       switch (msg.type) {
@@ -104,6 +105,9 @@ export default {
         case EVENT.userInfo:
           this.userInfo = msg.data
           break
+        case EVENT.redPacketStatus:
+          this.updateRedPacket(msg.data)
+          break
         default:
           break
       }
@@ -118,10 +122,30 @@ export default {
     isRedPacket(message) {
       return isRedPacket(message)
     },
+    getRedPacketMsg(message) {
+      let content = JSON.parse(message.content)
+      return `[🧧${content.msg} (${content.money}积分)🧧]`
+    },
     clickRedPacket(id) {
-      chrome.runtime.sendMessage({
-        type: TABS_EVENT.openRedPacket,
+      port.postMessage({
+        type: EVENT.openRedPacket,
         data: id,
+      })
+      this.updateMessage({ oId: id })
+    },
+    updateRedPacket(data) {
+      let msg
+      this.messageArray.some((e, index) => {
+        if (e.oId == data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
+          msg = JSON.parse(e.content)
+          if (msg.got >= msg.count) {
+            return true
+          }
+          msg.got = data.got ? data.got : msg.count
+          this.updateMessage(index, 'content', JSON.stringify(msg))
+          return true
+        }
+        return false
       })
     },
   },
@@ -143,7 +167,7 @@ body {
   --el-input-bg-color: #3a3a3a;
 }
 .message {
-  margin: 3px;
+  margin: 5px 3px;
   max-width: 100%;
 }
 .name {
@@ -171,7 +195,7 @@ body {
   margin: 3px 0;
 }
 .content blockquote {
-  margin-top: 5px;
+  margin: 0 0 0 5px;
   border-left: 3px solid #6e6e6e;
   padding-left: 5px;
 }
