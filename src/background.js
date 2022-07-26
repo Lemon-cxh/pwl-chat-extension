@@ -30,10 +30,16 @@ let count = 0
 let options = defaultOptions
 let careOnline = []
 
+/**
+ * 获取设置
+ */
 getSync({ [STORAGE.options]: defaultOptions }, (result) => {
   options = formatOptions(result.options)
 })
 
+/**
+ * 监听storage修改
+ */
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.options) {
     options = formatOptions(changes.options.newValue)
@@ -59,6 +65,9 @@ window.closeSocket = () => {
 
 window.openSocket()
 
+/**
+ * 创建WS连接
+ */
 function initWebSocket() {
   window.closeSocket()
   getLocal([STORAGE.key], (result) => {
@@ -81,6 +90,11 @@ function initWebSocket() {
   })
 }
 
+/**
+ * WS的消息类型处理
+ * 如果port连接存在，需要同步信息
+ * @param {*} event
+ */
 function messageHandler(event) {
   let data = JSON.parse(event.data)
   switch (data.type) {
@@ -120,6 +134,9 @@ function messageHandler(event) {
   }
 }
 
+/**
+ * 监听扩展页面、Devtools与background的长连接
+ */
 chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
   if (isClosed()) {
@@ -147,6 +164,9 @@ chrome.runtime.onConnect.addListener((p) => {
       case EVENT.sendMessage:
         sendMessage(msg.data)
         break
+      case EVENT.openRedPacket:
+        openRedPacket({ oId: msg.data, apiKey: store.getters.key })
+        break
       default:
         break
     }
@@ -157,6 +177,9 @@ chrome.runtime.onConnect.addListener((p) => {
   })
 })
 
+/**
+ * 监听content-script的短链接
+ */
 chrome.runtime.onMessage.addListener((request) => {
   if (TABS_EVENT.sendMessage === request.type) {
     sendMessage(request.data)
@@ -178,6 +201,12 @@ chrome.runtime.onMessage.addListener((request) => {
   }
 })
 
+/**
+ * 解析消息
+ * @param {*} message 消息内容
+ * @param {*} isMsg 是否是消息
+ * @returns
+ */
 function messageEvent(message, isMsg) {
   if (isMsg) {
     markCareAndBlack(message)
@@ -221,6 +250,10 @@ function onlineEvent(data) {
   careOnline = currentOnline
 }
 
+/**
+ * @用户的消息时，浏览器提示
+ * @param {*} message 消息内容
+ */
 function atNotifications(message) {
   chrome.browserAction.setBadgeText({ text: '' + ++count })
   chrome.browserAction.setBadgeBackgroundColor({ color: [64, 158, 255, 1] })
@@ -237,6 +270,9 @@ function atNotifications(message) {
   }
 }
 
+/**
+ * 获取聊天记录
+ */
 async function getMoreEvent() {
   let lastId = store.getters.lastMessageId
   let res = lastId
@@ -287,6 +323,10 @@ function sendMessage(data) {
   }).then()
 }
 
+/**
+ * 标记特殊关心和黑名单
+ * @param {*} message
+ */
 function markCareAndBlack(message) {
   message.isCare =
     options.care && options.care.some((e) => e === message.userName)

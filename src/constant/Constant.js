@@ -1,37 +1,110 @@
 // 消息类型
 export const MESSAGE_TYPE = {
+  /**
+   * 消息
+   */
   msg: 'msg',
+  /**
+   * 在线信息
+   */
   online: 'online',
+  /**
+   * 撤回
+   */
   revoke: 'revoke',
+  /**
+   * 红包领取消息
+   */
   redPacketStatus: 'redPacketStatus',
+  /**
+   * 话题变更
+   */
   discussChanged: 'discussChanged',
 }
 
 // storage存储key
 export const STORAGE = {
+  /**
+   * apiKey
+   */
   key: 'keyStorage',
+  /**
+   * 账号
+   */
   account: 'accountStorage',
+  /**
+   * 活跃度
+   */
   liveness: 'livenessStorage',
+  /**
+   * 设置
+   */
   options: 'options',
+  /**
+   * 话题是否启用
+   */
   discussEnable: 'discussEnable',
 }
 
-// background和popup通信类型
+// background和popup、devtools通信类型
 export const EVENT = {
+  /**
+   * 初始化页面加载消息
+   */
   loadMessage: 1,
+  /**
+   * 接受消息列表
+   */
   more: 2,
+  /**
+   * 获取消息列表
+   */
   getMore: 3,
+  /**
+   * 新消息
+   */
   message: 4,
+  /**
+   * 红包领取信息
+   */
   redPacketStatus: 5,
+  /**
+   * 撤回消息
+   */
   revoke: 6,
+  /**
+   * 在线人数信息
+   */
   online: 7,
+  /**
+   * 同步用户信息
+   */
   syncUserInfo: 8,
+  /**
+   * 标记红包领取状态
+   */
   markRedPacket: 10,
+  /**
+   * 话题消息
+   */
   discussChanged: 11,
+  /**
+   * 发送消息
+   */
   sendMessage: 12,
+  /**
+   * 获取用户信息
+   */
   userInfo: 13,
+  /**
+   * 领取红包
+   */
+  openRedPacket: 14,
 }
 
+/**
+ * content-scripts与background通信
+ */
 export const TABS_EVENT = {
   /**
    * 显示图片
@@ -59,16 +132,34 @@ export const TABS_EVENT = {
   markRedPacket: 6,
 }
 
+/**
+ * 默认设置
+ */
 export const defaultOptions = {
+  /**
+   * @消息通知
+   */
   atNotification: true,
+  /**
+   * 弹幕设置
+   */
   barrageOptions: {
     enable: false,
     fontSize: 16,
     opacity: 0.5,
     color: '#000000',
   },
+  /**
+   * 是否隐藏红包领取消息
+   */
   hideRedPacketMessage: true,
+  /**
+   * 黑名单列表
+   */
   blacklist: '',
+  /**
+   * 特别关心列表
+   */
   care: '',
 }
 

@@ -18,11 +18,8 @@
               {{ item.userNickname ? `(${item.userName})` : '' }}
             </div>
             <span style="margin: 0 10px 0 5px">:</span>
-            <div
-              v-if="isRedPacket(item.content)"
-              @click="clickRedPacket(item.oId)"
-            >
-              [🧧红包来了]
+            <div v-if="isRedPacket(item)" @click="clickRedPacket(item.oId)">
+              [🧧{{ getRedPacketMsg(item) }}]
             </div>
             <div v-else class="content" v-html="item.content"></div>
           </el-row>
@@ -35,7 +32,7 @@
 
 <script>
 import { ref } from 'vue'
-import { EVENT, TABS_EVENT } from '../constant/Constant'
+import { EVENT } from '../constant/Constant'
 import { isRedPacket } from '../utils/util'
 import XiaoIce from './components/XiaoIce.vue'
 
@@ -118,9 +115,13 @@ export default {
     isRedPacket(message) {
       return isRedPacket(message)
     },
+    getRedPacketMsg(message) {
+      let content = JSON.parse(message.content)
+      return `${content.msg} (${content.got}/${content.count})`
+    },
     clickRedPacket(id) {
-      chrome.runtime.sendMessage({
-        type: TABS_EVENT.openRedPacket,
+      port.postMessage({
+        type: EVENT.openRedPacket,
         data: id,
       })
     },
@@ -171,7 +172,7 @@ body {
   margin: 3px 0;
 }
 .content blockquote {
-  margin-top: 5px;
+  margin: 0 0 0 5px;
   border-left: 3px solid #6e6e6e;
   padding-left: 5px;
 }
