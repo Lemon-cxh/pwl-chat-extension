@@ -142,7 +142,7 @@ chrome.runtime.onConnect.addListener((p) => {
         store.commit('setUserInfo', msg.data)
         break
       case EVENT.markRedPacket:
-        store.commit('markRedPacket', msg.data)
+        store.commit('updateRedPacket', msg.data)
         break
       case EVENT.sendMessage:
         sendMessage(msg.data)

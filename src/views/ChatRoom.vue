@@ -336,7 +336,7 @@ export default {
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got = data.got
+          msg.got = data.count ? data.count : msg.got + 1
           this.updateMessage(index, 'content', JSON.stringify(msg))
           return true
         }
@@ -373,7 +373,7 @@ export default {
       this.redPacketInfo = info
       let data = { oId: info.oId, got: info.info.count }
       this.updateRedPacket(data)
-      port.postMessage(data)
+      port.postMessage({ type: EVENT.markRedPacket, data: data })
     },
     sendMessage(content) {
       this.$refs.messageInput.sendMessage(content)
