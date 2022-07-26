@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <div class="chat-room">
-      <el-scrollbar height="96vh">
+      <el-scrollbar id="messageList" height="96vh">
         <el-affix :offset="0">
           <el-input
             v-focus
@@ -32,8 +32,8 @@
 
 <script>
 import { ref } from 'vue'
-import { EVENT } from '../constant/Constant'
-import { rockPaperScissors } from '../constant/RedPacketConstant'
+import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
+import { clickEventListener } from '../utils/commonUtil'
 import { isRedPacket } from '../utils/util'
 import XiaoIce from './components/XiaoIce.vue'
 
@@ -85,6 +85,9 @@ export default {
     chrome.devtools.panels.create('finsh', 'icons/128.png', 'devtools.html')
     port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.onMessage.addListener((msg) => this.messageListener(msg))
+  },
+  mounted() {
+    clickEventListener()
   },
   methods: {
     messageListener(msg) {
