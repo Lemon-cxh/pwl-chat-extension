@@ -238,7 +238,7 @@ export default {
   align-items: flex-end;
 }
 .name {
-  color: white;
+  color: #999999;
   margin-bottom: 2px;
 }
 .nick-name {
@@ -285,7 +285,7 @@ export default {
 }
 .time {
   padding: 0 5px;
-  color: white;
+  color: #999999;
 }
 .menu {
   text-align: center;
