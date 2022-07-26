@@ -19,7 +19,7 @@
             </div>
             <span style="margin: 0 10px 0 5px">:</span>
             <div v-if="isRedPacket(item)" @click="clickRedPacket(item.oId)">
-              [🧧{{ getRedPacketMsg(item) }}]
+              {{ getRedPacketMsg(item) }}
             </div>
             <div v-else class="content" v-html="item.content"></div>
           </el-row>
@@ -33,6 +33,7 @@
 <script>
 import { ref } from 'vue'
 import { EVENT } from '../constant/Constant'
+import { rockPaperScissors } from '../constant/RedPacketConstant'
 import { isRedPacket } from '../utils/util'
 import XiaoIce from './components/XiaoIce.vue'
 
@@ -101,6 +102,9 @@ export default {
         case EVENT.userInfo:
           this.userInfo = msg.data
           break
+        case EVENT.redPacketStatus:
+          this.updateRedPacket(msg.data)
+          break
         default:
           break
       }
@@ -117,12 +121,28 @@ export default {
     },
     getRedPacketMsg(message) {
       let content = JSON.parse(message.content)
-      return `${content.msg} (${content.got}/${content.count})`
+      return `[🧧${content.msg} (${content.money}积分)🧧]`
     },
     clickRedPacket(id) {
       port.postMessage({
         type: EVENT.openRedPacket,
         data: id,
+      })
+      this.updateMessage({ oId: id })
+    },
+    updateRedPacket(data) {
+      let msg
+      this.messageArray.some((e, index) => {
+        if (e.oId == data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
+          msg = JSON.parse(e.content)
+          if (msg.got >= msg.count) {
+            return true
+          }
+          msg.got = data.got ? data.got : msg.count
+          this.updateMessage(index, 'content', JSON.stringify(msg))
+          return true
+        }
+        return false
       })
     },
   },
@@ -144,7 +164,7 @@ body {
   --el-input-bg-color: #3a3a3a;
 }
 .message {
-  margin: 3px;
+  margin: 5px 3px;
   max-width: 100%;
 }
 .name {

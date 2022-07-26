@@ -109,7 +109,7 @@ export default createStore({
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got = message.count ? message.count : msg.got + 1
+          msg.got = message.got ? message.got : msg.count
           e.content = JSON.stringify(msg)
           return true
         }

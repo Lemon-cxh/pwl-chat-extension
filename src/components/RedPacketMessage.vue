@@ -42,7 +42,10 @@
 <script>
 import { openRedPacket } from '../api/chat'
 import { mapGetters } from 'vuex'
-import { redPacketTypeMap } from '../constant/RedPacketConstant'
+import {
+  redPacketTypeMap,
+  rockPaperScissors,
+} from '../constant/RedPacketConstant'
 
 export default {
   name: 'redPacketMessage',
@@ -72,7 +75,7 @@ export default {
     clickRedPacket() {
       let redPacket = this.redPacket
       if (
-        redPacket.type === 'rockPaperScissors' &&
+        redPacket.type === rockPaperScissors &&
         redPacket.got < redPacket.count
       ) {
         this.dialogGestureVisible = true

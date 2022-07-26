@@ -336,7 +336,7 @@ export default {
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got = data.count ? data.count : msg.got + 1
+          msg.got = data.got ? data.got : msg.count
           this.updateMessage(index, 'content', JSON.stringify(msg))
           return true
         }
