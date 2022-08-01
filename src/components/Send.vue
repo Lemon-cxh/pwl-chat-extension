@@ -177,6 +177,7 @@ export default {
     },
     sendMessage(content) {
       send({ content: content, apiKey: this.key }).then()
+      this.$refs.contentInput.focus()
     },
     send() {
       let form = this.form
