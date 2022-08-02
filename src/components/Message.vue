@@ -7,6 +7,7 @@
       >
         <el-avatar
           :id="'avatar_' + message.oId"
+          alt="avatar"
           size="default"
           :src="message.userAvatarURL"
         ></el-avatar>
