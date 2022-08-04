@@ -2,7 +2,7 @@
   <div class="xiao-ice">
     <el-scrollbar height="96vh">
       <el-affix :offset="0">
-        <el-input v-focus v-model="sendParams.msg" @keyup.enter="sendHandler" />
+        <el-input v-model="sendParams.msg" @keyup.enter="sendHandler" />
       </el-affix>
       <div class="message" v-for="item in message" :key="item.timeStamp">
         <span class="name">{{

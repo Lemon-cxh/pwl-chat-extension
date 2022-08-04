@@ -183,10 +183,12 @@ body {
   color: white;
 }
 .content img {
-  height: 40px;
-  max-width: 100%;
+  max-height: 1em;
 }
-
+.content iframe {
+  height: 0;
+  width: 0;
+}
 .contnet * {
   overflow: auto;
   margin: 0px;
