@@ -16,27 +16,27 @@
               {{ userInfo.userAppRole == 0 ? '黑客' : '画家' }}</span
             >
           </el-row>
-          <el-row class="column"
-            ><span
-              ><avatar class="svg-icon" />{{ userInfo.userRole }}</span
-            ></el-row
-          >
           <el-row class="column">
-            <span><coin class="svg-icon" />{{ userInfo.userPoint }}</span>
-            <span
-              ><location-filled class="svg-icon" />{{ userInfo.userCity }}</span
-            >
+            <span> <avatar class="svg-icon" />{{ userInfo.userRole }} </span>
+          </el-row>
+          <el-row class="column">
+            <span @click="openPoints">
+              <coin class="svg-icon" />{{ userInfo.userPoint }}
+            </span>
+            <span>
+              <location-filled class="svg-icon" />{{ userInfo.userCity }}
+            </span>
           </el-row>
         </el-row>
 
         <el-row class="flex-column info">
-          <el-row class="name-column" @click="goto">
+          <el-row class="name-column" @click="openMember">
             <span class="name">{{
               userInfo.userNickname ? userInfo.userNickname : userInfo.userName
             }}</span>
             <span>{{ userInfo.userNickname ? userInfo.userName : '' }}</span>
           </el-row>
-          <el-row style="height: 20px; margin: 3px 5px;flex-grow:2">
+          <el-row style="height: 20px; margin: 3px 5px; flex-grow: 2">
             <template v-if="userInfo.sysMetal">
               <img
                 v-for="(item, index) in userInfo.sysMetal.list"
@@ -106,9 +106,14 @@ export default {
         ? `background-image:url('${url}')`
         : 'background-color: #1b4f8f;'
     },
-    goto() {
+    openMember() {
       window.open(
         `${process.env.VUE_APP_BASE_URL}/member/${this.userInfo.userName}`
+      )
+    },
+    openPoints() {
+      window.open(
+        `${process.env.VUE_APP_BASE_URL}/member/${this.userInfo.userName}/points`
       )
     },
     openUrl() {
@@ -178,7 +183,7 @@ export default {
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
-  display:-webkit-box;
+  display: -webkit-box;
 }
 .intro {
   flex-grow: 1;
