@@ -49,6 +49,7 @@ import {
 
 export default {
   name: 'redPacketMessage',
+  inject: ['$message'],
   props: {
     oId: String,
     content: String,
@@ -91,6 +92,10 @@ export default {
     },
     openRedPacket(form) {
       openRedPacket(form).then((res) => {
+        if (res.code == -1) {
+          this.$message.warning(res.msg)
+          return
+        }
         res.oId = this.oId
         this.$emit('showRedpacketInfo', res)
       })
