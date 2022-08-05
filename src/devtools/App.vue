@@ -201,4 +201,7 @@ body {
   border-left: 3px solid #6e6e6e;
   padding-left: 5px;
 }
+.content iframe {
+  border: none;
+}
 </style>

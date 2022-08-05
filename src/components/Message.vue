@@ -346,4 +346,7 @@ export default {
 .message-content blockquote * {
   max-width: 257px;
 }
+.message-content iframe {
+  border: none;
+}
 </style>
