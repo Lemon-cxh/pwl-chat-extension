@@ -102,7 +102,7 @@ export const type = new Map([
         userName: 'authorName',
         content: 'articleTitle',
         time: 'createTime',
-      }
+      },
     },
   ],
   [

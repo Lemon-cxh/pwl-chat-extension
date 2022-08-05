@@ -55,7 +55,7 @@
                 active-color="#13ce66"
                 @change="optionsChange"
               />
-              <span class="option-text">被@通知</span>
+              <span class="option-text">@桌面通知</span>
             </el-row>
             <el-row class="option-item">
               <el-switch
@@ -72,6 +72,24 @@
                 @change="optionsChange"
               />
               <span class="option-text">隐藏红包领取</span>
+            </el-row>
+          </el-row>
+          <el-row justify="space-between" class="option-row">
+            <el-row class="option-item">
+              <el-switch
+                v-model="options.autoReadAtNotification"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">自动已读@通知</span>
+            </el-row>
+            <el-row class="option-item">
+              <el-switch
+                v-model="options.autoReadPointNotification"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">自动已读积分通知</span>
             </el-row>
           </el-row>
         </el-tab-pane>
@@ -165,8 +183,9 @@ export default {
     },
   },
   created() {
+    // 获取活跃度
     getLocal([STORAGE.liveness], (res) => {
-      let storage = res[STORAGE.liveness] ? res[STORAGE.liveness] : {}
+      let storage = res[STORAGE.liveness] ?? {}
       let date = getDate()
       if (storage && date === storage.date) {
         this.init(storage)
@@ -178,6 +197,7 @@ export default {
         this.init(storage)
       })
     })
+    // 获取设置
     getSync({ [STORAGE.options]: defaultOptions }, (result) => {
       if (result.options.blacklist) {
         result.options.blacklist = JSON.parse(result.options.blacklist)
@@ -196,7 +216,7 @@ export default {
   },
   methods: {
     init(storage) {
-      this.percentage = storage.percentage ? storage.percentage : 0
+      this.percentage = storage.percentage ?? 0
       if (
         storage.percentage >= 100 ||
         (storage.time && new Date().getTime() - storage.time < REQUEST_INTERVAL)
@@ -238,10 +258,25 @@ export default {
         if (0 !== res.code) {
           return
         }
-        this.unreadCount =
-          res.unreadNotificationCnt - res.unreadAtNotificationCnt
-        if (res.unreadAtNotificationCnt > 0) {
+        let count = res.unreadNotificationCnt
+        if (this.options.autoReadAtNotification) {
+          count -= res.unreadAtNotificationCnt
+        }
+        if (this.options.autoReadPointNotification) {
+          count -= res.unreadPointNotificationCnt
+        }
+        this.unreadCount = count
+        if (
+          this.options.autoReadAtNotification &&
+          res.unreadAtNotificationCnt > 0
+        ) {
           makeReadNotifications('at', this.apiKey).then()
+        }
+        if (
+          this.options.autoReadPointNotification &&
+          res.unreadPointNotificationCnt > 0
+        ) {
+          makeReadNotifications('point', this.apiKey).then()
         }
       })
     },

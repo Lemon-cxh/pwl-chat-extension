@@ -161,6 +161,14 @@ export const defaultOptions = {
    * 特别关心列表
    */
   care: '',
+  /**
+   * 自动已读@ 通知
+   */
+  autoReadAtNotification: true,
+  /**
+   * 自动已读积分通知
+   */
+  autoReadPointNotification: false,
 }
 
 export const MESSAGE_LIMIT = 25
