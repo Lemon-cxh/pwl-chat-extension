@@ -1,15 +1,13 @@
 <template>
   <div>
     <el-row :class="[{ 'own-chat-item': isOwn }, 'chat-item']">
-      <el-row
-        :class="[{ 'own-avatar': isOwn }, 'avatar']"
-        @click="$emit('showUserCard', message.userName)"
-      >
+      <el-row :class="[{ 'own-avatar': isOwn }, 'avatar']">
         <el-avatar
           :id="'avatar_' + message.oId"
           alt="avatar"
           size="default"
           :src="message.userAvatarURL"
+          @click="$emit('showUserCard', message.userName)"
         ></el-avatar>
         <img
           v-if="avatarPendant && avatarPendant.isChristmas"
