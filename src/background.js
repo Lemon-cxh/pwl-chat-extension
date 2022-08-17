@@ -266,7 +266,10 @@ function atNotifications(message) {
     message.md &&
     -1 !== message.md.indexOf('@' + store.getters.userInfo.userName)
   ) {
-    notifications(`${message.userName}@了你`, message.md)
+    notifications(
+      `${message.userName}@了你`,
+      message.md.substring(0, message.md.lastIndexOf('<span class='))
+    )
   }
 }
 
