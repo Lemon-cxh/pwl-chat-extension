@@ -91,6 +91,7 @@
         :key="index"
         :src="item.userAvatarURL"
         :size="20"
+        alt="avatar"
         class="plus-one-avatar"
         @click="$emit('showUserCard', item.userName)"
       />
