@@ -17,7 +17,7 @@
     </el-row>
     <!-- 新消息提示 -->
     <transition name="fade">
-      <div v-show="hasNewMessage" class="new-message-tip">
+      <div v-show="hasNewMessage" class="new-message-tip" @click="backTop()">
         <info-filled class="svg-icon" />有新消息啦
       </div>
     </transition>
