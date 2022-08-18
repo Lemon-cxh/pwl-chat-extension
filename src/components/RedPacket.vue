@@ -115,7 +115,9 @@ import {
   defaultType,
 } from '../constant/RedPacketConstant'
 import { inputRule, selectRule, numberRule } from '../constant/RuleConstant'
-
+/**
+ * 发送红包组件
+ */
 export default {
   name: 'redPacket',
   inject: ['$message'],

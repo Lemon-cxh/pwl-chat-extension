@@ -154,7 +154,9 @@ import { setLocal, getLocal, getSync, setSync } from '../utils/chromeUtil'
 import { Bell, Setting, SwitchButton } from '@element-plus/icons-vue'
 
 const REQUEST_INTERVAL = 40000
-
+/**
+ * 左上角用户信息(活跃度进度条，下拉菜单)
+ */
 export default {
   name: 'userInfo',
   inject: ['$message'],
@@ -188,13 +190,13 @@ export default {
       let storage = res[STORAGE.liveness] ?? {}
       let date = getDate()
       if (storage && date === storage.date) {
-        this.init(storage)
+        this.initLiveness(storage)
         return
       }
       this.getLivenessReward(() => {
         storage.date = date
         storage.percentage = 0
-        this.init(storage)
+        this.initLiveness(storage)
       })
     })
     // 获取设置
@@ -215,7 +217,7 @@ export default {
     }
   },
   methods: {
-    init(storage) {
+    initLiveness(storage) {
       this.percentage = storage.percentage ?? 0
       if (
         storage.percentage >= 100 ||

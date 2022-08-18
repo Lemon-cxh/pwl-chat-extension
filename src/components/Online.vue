@@ -28,6 +28,9 @@
 </template>
 
 <script>
+/**
+ * 在线人数组件
+ */
 export default {
   name: 'online',
   props: {

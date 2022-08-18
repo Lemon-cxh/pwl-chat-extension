@@ -26,7 +26,9 @@
 <script>
 import { getEmoji } from '../api/chat'
 import { mapGetters } from 'vuex'
-
+/**
+ * emoji表情组件
+ */
 export default {
   name: 'emoji',
   emits: ['addContent'],

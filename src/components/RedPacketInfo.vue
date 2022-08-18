@@ -63,6 +63,9 @@
 
 <script>
 import { toRefs } from 'vue'
+/**
+ * 红包详情组件
+ */
 export default {
   name: 'redPacket',
   props: {

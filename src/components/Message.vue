@@ -106,7 +106,9 @@
 import { mapGetters } from 'vuex'
 import { isRedPacket } from '../utils/util'
 import { getMd } from '../api/chat'
-
+/**
+ * 消息组件
+ */
 export default {
   name: 'message',
   props: {

@@ -49,7 +49,9 @@ import { getCloudImage, syncCloudImage } from '../api/chat'
 import { getMessageMark } from '../utils/util'
 import { mapGetters } from 'vuex'
 import { CircleCloseFilled } from '@element-plus/icons-vue'
-
+/**
+ * 图片表情组件
+ */
 export default {
   name: 'images',
   components: {

@@ -46,7 +46,9 @@ import {
   redPacketTypeMap,
   rockPaperScissors,
 } from '../constant/RedPacketConstant'
-
+/**
+ * 红包消息组件
+ */
 export default {
   name: 'redPacketMessage',
   inject: ['$message'],

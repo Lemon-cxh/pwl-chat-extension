@@ -7,7 +7,8 @@
         </span>
         <span> 抢到了 </span>
         <span class="text" @click="showUserCard(message.whoGive)">
-          {{ message.whoGive }} </span>
+          {{ message.whoGive }}
+        </span>
         <span> 的</span>
         <span class="number" @click="openRedPacket"> 红包 </span>
         <span>({{ message.got }}/{{ message.count }})</span>
@@ -29,7 +30,9 @@
 import { openRedPacket } from '../api/chat'
 import { mapGetters } from 'vuex'
 import { MESSAGE_TYPE } from '../constant/Constant'
-
+/**
+ * 提示信息：红包领取、更新话题
+ */
 export default {
   name: 'hintMessage',
   props: {

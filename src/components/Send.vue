@@ -74,7 +74,9 @@ import { getUserName } from '../api/user'
 import { mapGetters } from 'vuex'
 import { getMessageMark } from '../utils/util'
 import { Promotion, CircleCloseFilled } from '@element-plus/icons-vue'
-
+/**
+ * 消息输入框
+ */
 export default {
   name: 'send',
   components: {

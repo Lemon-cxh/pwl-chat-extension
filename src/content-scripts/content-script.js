@@ -15,6 +15,9 @@ let lastMessage = {
 }
 let options = {}
 
+/**
+ * 获取设置参数，并创建弹幕
+ */
 window.onload = function () {
   getSync({ [STORAGE.options]: defaultOptions }, (result) => {
     options = result.options
@@ -25,6 +28,9 @@ window.onload = function () {
   })
 }
 
+/**
+ * 监控background.js的消息
+ */
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.type) {
     case TABS_EVENT.showImage:
@@ -46,6 +52,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 })
 
+/**
+ * 创建弹幕展示的dom
+ */
 function createBarrage() {
   let div = document.createElement('div')
   div.setAttribute('class', 'pwl-message-fixed-box')
@@ -64,6 +73,7 @@ function createBarrage() {
     }
   })
 
+  // 监听图标的鼠标悬浮事件，变为大图显示
   var observe = new MutationObserver(function () {
     let imgs = box.querySelectorAll('img')
     imgs.forEach((e) => {
@@ -71,9 +81,15 @@ function createBarrage() {
       e.onmouseout = () => (e.style = '')
     })
   })
+  // 开始接收与给定选项匹配的 DOM 变化的通知
   observe.observe(box, { childList: true })
 }
 
+/**
+ * 发送消息
+ * @param {*} input
+ * @returns
+ */
 function sendMessage(input) {
   if (input.value === '') {
     return
@@ -85,6 +101,11 @@ function sendMessage(input) {
   input.value = ''
 }
 
+/**
+ * 新增新消息
+ * @param {*} data
+ * @returns
+ */
 function insetMessage(data) {
   let redPacket = isRedPacket(data)
   if (!redPacket && lastMessage.md === data.md && plusOneMessage(data)) {
@@ -129,6 +150,10 @@ function insetMessage(data) {
   }, second * 1000)
 }
 
+/**
+ * 点击红包消息
+ * @param {*} child
+ */
 function redPacketClick(child) {
   child.addEventListener('click', () => {
     if (child.getAttribute('open')) {

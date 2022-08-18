@@ -64,7 +64,9 @@
 import { mapGetters } from 'vuex'
 import { getUserInfo } from '../api/user'
 import { Medal, Avatar, Coin, LocationFilled } from '@element-plus/icons-vue'
-
+/**
+ * 用户信息卡片
+ */
 export default {
   name: 'userCard',
   components: {

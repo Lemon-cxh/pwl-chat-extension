@@ -27,12 +27,14 @@
 
 <script>
 import { getUserName } from '../api/user'
-
+/**
+ * 用户名联想的用户列表
+ */
 export default {
   name: 'userSelect',
   emits: ['change'],
   props: {
-    user: Array
+    user: Array,
   },
   data() {
     return {
@@ -51,7 +53,7 @@ export default {
     },
     change() {
       this.$emit('change', this.userList)
-    }
-  }
+    },
+  },
 }
 </script>

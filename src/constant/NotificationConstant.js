@@ -1,3 +1,6 @@
+/**
+ * 未读通知的类型及接口字段key
+ */
 export const typeArray = [
   {
     name: 'commented',
@@ -35,6 +38,9 @@ export const typeArray = [
     count: 'unreadSysAnnounceNotificationCnt',
   },
 ]
+/**
+ * 通知列表接口字段的映射
+ */
 export const type = new Map([
   [
     'commented',
