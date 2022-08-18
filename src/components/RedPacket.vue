@@ -152,7 +152,7 @@ export default {
       return { apiKey: this.key }
     },
     redPacketContent() {
-      const redPacketForm = this.redPacketForm
+      const redPacketForm = { ...this.redPacketForm }
       redPacketForm.recivers = redPacketForm.recivers
         ? [redPacketForm.recivers]
         : redPacketForm.recivers
