@@ -77,10 +77,6 @@ export const EVENT = {
    */
   online: 7,
   /**
-   * 同步用户信息
-   */
-  syncUserInfo: 8,
-  /**
    * 标记红包领取状态
    */
   markRedPacket: 10,

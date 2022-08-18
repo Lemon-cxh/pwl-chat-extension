@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { getKey, getUserInfo } from '../api/login'
+import { getKey } from '../api/login'
 import { mapMutations } from 'vuex'
 import md5 from 'js-md5'
 import { setLocal, getLocal } from '../utils/chromeUtil'
@@ -73,9 +73,9 @@ export default {
     const name = this.$route.params.nameOrEmail
     const password = this.$route.params.userPassword
     if (name != null && password != null) {
-        that.form.nameOrEmail = name
-        that.form.userPassword = password
-        return
+      that.form.nameOrEmail = name
+      that.form.userPassword = password
+      return
     }
 
     getLocal([STORAGE.account], function (result) {
@@ -96,20 +96,13 @@ export default {
           this.$message.error(response.msg ? response.msg : response)
           return
         }
-        getUserInfo({ apiKey: response.Key }).then((res) => {
-          if (0 !== res.code) {
-            this.$message.error(res)
-            return
-          }
-          this.setKey(response.Key)
-          this.setUserInfo(res.data)
-          setLocal({
-            [STORAGE.key]: response.Key,
-            [STORAGE.account]: data,
-          })
-          chrome.extension.getBackgroundPage().openSocket()
-          this.$router.push({ name: 'ChatRoom' })
+        this.setKey(response.Key)
+        setLocal({
+          [STORAGE.key]: response.Key,
+          [STORAGE.account]: data,
         })
+        chrome.extension.getBackgroundPage().openSocket()
+        this.$router.push({ name: 'ChatRoom' })
       })
     },
     register() {

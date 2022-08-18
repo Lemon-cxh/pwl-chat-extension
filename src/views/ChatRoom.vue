@@ -175,7 +175,6 @@ export default {
     let that = this
     // 连接background.js
     port = chrome.runtime.connect({ name: 'pwl-chat' })
-    port.postMessage({ type: EVENT.syncUserInfo, data: that.userInfo })
     port.onMessage.addListener((msg) => that.messageListener(msg))
     // 是否展示圣诞头像挂件
     this.avatarPendant.isChristmas =
@@ -197,9 +196,16 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setDiscussContent']),
+    ...mapMutations(['setUserInfo', 'setDiscussContent']),
     messageListener(msg) {
       switch (msg.type) {
+        case EVENT.userInfo:
+          if (!msg.data.oId) {
+            this.$router.push({ name: 'Error' })
+            return
+          }
+          this.setUserInfo(msg.data)
+          break
         case EVENT.loadMessage:
           this.pushMessage(msg.data.message)
           this.loading = false

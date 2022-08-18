@@ -36,5 +36,5 @@ export const user = {
     setUserInfo(state, userInfo) {
       state.userInfo = userInfo
     },
-  }
+  },
 }

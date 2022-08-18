@@ -52,6 +52,9 @@ window.openSocket = () => {
     .dispatch('getUser')
     .then(() => {
       initWebSocket()
+      if (port) {
+        port.postMessage({ type: EVENT.userInfo, data: store.getters.userInfo })
+      }
     })
     .catch(() => {
       window.webSocket && window.webSocket.close()
@@ -60,7 +63,7 @@ window.openSocket = () => {
 
 window.closeSocket = () => {
   window.webSocket && window.webSocket.close()
-  store.commit('clearMessage')
+  store.commit('logout')
 }
 
 window.openSocket()
@@ -143,20 +146,19 @@ chrome.runtime.onConnect.addListener((p) => {
     reconnect()
   }
   port = p
-  let message = {
-    message: store.getters.message,
-    online: store.getters.online,
-    discuss: store.getters.discuss,
-  }
-  port.postMessage({ type: EVENT.loadMessage, data: message })
   port.postMessage({ type: EVENT.userInfo, data: store.getters.userInfo })
+  port.postMessage({
+    type: EVENT.loadMessage,
+    data: {
+      message: store.getters.message,
+      online: store.getters.online,
+      discuss: store.getters.discuss,
+    },
+  })
   port.onMessage.addListener((msg) => {
     switch (msg.type) {
       case EVENT.getMore:
         getMoreEvent()
-        break
-      case EVENT.syncUserInfo:
-        store.commit('setUserInfo', msg.data)
         break
       case EVENT.markRedPacket:
         store.commit('updateRedPacket', msg.data)

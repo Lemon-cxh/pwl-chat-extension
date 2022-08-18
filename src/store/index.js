@@ -88,8 +88,9 @@ export default createStore({
       state.message[index] = message
       state.message = state.message.concat(data.slice(1))
     },
-    clearMessage(state) {
+    logout(state) {
       state.message = []
+      state.userInfo = {}
     },
     setOnline(state, online) {
       state.online = {
@@ -139,16 +140,8 @@ export default createStore({
           }
           let key = result[STORAGE.key]
           let res = await getUserInfo({ apiKey: key })
-          if (res.code === undefined) {
-            reject()
-            return
-          }
           if (res.code !== 0) {
             let r = await getKey(result[STORAGE.account])
-            if (res.code === undefined) {
-              reject()
-              return
-            }
             if (r.code !== 0) {
               setLocal({ [STORAGE.key]: '' })
               reject()
@@ -157,11 +150,10 @@ export default createStore({
             key = r.Key
             setLocal({ [STORAGE.key]: key })
             res = await getUserInfo({ apiKey: key })
-            if (res.code === undefined || r.code !== 0) {
+            if (r.code !== 0) {
               reject()
               return
             }
-            reject()
           }
           context.commit('setUserInfo', res.data)
           context.commit('setKey', key)
