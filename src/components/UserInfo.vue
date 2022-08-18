@@ -48,62 +48,64 @@
     >
       <el-tabs>
         <el-tab-pane label="基础设置">
-          <el-row justify="space-between" class="option-row">
-            <el-row class="option-item">
+          <el-row class="option-row">
+            <el-col :span="10" :offset="2">
               <el-switch
                 v-model="options.atNotification"
                 active-color="#13ce66"
                 @change="optionsChange"
               />
               <span class="option-text">@桌面通知</span>
-            </el-row>
-            <el-row class="option-item">
-              <el-switch
-                v-model="options.barrageOptions.enable"
-                active-color="#13ce66"
-                @change="optionsChange"
-              />
-              <span class="option-text">弹幕消息</span>
-            </el-row>
-            <el-row class="option-item">
-              <el-switch
-                v-model="options.hideRedPacketMessage"
-                active-color="#13ce66"
-                @change="optionsChange"
-              />
-              <span class="option-text">隐藏红包领取</span>
-            </el-row>
-          </el-row>
-          <el-row justify="space-between" class="option-row">
-            <el-row class="option-item">
-              <el-switch
-                v-model="options.autoReadAtNotification"
-                active-color="#13ce66"
-                @change="optionsChange"
-              />
-              <span class="option-text">自动已读@通知</span>
-            </el-row>
-            <el-row class="option-item">
-              <el-switch
-                v-model="options.autoReadPointNotification"
-                active-color="#13ce66"
-                @change="optionsChange"
-              />
-              <span class="option-text">自动已读积分通知</span>
-            </el-row>
-            <el-row class="option-item">
+            </el-col>
+            <el-col :span="10" :offset="2">
               <el-switch
                 v-model="options.showUnReadCount"
                 active-color="#13ce66"
                 @change="optionsChange"
               />
               <span class="option-text">显示未读数</span>
-            </el-row>
+            </el-col>
+          </el-row>
+          <el-row class="option-row">
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.barrageOptions.enable"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">弹幕消息</span>
+            </el-col>
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.hideRedPacketMessage"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">隐藏红包领取</span>
+            </el-col>
+          </el-row>
+          <el-row class="option-row">
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.autoReadAtNotification"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">自动已读@通知</span>
+            </el-col>
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.autoReadPointNotification"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">自动已读积分通知</span>
+            </el-col>
           </el-row>
         </el-tab-pane>
         <el-tab-pane label="弹幕设置">
-          <el-row justify="space-between" class="option-row">
-            <el-row class="option-item">
+          <el-row class="option-row">
+            <el-col :span="12">
               <el-input-number
                 v-model="options.barrageOptions.fontSize"
                 @change="optionsChange"
@@ -112,8 +114,8 @@
                 :max="30"
               ></el-input-number>
               <span class="option-text">字体大小</span>
-            </el-row>
-            <el-row class="option-item">
+            </el-col>
+            <el-col :span="12">
               <el-input-number
                 v-model="options.barrageOptions.opacity"
                 @change="optionsChange"
@@ -124,17 +126,17 @@
                 size="small"
               ></el-input-number>
               <span class="option-text">透明度</span>
-            </el-row>
+            </el-col>
           </el-row>
           <el-row class="option-row">
-            <el-row class="option-item">
+            <el-col :span="10" :offset="2">
               <el-color-picker
                 v-model="options.barrageOptions.color"
                 @change="optionsChange"
                 size="small"
               ></el-color-picker>
               <span class="option-text">字体颜色</span>
-            </el-row>
+            </el-col>
           </el-row>
         </el-tab-pane>
         <el-tab-pane label="黑名单">
@@ -333,11 +335,6 @@ export default {
 }
 .option-row {
   margin-bottom: 20px;
-  padding: 0 20px;
-}
-.option-item {
-  height: 30px;
-  align-items: center;
 }
 .option-text {
   margin-left: 3px;
