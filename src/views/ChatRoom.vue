@@ -108,10 +108,10 @@ import { InfoFilled } from '@element-plus/icons-vue'
 let port
 
 export default {
-  name: 'chatRoom',
+  name: 'chat-room',
   components: {
     InfoFilled,
-    UserInfo: defineAsyncComponent(() => import('../components/UserInfo.vue')),
+    UserInfo: defineAsyncComponent(() => import('../components/UserInfo.vue'))
   },
   data() {
     return {
@@ -120,7 +120,7 @@ export default {
       dialogVisible: false,
       userName: '',
       redPacketInfo: {
-        info: {},
+        info: {}
       },
       online: {},
       redPacketVisible: false,
@@ -128,7 +128,7 @@ export default {
       avatarPendant: {},
       showTop: false,
       isTop: true,
-      hasNewMessage: false,
+      hasNewMessage: false
     }
   },
   inject: ['$message'],
@@ -139,7 +139,7 @@ export default {
     },
     unlimitedRevoke() {
       return ['协警', 'OP', '管理员'].some((e) => e === this.userInfo.userRole)
-    },
+    }
   },
   setup() {
     const messageArray = ref([])
@@ -147,13 +147,13 @@ export default {
       messageArray.value.unshift(msg)
     }
     const pushMessage = (msg) => {
-      let index = messageArray.value.length - 1
+      const index = messageArray.value.length - 1
       if (index < 0) {
         messageArray.value.push(...msg)
         return
       }
-      let last = messageArray.value[index]
-      let message = msg[0]
+      const last = messageArray.value[index]
+      const message = msg[0]
       if (last.content !== message.content) {
         messageArray.value.push(...msg)
         return
@@ -168,12 +168,13 @@ export default {
       messageArray,
       unshiftMessage,
       pushMessage,
-      updateMessage,
+      updateMessage
     }
   },
   created() {
-    let that = this
+    const that = this
     // 连接background.js
+    /* global chrome */
     port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.onMessage.addListener((msg) => that.messageListener(msg))
     // 是否展示圣诞头像挂件
@@ -241,15 +242,15 @@ export default {
         this.newMessage(message)
         return
       }
-      let last = this.messageArray[0]
+      const last = this.messageArray[0]
       if (!last || !last.md || message.md !== last.md || isRedPacket(message)) {
         this.newMessage(message)
         return
       }
-      let users = last.users ? last.users : []
+      const users = last.users ? last.users : []
       users.unshift({
         userName: message.userName,
-        userAvatarURL: message.userAvatarURL,
+        userAvatarURL: message.userAvatarURL
       })
       this.updateMessage(0, 'users', users)
     },
@@ -267,7 +268,7 @@ export default {
         this.isTop = false
       }
       this.showTop = scrollTop > 100
-      let distance =
+      const distance =
         this.$refs.messageScrollbar.wrap$.scrollHeight - scrollTop - 420
       if (!this.loading && distance < 10) {
         this.load()
@@ -285,9 +286,11 @@ export default {
       port.postMessage({ type: EVENT.getMore })
     },
     showMessageMenu(event) {
-      let dom = event.path.find((e) => e.id && -1 !== e.id.indexOf('message_'))
+      const dom = event.path.find(
+        (e) => e.id && e.id.indexOf('message_') !== -1
+      )
       if (dom) {
-        let isImage =
+        const isImage =
           event.path[0].nodeName === 'IMG' &&
           event.path[0].className !== 'emoji'
         this.$refs[dom.id][0].showMessageMenu(
@@ -302,7 +305,7 @@ export default {
     updateRedPacket(data) {
       let msg
       this.messageArray.some((e, index) => {
-        if (e.oId == data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
+        if (e.oId === data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
           msg = JSON.parse(e.content)
           if (msg.got >= msg.count) {
             return true
@@ -316,7 +319,7 @@ export default {
     },
     revoke(oId) {
       this.messageArray.some((e, index) => {
-        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
+        if (e.oId === oId && e.type === MESSAGE_TYPE.msg) {
           this.updateMessage(index, 'revoke', true)
           return true
         }
@@ -334,7 +337,7 @@ export default {
         return
       }
       revoke(message.oId).then((res) => {
-        0 === res.code
+        res.code === 0
           ? this.$message.success(res.msg)
           : this.$message.info(res.msg)
       })
@@ -342,9 +345,9 @@ export default {
     showRedpacketInfo(info) {
       this.redPacketVisible = true
       this.redPacketInfo = info
-      let data = { oId: info.oId, got: info.info.count }
+      const data = { oId: info.oId, got: info.info.count }
       this.updateRedPacket(data)
-      port.postMessage({ type: EVENT.markRedPacket, data: data })
+      port.postMessage({ type: EVENT.markRedPacket, data })
     },
     sendMessage(content) {
       this.$refs.messageInput.sendMessage(content)
@@ -360,8 +363,8 @@ export default {
     },
     closeRedapcket() {
       this.redPacketVisible = false
-    },
-  },
+    }
+  }
 }
 </script>
 <style scoped>

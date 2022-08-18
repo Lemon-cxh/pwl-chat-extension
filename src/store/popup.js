@@ -3,18 +3,18 @@ import { user } from './module/user'
 
 export default createStore({
   modules: {
-    user: user,
+    user
   },
   state: {
     discuss: {
       content: '',
-      enable: false,
-    },
+      enable: false
+    }
   },
   getters: {
     discuss: (state) => {
       return state.discuss
-    },
+    }
   },
   mutations: {
     setDiscussContent(state, content) {
@@ -22,6 +22,6 @@ export default createStore({
     },
     changeDiscuss(state) {
       state.discuss.enable = !state.discuss.enable
-    },
-  },
+    }
+  }
 })

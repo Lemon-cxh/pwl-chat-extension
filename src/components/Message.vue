@@ -34,14 +34,14 @@
           v-else
           :class="[
             isOwn ? 'own-content-background' : 'content-background',
-            'message-content',
+            'message-content'
           ]"
         >
           <el-popover
             width="auto"
             placement="bottom"
             trigger="manual"
-            v-model:visible="visible"
+            :visible="visible"
           >
             <template #reference>
               <span
@@ -110,12 +110,12 @@ import { getMd } from '../api/chat'
  * 消息组件
  */
 export default {
-  name: 'message',
+  name: 'message-component',
   props: {
     message: Object,
     date: String,
     unlimitedRevoke: Boolean,
-    avatarPendant: Object,
+    avatarPendant: Object
   },
   emits: [
     'quote',
@@ -124,7 +124,7 @@ export default {
     'showRedpacketInfo',
     'showUserCard',
     'sendMessage',
-    'revokeMessage',
+    'revokeMessage'
   ],
   data() {
     return {
@@ -135,8 +135,8 @@ export default {
         oId: '',
         userName: '',
         md: '',
-        content: '',
-      },
+        content: ''
+      }
     }
   },
   computed: {
@@ -146,11 +146,11 @@ export default {
     },
     isRedPacket() {
       return isRedPacket(this.message)
-    },
+    }
   },
   methods: {
     getTime(time) {
-      if (-1 === time.indexOf(this.date)) {
+      if (time.indexOf(this.date) === -1) {
         return time
       }
       return time.slice(11)
@@ -161,13 +161,13 @@ export default {
         return
       }
       this.visible = true
-      let message = this.message
+      const message = this.message
       this.userName = `@${message.userName} `
       this.quoteForm = {
         oId: message.oId,
         userName: message.userName,
         md: message.md,
-        content: message.content,
+        content: message.content
       }
       this.imageUrl = imageUrl
       setTimeout(() => {
@@ -175,7 +175,7 @@ export default {
       }, 2000)
     },
     quote() {
-      let form = this.quoteForm
+      const form = this.quoteForm
       if (form.md) {
         this.$emit('quote', this.quoteForm)
         this.closePopover()
@@ -207,8 +207,8 @@ export default {
     },
     showRedpacketInfo(info) {
       this.$emit('showRedpacketInfo', info)
-    },
-  },
+    }
+  }
 }
 </script>
 

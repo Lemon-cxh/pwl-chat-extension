@@ -53,9 +53,9 @@ import { CircleCloseFilled } from '@element-plus/icons-vue'
  * 图片表情组件
  */
 export default {
-  name: 'images',
+  name: 'images-component',
   components: {
-    CircleCloseFilled,
+    CircleCloseFilled
   },
   inject: ['$message'],
   emits: ['sendMessage'],
@@ -63,14 +63,14 @@ export default {
     return {
       drawer: false,
       url: '',
-      images: [],
+      images: []
     }
   },
   computed: {
     ...mapGetters(['key']),
     form() {
       return { gameId: 'emojis', apiKey: this.key }
-    },
+    }
   },
   created() {
     this.getCloudImage()
@@ -78,7 +78,7 @@ export default {
   methods: {
     getCloudImage() {
       getCloudImage(this.form).then((res) => {
-        if (0 === res.code) {
+        if (res.code === 0) {
           this.images = res.data ? JSON.parse(res.data).reverse() : []
         }
       })
@@ -87,7 +87,7 @@ export default {
       this.$emit('sendMessage', `![image.png](${image})${getMessageMark()}`)
     },
     syncCloudImage(url) {
-      let that = this
+      const that = this
       this.getCloud((images) => {
         if (images.some((e) => e === url)) {
           that.$message.info('已添加过该表情')
@@ -111,7 +111,7 @@ export default {
     },
     deleteImage(url) {
       this.getCloud((images) => {
-        let index = images.indexOf(url)
+        const index = images.indexOf(url)
         if (index === -1) {
           return
         }
@@ -121,22 +121,22 @@ export default {
     },
     getCloud(fun) {
       getCloudImage(this.form).then((res) => {
-        if (0 === res.code) {
+        if (res.code === 0) {
           fun(res.data ? JSON.parse(res.data) : [])
         }
       })
     },
     syncCloud(images) {
-      let form = this.form
+      const form = this.form
       form.data = JSON.stringify(images)
       syncCloudImage(form).then((r) => {
-        if (0 === r.code) {
+        if (r.code === 0) {
           this.$message.success('表情包同步成功')
           this.getCloudImage()
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

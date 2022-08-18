@@ -30,18 +30,18 @@ import { mapGetters } from 'vuex'
  * emoji表情组件
  */
 export default {
-  name: 'emoji',
+  name: 'emoji-component',
   emits: ['addContent'],
   data() {
     return {
-      emojis: [],
+      emojis: []
     }
   },
   computed: {
     ...mapGetters(['key']),
     apiKey() {
       return { apiKey: this.key }
-    },
+    }
   },
   created() {
     this.getEmoji()
@@ -49,10 +49,10 @@ export default {
   methods: {
     getEmoji() {
       getEmoji(this.apiKey).then((res) => {
-        if (0 === res.code) {
-          let emojis = []
+        if (res.code === 0) {
+          const emojis = []
           res.data.forEach((e) => {
-            for (let key in e) {
+            for (const key in e) {
               emojis.push({ name: key, value: e[key] })
             }
           })
@@ -65,8 +65,8 @@ export default {
     },
     judgeEmojiIsImage(value) {
       return value.startsWith('http')
-    },
-  },
+    }
+  }
 }
 </script>
 

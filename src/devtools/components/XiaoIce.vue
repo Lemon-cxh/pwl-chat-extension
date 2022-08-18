@@ -15,11 +15,11 @@
 </template>
 
 <script>
-var socket
+let socket
 export default {
   name: 'xiaoIce',
   props: {
-    userInfo: Object,
+    userInfo: Object
   },
   data() {
     return {
@@ -27,14 +27,14 @@ export default {
       sendParams: {
         type: 'gameMsg',
         ck: '',
-        msg: '',
-      },
+        msg: ''
+      }
     }
   },
   created() {
     socket = new WebSocket('wss:game.yuis.cc/wss')
     socket.onmessage = (msg) => {
-      let data = JSON.parse(msg.data)
+      const data = JSON.parse(msg.data)
       data.timeStamp = msg.timeStamp
       this.message.unshift(data)
       if (data.type === 'setCK') {
@@ -46,7 +46,7 @@ export default {
         JSON.stringify({
           type: 'setUser',
           user: this.userInfo.userName,
-          uid: this.userInfo.oId,
+          uid: this.userInfo.oId
         })
       )
     }
@@ -56,16 +56,16 @@ export default {
       this.message.unshift({
         msg: this.sendParams.msg,
         timeStamp: new Date().getTime(),
-        isSelf: true,
+        isSelf: true
       })
-      let { ...data } = this.sendParams
+      const { ...data } = this.sendParams
       if (this.sendParams.msg.indexOf('登录 ') >= 0) {
         data.type = 'login'
       }
       socket.send(JSON.stringify(data))
       this.sendParams.msg = ''
-    },
-  },
+    }
+  }
 }
 </script>
 

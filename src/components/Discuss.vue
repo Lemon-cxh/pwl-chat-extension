@@ -44,9 +44,9 @@ import { mapGetters, mapMutations } from 'vuex'
  * 话题组件
  */
 export default {
-  name: 'discuss',
+  name: 'discuss-component',
   components: {
-    Comment,
+    Comment
   },
   emits: ['discussChange'],
   computed: {
@@ -57,15 +57,15 @@ export default {
     form() {
       return {
         content: `[setdiscuss]${this.inputValue}[/setdiscuss]`,
-        apiKey: this.key,
+        apiKey: this.key
       }
-    },
+    }
   },
   data() {
     return {
       visible: false,
       inputVisible: false,
-      inputValue: '',
+      inputValue: ''
     }
   },
   methods: {
@@ -92,8 +92,8 @@ export default {
       send(this.form).then(() => {
         this.cancel()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 <style scoped>

@@ -91,6 +91,14 @@
               />
               <span class="option-text">自动已读积分通知</span>
             </el-row>
+            <el-row class="option-item">
+              <el-switch
+                v-model="options.showUnReadCount"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">显示未读数</span>
+            </el-row>
           </el-row>
         </el-tab-pane>
         <el-tab-pane label="弹幕设置">
@@ -163,7 +171,7 @@ export default {
   components: {
     Bell,
     Setting,
-    SwitchButton,
+    SwitchButton
   },
   data() {
     return {
@@ -171,24 +179,24 @@ export default {
       intervalId: null,
       colors: [
         { color: '#f56c6c', percentage: 10 },
-        { color: '#1989fa', percentage: 100 },
+        { color: '#1989fa', percentage: 100 }
       ],
       unreadCount: 0,
       drawer: false,
-      options: defaultOptions,
+      options: defaultOptions
     }
   },
   computed: {
     ...mapGetters(['userInfo', 'key']),
     apiKey() {
       return { apiKey: this.key }
-    },
+    }
   },
   created() {
     // 获取活跃度
     getLocal([STORAGE.liveness], (res) => {
-      let storage = res[STORAGE.liveness] ?? {}
-      let date = getDate()
+      const storage = res[STORAGE.liveness] ?? {}
+      const date = getDate()
       if (storage && date === storage.date) {
         this.initLiveness(storage)
         return
@@ -257,7 +265,7 @@ export default {
     },
     countNotifications() {
       countNotifications(this.apiKey).then((res) => {
-        if (0 !== res.code) {
+        if (res.code !== 0) {
           return
         }
         let count = res.unreadNotificationCnt
@@ -295,6 +303,7 @@ export default {
       this.drawer = true
     },
     logout() {
+      /* global chrome */
       chrome.extension.getBackgroundPage().closeSocket()
       setLocal({ [STORAGE.key]: '' })
       this.$router.push({ name: 'Login' })
@@ -308,12 +317,12 @@ export default {
       this.optionsChange()
     },
     optionsChange() {
-      let options = { ...this.options }
+      const options = { ...this.options }
       options.blacklist = JSON.stringify(options.blacklist)
       options.care = JSON.stringify(options.care)
       setSync({ [STORAGE.options]: options })
-    },
-  },
+    }
+  }
 }
 </script>
 

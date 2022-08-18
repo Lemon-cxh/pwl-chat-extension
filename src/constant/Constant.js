@@ -19,7 +19,7 @@ export const MESSAGE_TYPE = {
   /**
    * 话题变更
    */
-  discussChanged: 'discussChanged',
+  discussChanged: 'discussChanged'
 }
 
 // storage存储key
@@ -43,7 +43,7 @@ export const STORAGE = {
   /**
    * 话题是否启用
    */
-  discussEnable: 'discussEnable',
+  discussEnable: 'discussEnable'
 }
 
 // background和popup、devtools通信类型
@@ -95,7 +95,7 @@ export const EVENT = {
   /**
    * 领取红包
    */
-  openRedPacket: 14,
+  openRedPacket: 14
 }
 
 /**
@@ -125,7 +125,7 @@ export const TABS_EVENT = {
   /**
    * 标记红包领取状态
    */
-  markRedPacket: 6,
+  markRedPacket: 6
 }
 
 /**
@@ -143,7 +143,7 @@ export const defaultOptions = {
     enable: false,
     fontSize: 16,
     opacity: 0.5,
-    color: '#000000',
+    color: '#000000'
   },
   /**
    * 是否隐藏红包领取消息
@@ -165,6 +165,10 @@ export const defaultOptions = {
    * 自动已读积分通知
    */
   autoReadPointNotification: false,
+  /**
+   * 显示未读消息总数
+   */
+  showUnReadCount: true
 }
 
 export const MESSAGE_LIMIT = 25

@@ -13,8 +13,8 @@ import { STORAGE } from '../constant/Constant'
   ElMessage[type] = (msg) => {
     return ElMessage({
       message: msg,
-      type: type,
-      duration: 1500,
+      type,
+      duration: 1500
     })
   }
 })
@@ -25,7 +25,7 @@ const req = require.context('../svg', false, /\.svg$/)
 requireAll(req)
 
 getLocal([STORAGE.key, STORAGE.account], async (result) => {
-  let key = result[STORAGE.key]
+  const key = result[STORAGE.key]
   if (!key) {
     router.push({ name: 'Login' })
     return
@@ -44,6 +44,6 @@ createApp(App)
   .directive('focus', {
     mounted(el) {
       el.children[0].focus()
-    },
+    }
   })
   .mount('#app')

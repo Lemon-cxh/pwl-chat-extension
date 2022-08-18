@@ -1,9 +1,10 @@
 export function notifications(title, message) {
+  /* global chrome */
   chrome.notifications.create({
     type: 'basic',
     iconUrl: 'icons/128.png',
-    title: title,
-    message: message,
+    title,
+    message
   })
 }
 

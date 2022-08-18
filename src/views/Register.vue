@@ -64,7 +64,7 @@
 import { register, verify, register2 } from '../api/register'
 import md5 from 'js-md5'
 export default {
-  name: 'Register',
+  name: 'register-component',
   data() {
     return {
       captchaUrl: process.env.VUE_APP_BASE_URL + '/captcha',
@@ -77,20 +77,20 @@ export default {
         captcha: '',
         userId: '',
         userPassword: '',
-        userAppRole: '',
+        userAppRole: ''
       },
       rules: {
         userName: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { required: true, message: '请输入用户名', trigger: 'blur' }
         ],
         userPhone: [
-          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { required: true, message: '请输入手机号', trigger: 'blur' }
         ],
         userPassword: [
-          { required: true, message: '请输入密码', trigger: 'blur' },
+          { required: true, message: '请输入密码', trigger: 'blur' }
         ],
-        captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-      },
+        captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
+      }
     }
   },
   inject: ['$message'],
@@ -100,9 +100,9 @@ export default {
         process.env.VUE_APP_BASE_URL + '/captcha?' + new Date().getTime()
     },
     onSubmit() {
-      let data = { ...this.form }
+      const data = { ...this.form }
       register(data).then((response) => {
-        if (0 !== response.code) {
+        if (response.code !== 0) {
           this.$message.error(response.msg ? response.msg : response)
           this.getCaptcha()
           return
@@ -112,7 +112,7 @@ export default {
     },
     onVerify() {
       verify(this.code).then((response) => {
-        if (0 !== response.code) {
+        if (response.code !== 0) {
           this.$message.error(response.msg ? response.msg : response)
           return
         }
@@ -122,21 +122,21 @@ export default {
       })
     },
     onRegister() {
-      var that = this
+      const that = this
       this.$refs.form.validate(async (v) => {
         if (!v) {
           return
         }
-        let noHashedPassword = that.form.userPassword
+        const noHashedPassword = that.form.userPassword
         that.form.userPassword = md5(noHashedPassword)
-        //iwpz: 桥接form body
-        var userInfo = {
+        // iwpz: 桥接form body
+        const userInfo = {
           userId: that.form.userId,
           userPassword: that.form.userPassword,
-          userAppRole: that.form.userAppRole,
+          userAppRole: that.form.userAppRole
         }
         register2(userInfo).then((response) => {
-          if (0 !== response.code) {
+          if (response.code !== 0) {
             that.$message.error(response.msg ? response.msg : response)
             return
           }
@@ -144,13 +144,13 @@ export default {
             name: 'Login',
             params: {
               nameOrEmail: that.form.userName,
-              userPassword: noHashedPassword,
-            },
+              userPassword: noHashedPassword
+            }
           })
         })
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

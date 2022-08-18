@@ -48,27 +48,27 @@ import { setLocal, getLocal } from '../utils/chromeUtil'
 import { STORAGE } from '../constant/Constant'
 
 export default {
-  name: 'Login',
+  name: 'login-component',
   data() {
     return {
       form: {
         nameOrEmail: '',
         userPassword: '',
-        mfaCode: '',
+        mfaCode: ''
       },
       rules: {
         nameOrEmail: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { required: true, message: '请输入用户名', trigger: 'blur' }
         ],
         userPassword: [
-          { required: true, message: '请输入密码', trigger: 'blur' },
-        ],
-      },
+          { required: true, message: '请输入密码', trigger: 'blur' }
+        ]
+      }
     }
   },
   inject: ['$message'],
   created() {
-    let that = this
+    const that = this
 
     const name = this.$route.params.nameOrEmail
     const password = this.$route.params.userPassword
@@ -82,33 +82,33 @@ export default {
       if (result[STORAGE.account]) {
         that.form.nameOrEmail = result[STORAGE.account].nameOrEmail
         that.$refs.userPassword.focus()
-        return
       }
     })
   },
   methods: {
     ...mapMutations(['setUserInfo', 'setKey']),
     onSubmit() {
-      let data = { ...this.form }
+      const data = { ...this.form }
       data.userPassword = md5(data.userPassword)
       getKey(data).then((response) => {
-        if (0 !== response.code) {
+        if (response.code !== 0) {
           this.$message.error(response.msg ? response.msg : response)
           return
         }
         this.setKey(response.Key)
         setLocal({
           [STORAGE.key]: response.Key,
-          [STORAGE.account]: data,
+          [STORAGE.account]: data
         })
+        /* global chrome */
         chrome.extension.getBackgroundPage().openSocket()
         this.$router.push({ name: 'ChatRoom' })
       })
     },
     register() {
       this.$router.push({ name: 'Register' })
-    },
-  },
+    }
+  }
 }
 </script>
 

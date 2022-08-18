@@ -73,34 +73,34 @@ export default {
     Medal,
     Avatar,
     Coin,
-    LocationFilled,
+    LocationFilled
   },
   props: {
     dialogVisible: Boolean,
-    userName: String,
+    userName: String
   },
   emits: ['closeDialog'],
   data() {
     return {
-      userInfo: {},
+      userInfo: {}
     }
   },
   computed: {
     ...mapGetters(['key']),
     visible() {
       return this.dialogVisible
-    },
+    }
   },
   watch: {
     userName(newValue) {
       getUserInfo(newValue, { apiKey: this.key }).then((res) => {
-        let info = res
+        const info = res
         if (info.sysMetal) {
           info.sysMetal = JSON.parse(info.sysMetal)
         }
         this.userInfo = info
       })
-    },
+    }
   },
   methods: {
     getBackgroundImage(url) {
@@ -125,8 +125,8 @@ export default {
     },
     closeHandler() {
       this.$emit('closeDialog')
-    },
-  },
+    }
+  }
 }
 </script>
 

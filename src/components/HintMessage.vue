@@ -34,20 +34,20 @@ import { MESSAGE_TYPE } from '../constant/Constant'
  * 提示信息：红包领取、更新话题
  */
 export default {
-  name: 'hintMessage',
+  name: 'hint-message',
   props: {
-    message: Object,
+    message: Object
   },
   emits: ['showRedpacketInfo', 'showUserCard'],
   computed: {
     ...mapGetters(['key']),
     form() {
       return { oId: this.message.oId, apiKey: this.key }
-    },
+    }
   },
   data() {
     return {
-      type: MESSAGE_TYPE,
+      type: MESSAGE_TYPE
     }
   },
   methods: {
@@ -62,8 +62,8 @@ export default {
     },
     showUserCard(userName) {
       this.$emit('showUserCard', userName)
-    },
-  },
+    }
+  }
 }
 </script>
 

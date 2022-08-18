@@ -67,11 +67,11 @@ import { toRefs } from 'vue'
  * 红包详情组件
  */
 export default {
-  name: 'redPacket',
+  name: 'red-packet',
   props: {
     info: Object,
     dialogVisible: Boolean,
-    userInfo: Object,
+    userInfo: Object
   },
   emits: ['close'],
   setup(props) {
@@ -82,17 +82,17 @@ export default {
     return {
       message: '',
       max: 0,
-      count: 0,
+      count: 0
     }
   },
   watch: {
     info(val) {
-      let userName = this.userInfo.userName
+      const userName = this.userInfo.userName
       let max = 0
       let count = 0
-      let info = {
+      const info = {
         has: false,
-        userMoney: 0,
+        userMoney: 0
       }
       val.who.forEach((e) => {
         max = Math.max(max, e.userMoney)
@@ -115,7 +115,7 @@ export default {
         !val.recivers.some((e) => e === userName)
           ? '终究还是错付了'
           : '很遗憾，没有抢到'
-    },
+    }
   },
   methods: {
     showMessage(userMoney) {
@@ -123,8 +123,8 @@ export default {
     },
     close() {
       this.$emit('close')
-    },
-  },
+    }
+  }
 }
 </script>
 

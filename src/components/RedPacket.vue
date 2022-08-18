@@ -2,7 +2,7 @@
   <el-popover
     placement="left-start"
     :width="220"
-    v-model:visible="redPacketDialogVisible"
+    :visible="redPacketDialogVisible"
     @show="redPacketHandler"
   >
     <template #reference>
@@ -112,7 +112,7 @@ import { mapGetters } from 'vuex'
 import {
   redPacketTypeMap,
   redPacketTypeArray,
-  defaultType,
+  defaultType
 } from '../constant/RedPacketConstant'
 import { inputRule, selectRule, numberRule } from '../constant/RuleConstant'
 /**
@@ -129,11 +129,11 @@ export default {
         msg: redPacketTypeMap.get(defaultType).msg,
         type: defaultType,
         recivers: undefined,
-        gesture: undefined,
+        gesture: undefined
       },
       redPacketDialogVisible: false,
-      redPacketTypeMap: redPacketTypeMap,
-      redPacketTypeArray: redPacketTypeArray,
+      redPacketTypeMap,
+      redPacketTypeArray,
       userList: [],
       userListLoading: false,
       rules: {
@@ -142,8 +142,8 @@ export default {
         msg: inputRule('内容'),
         type: selectRule('类型'),
         recivers: selectRule('你的偏爱'),
-        gesture: selectRule('出拳'),
-      },
+        gesture: selectRule('出拳')
+      }
     }
   },
   computed: {
@@ -152,27 +152,27 @@ export default {
       return { apiKey: this.key }
     },
     redPacketContent() {
-      let redPacketForm = this.redPacketForm
+      const redPacketForm = this.redPacketForm
       redPacketForm.recivers = redPacketForm.recivers
         ? [redPacketForm.recivers]
         : redPacketForm.recivers
       return {
         content: `[redpacket]${JSON.stringify(redPacketForm)}[/redpacket]`,
-        apiKey: this.key,
+        apiKey: this.key
       }
-    },
+    }
   },
   methods: {
     redPacketHandler() {
-      if (this.$refs['form']) {
-        this.$refs['form'].resetFields()
+      if (this.$refs.form) {
+        this.$refs.form.resetFields()
       }
     },
     sendRedPacket() {
       this.validate(() => this.send())
     },
     validate(fun) {
-      this.$refs['form'].validate((valid) => {
+      this.$refs.form.validate((valid) => {
         if (!valid) {
           return
         }
@@ -199,13 +199,13 @@ export default {
       })
     },
     redPacketTypeChange(value) {
-      let map = redPacketTypeMap.get(value)
+      const map = redPacketTypeMap.get(value)
       this.redPacketForm.count = map.count
       this.redPacketForm.msg = map.msg
       this.redPacketForm.recivers = undefined
       this.redPacketForm.gesture = value === 'rockPaperScissors' ? 0 : undefined
-    },
-  },
+    }
+  }
 }
 </script>
 

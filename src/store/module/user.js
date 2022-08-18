@@ -18,8 +18,8 @@ export const user = {
       sysMetal: '',
       userRole: '',
       followerCount: 0,
-      userURL: '',
-    },
+      userURL: ''
+    }
   },
   getters: {
     key: (state) => {
@@ -27,7 +27,7 @@ export const user = {
     },
     userInfo: (state) => {
       return state.userInfo
-    },
+    }
   },
   mutations: {
     setKey(state, key) {
@@ -35,6 +35,6 @@ export const user = {
     },
     setUserInfo(state, userInfo) {
       state.userInfo = userInfo
-    },
-  },
+    }
+  }
 }

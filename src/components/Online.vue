@@ -32,21 +32,21 @@
  * 在线人数组件
  */
 export default {
-  name: 'online',
+  name: 'online-component',
   props: {
     online: {
       type: Object,
       default() {
         return { onlineChatCnt: 0, users: [] }
-      },
-    },
+      }
+    }
   },
   emits: ['showUserCard'],
   data() {
     return {
-      visible: false,
+      visible: false
     }
-  },
+  }
 }
 </script>
 <style scoped>

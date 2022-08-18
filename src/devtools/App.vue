@@ -11,8 +11,8 @@
           />
         </el-affix>
 
-        <template v-for="item in messageArray" :key="item.oId">
-          <el-row class="message" v-if="!item.hidden">
+        <template v-for="item in messageArray">
+          <el-row class="message" :key="item.oId" v-if="!item.hidden">
             <div class="name">
               {{ item.userNickname ? item.userNickname : item.userName }}
               {{ item.userNickname ? `(${item.userName})` : '' }}
@@ -45,11 +45,11 @@ export default {
     return {
       port: undefined,
       userInfo: '',
-      input: '',
+      input: ''
     }
   },
   components: {
-    'xiao-ice': XiaoIce,
+    'xiao-ice': XiaoIce
   },
   setup() {
     const messageArray = ref([])
@@ -57,13 +57,13 @@ export default {
       messageArray.value.unshift(msg)
     }
     const pushMessage = (msg) => {
-      let index = messageArray.value.length - 1
+      const index = messageArray.value.length - 1
       if (index < 0) {
         messageArray.value.push(...msg)
         return
       }
-      let last = messageArray.value[index]
-      let message = msg[0]
+      const last = messageArray.value[index]
+      const message = msg[0]
       if (last.content !== message.content) {
         messageArray.value.push(...msg)
         return
@@ -78,10 +78,11 @@ export default {
       messageArray,
       unshiftMessage,
       pushMessage,
-      updateMessage,
+      updateMessage
     }
   },
   created() {
+    /* global chrome */
     chrome.devtools.panels.create('finsh', 'icons/128.png', 'devtools.html')
     port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.onMessage.addListener((msg) => this.messageListener(msg))
@@ -115,7 +116,7 @@ export default {
     sendHandler() {
       port.postMessage({
         type: EVENT.sendMessage,
-        data: this.input,
+        data: this.input
       })
       this.input = ''
     },
@@ -123,20 +124,20 @@ export default {
       return isRedPacket(message)
     },
     getRedPacketMsg(message) {
-      let content = JSON.parse(message.content)
+      const content = JSON.parse(message.content)
       return `[🧧${content.msg} (${content.money}积分)🧧]`
     },
     clickRedPacket(id) {
       port.postMessage({
         type: EVENT.openRedPacket,
-        data: id,
+        data: id
       })
       this.updateMessage({ oId: id })
     },
     updateRedPacket(data) {
       let msg
       this.messageArray.some((e, index) => {
-        if (e.oId == data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
+        if (e.oId === data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
           msg = JSON.parse(e.content)
           if (msg.got >= msg.count) {
             return true
@@ -147,8 +148,8 @@ export default {
         }
         return false
       })
-    },
-  },
+    }
+  }
 }
 </script>
 <style>

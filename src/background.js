@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import { createApp } from 'vue'
 import store from './store/index'
 import { more, getMessages, send, openRedPacket } from './api/chat'
@@ -5,7 +6,7 @@ import {
   notifications,
   getLocal,
   sendTabsMessage,
-  getSync,
+  getSync
 } from './utils/chromeUtil'
 import { getMessageMark } from './utils/util'
 import {
@@ -14,14 +15,14 @@ import {
   EVENT,
   MESSAGE_LIMIT,
   TABS_EVENT,
-  defaultOptions,
+  defaultOptions
 } from './constant/Constant'
 
 const URL = 'wss://fishpi.cn/chat-room-channel'
 let socketLock = false
 // 最大保留两页消息
 const MAX_PAGE = 2
-let intervalId = undefined
+let intervalId
 // 与popup页面的通信
 let port = null
 let deleteMessage = false
@@ -40,6 +41,7 @@ getSync({ [STORAGE.options]: defaultOptions }, (result) => {
 /**
  * 监听storage修改
  */
+/* global chrome */
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.options) {
     options = formatOptions(changes.options.newValue)
@@ -75,7 +77,7 @@ function initWebSocket() {
   window.closeSocket()
   getLocal([STORAGE.key], (result) => {
     window.webSocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
-    if (intervalId != undefined) {
+    if (intervalId !== undefined) {
       clearInterval(intervalId)
     }
     intervalId = setInterval(() => {
@@ -99,11 +101,11 @@ function initWebSocket() {
  * @param {*} event
  */
 function messageHandler(event) {
-  let data = JSON.parse(event.data)
+  const data = JSON.parse(event.data)
   switch (data.type) {
     case MESSAGE_TYPE.online:
       if (port) {
-        port.postMessage({ type: EVENT.online, data: data })
+        port.postMessage({ type: EVENT.online, data })
       }
       store.commit('setOnline', data)
       onlineEvent(data)
@@ -120,7 +122,7 @@ function messageHandler(event) {
       }
       messageEvent(data, false)
       if (port) {
-        port.postMessage({ type: EVENT.redPacketStatus, data: data })
+        port.postMessage({ type: EVENT.redPacketStatus, data })
       }
       store.commit('updateRedPacket', data)
       break
@@ -152,8 +154,8 @@ chrome.runtime.onConnect.addListener((p) => {
     data: {
       message: store.getters.message,
       online: store.getters.online,
-      discuss: store.getters.discuss,
-    },
+      discuss: store.getters.discuss
+    }
   })
   port.onMessage.addListener((msg) => {
     switch (msg.type) {
@@ -195,8 +197,8 @@ chrome.runtime.onMessage.addListener((request) => {
           data: {
             data: res,
             userName: store.getters.userInfo.userName,
-            oId: request.data,
-          },
+            oId: request.data
+          }
         })
       }
     )
@@ -213,7 +215,7 @@ function messageEvent(message, isMsg) {
   if (isMsg) {
     markCareAndBlack(message)
   }
-  store.commit('addMessage', { message: message, isMsg: isMsg })
+  store.commit('addMessage', { message, isMsg })
   if (port) {
     port.postMessage({ type: EVENT.message, data: message })
     return
@@ -236,7 +238,7 @@ function onlineEvent(data) {
   if (!options.care || options.care.length === 0) {
     return
   }
-  let currentOnline = data.users
+  const currentOnline = data.users
     .filter((element) => options.care.some((e) => e === element.userName))
     .flatMap((e) => e.userName)
   currentOnline
@@ -257,8 +259,10 @@ function onlineEvent(data) {
  * @param {*} message 消息内容
  */
 function atNotifications(message) {
-  chrome.browserAction.setBadgeText({ text: '' + ++count })
-  chrome.browserAction.setBadgeBackgroundColor({ color: [64, 158, 255, 1] })
+  if (options.showUnReadCount) {
+    chrome.browserAction.setBadgeText({ text: '' + ++count })
+    chrome.browserAction.setBadgeBackgroundColor({ color: [64, 158, 255, 1] })
+  }
   if (message.isCare) {
     notifications(message.userName, message.md)
     return
@@ -266,7 +270,7 @@ function atNotifications(message) {
   if (
     options.atNotification &&
     message.md &&
-    -1 !== message.md.indexOf('@' + store.getters.userInfo.userName)
+    message.md.indexOf('@' + store.getters.userInfo.userName) !== -1
   ) {
     notifications(
       `${message.userName}@了你`,
@@ -279,37 +283,37 @@ function atNotifications(message) {
  * 获取聊天记录
  */
 async function getMoreEvent() {
-  let lastId = store.getters.lastMessageId
-  let res = lastId
+  const lastId = store.getters.lastMessageId
+  const res = lastId
     ? await getMessages({
         apiKey: store.getters.key,
         oId: lastId,
         mode: 1,
-        size: MESSAGE_LIMIT,
+        size: MESSAGE_LIMIT
       })
     : await more({ apiKey: store.getters.key, page: 1 })
   if (res.code !== 0) {
     return
   }
-  let data = lastId ? res.data.slice(1).reverse() : res.data.reverse()
-  let arr = []
+  const data = lastId ? res.data.slice(1).reverse() : res.data.reverse()
+  const arr = []
   for (let index = 0; index < data.length; index++) {
     if (index === 0) {
       markCareAndBlack(data[index])
       arr.unshift(data[index])
       continue
     }
-    let e = data[index]
-    let last = arr[0]
+    const e = data[index]
+    const last = arr[0]
     if (last.content !== e.content) {
       markCareAndBlack(e)
       arr.unshift(e)
       continue
     }
-    let { users = [], oIds = [] } = last
+    const { users = [], oIds = [] } = last
     users.push({
       userName: e.userName,
-      userAvatarURL: e.userAvatarURL,
+      userAvatarURL: e.userAvatarURL
     })
     oIds.push(e.oId)
     arr[0].users = users
@@ -324,7 +328,7 @@ async function getMoreEvent() {
 function sendMessage(data) {
   send({
     content: data + getMessageMark(),
-    apiKey: store.getters.key,
+    apiKey: store.getters.key
   }).then()
 }
 

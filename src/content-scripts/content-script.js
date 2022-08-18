@@ -11,7 +11,7 @@ let lastMessage = {
   oId: '',
   md: '',
   userName: '',
-  count: 0,
+  count: 0
 }
 let options = {}
 
@@ -31,6 +31,7 @@ window.onload = function () {
 /**
  * 监控background.js的消息
  */
+/* global chrome */
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.type) {
     case TABS_EVENT.showImage:
@@ -56,26 +57,26 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
  * 创建弹幕展示的dom
  */
 function createBarrage() {
-  let div = document.createElement('div')
+  const div = document.createElement('div')
   div.setAttribute('class', 'pwl-message-fixed-box')
   document.body.appendChild(div)
-  let box = document.createElement('div')
+  const box = document.createElement('div')
   box.setAttribute('id', 'pwl-message-box')
   box.setAttribute('class', 'pwl-message-box')
   div.appendChild(box)
-  let input = document.createElement('input')
+  const input = document.createElement('input')
   input.setAttribute('id', 'pwl-input')
   input.setAttribute('class', 'pwl-message-input')
   document.body.appendChild(input)
   input.addEventListener('keydown', (event) => {
-    if (event.key == 'Enter') {
+    if (event.key === 'Enter') {
       sendMessage(input)
     }
   })
 
   // 监听图标的鼠标悬浮事件，变为大图显示
-  var observe = new MutationObserver(function () {
-    let imgs = box.querySelectorAll('img')
+  const observe = new MutationObserver(function () {
+    const imgs = box.querySelectorAll('img')
     imgs.forEach((e) => {
       e.onmouseover = () => (e.style = 'max-height: 100vh;max-width: 60vw;')
       e.onmouseout = () => (e.style = '')
@@ -96,7 +97,7 @@ function sendMessage(input) {
   }
   chrome.runtime.sendMessage({
     type: TABS_EVENT.sendMessage,
-    data: input.value,
+    data: input.value
   })
   input.value = ''
 }
@@ -107,21 +108,21 @@ function sendMessage(input) {
  * @returns
  */
 function insetMessage(data) {
-  let redPacket = isRedPacket(data)
+  const redPacket = isRedPacket(data)
   if (!redPacket && lastMessage.md === data.md && plusOneMessage(data)) {
     return
   }
-  let name = data.userNickname
+  const name = data.userNickname
     ? `${data.userNickname}(${data.userName})`
     : data.userName
   lastMessage = {
     md: data.md,
     oId: data.oId,
     userName: name,
-    count: 0,
+    count: 0
   }
-  let box = document.getElementById('pwl-message-box')
-  let child = document.createElement('div')
+  const box = document.getElementById('pwl-message-box')
+  const child = document.createElement('div')
   child.setAttribute('id', 'pwl-message-' + data.oId)
   if (redPacket) {
     child.innerHTML = `🧧${name}的红包来啦,点击领取`
@@ -140,7 +141,7 @@ function insetMessage(data) {
     (redPacket ? 'red-packet ' : '') + 'pwl-message-child'
   )
   box.appendChild(child)
-  let second = getSecond(box, child)
+  const second = getSecond(box, child)
   child.setAttribute('style', getSytle(child, second, data.isCare))
   if (redPacket) {
     redPacketClick(child)
@@ -162,14 +163,14 @@ function redPacketClick(child) {
     child.setAttribute('open', true)
     chrome.runtime.sendMessage({
       type: TABS_EVENT.openRedPacket,
-      data: child.id.substring(12),
+      data: child.id.substring(12)
     })
   })
 }
 
 function markRedPacket(data) {
-  let child = document.getElementById('pwl-message-' + data.oId)
-  let got = data.data.who.find((e) => data.userName === e.userName)
+  const child = document.getElementById('pwl-message-' + data.oId)
+  const got = data.data.who.find((e) => data.userName === e.userName)
   child.innerHTML += `[${got ? `抢到了${got.userMoney}` : '没有抢到'}]`
 }
 
@@ -180,7 +181,7 @@ function showImage(data) {
       img.setAttribute('src', data.src)
       return
     }
-    img.style.display = 'none' === img.style.display ? '' : 'none'
+    img.style.display = img.style.display === 'none' ? '' : 'none'
     return
   }
   img = document.createElement('img')
@@ -192,14 +193,14 @@ function showImage(data) {
   img.addEventListener('click', () => {
     img.style.display = 'none'
   })
-  let div = document.createElement('div')
+  const div = document.createElement('div')
   div.setAttribute('class', 'pwl-extension-img')
   document.body.appendChild(div)
   div.appendChild(img)
 }
 
 function plusOneMessage() {
-  let box = document.getElementById('pwl-message-' + lastMessage.oId)
+  const box = document.getElementById('pwl-message-' + lastMessage.oId)
   if (!box) {
     return false
   }
@@ -221,7 +222,7 @@ function getSecond(box, child) {
 
 function getSytle(dom, second, isCare) {
   index = (index + 3) % 13
-  let top = index * height
+  const top = index * height
   return `font-size: ${options.barrageOptions.fontSize}px;${
     isCare ? 'font-weight: bolder;' : ''
   }opacity: ${options.barrageOptions.opacity};color: ${

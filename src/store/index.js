@@ -7,15 +7,15 @@ import { isRedPacket } from '../utils/util'
 
 export default createStore({
   modules: {
-    user: user,
+    user
   },
   state: {
     message: [],
     discuss: '',
     online: {
       onlineChatCnt: 0,
-      users: [],
-    },
+      users: []
+    }
   },
   getters: {
     message: (state) => {
@@ -25,7 +25,7 @@ export default createStore({
       return state.message.length
     },
     lastMessageId: (state) => {
-      let length = state.message.length
+      const length = state.message.length
       return length > 0 ? state.message[length - 1].oId : 0
     },
     online: (state) => {
@@ -33,7 +33,7 @@ export default createStore({
     },
     discuss: (state) => {
       return state.discuss
-    },
+    }
   },
   mutations: {
     popMessage(state) {
@@ -49,33 +49,33 @@ export default createStore({
         return
       }
       // +1 消息折叠
-      let last = state.message[0]
+      const last = state.message[0]
       if (!last || message.message.md !== last.md) {
         state.message.unshift(message.message)
         return
       }
-      let { users = [], oIds = [] } = last
+      const { users = [], oIds = [] } = last
       users.push({
         userName: message.message.userName,
-        userAvatarURL: message.message.userAvatarURL,
+        userAvatarURL: message.message.userAvatarURL
       })
       oIds.push(message.oId)
       state.message[0].users = users
       state.message[0].oIds = oIds
     },
     concatMessage(state, data) {
-      let index = state.message.length - 1
-      let last = state.message[index]
-      let message = data[0]
+      const index = state.message.length - 1
+      const last = state.message[index]
+      const message = data[0]
       // +1 消息折叠
       if (!last || last.content !== message.content) {
         state.message = state.message.concat(data)
         return
       }
-      let { users = [], oIds = [] } = message
+      const { users = [], oIds = [] } = message
       users.push({
         userName: last.userName,
-        userAvatarURL: last.userAvatarURL,
+        userAvatarURL: last.userAvatarURL
       })
       oIds.push(last.oId)
       if (last.users) {
@@ -95,7 +95,7 @@ export default createStore({
     setOnline(state, online) {
       state.online = {
         onlineChatCnt: online.onlineChatCnt,
-        users: online.users,
+        users: online.users
       }
       state.discuss = online.discussing
     },
@@ -105,7 +105,7 @@ export default createStore({
     updateRedPacket(state, message) {
       let msg
       state.message.some((e) => {
-        if (e.oId == message.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
+        if (e.oId === message.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
           msg = JSON.parse(e.content)
           if (msg.got >= msg.count) {
             return true
@@ -121,37 +121,37 @@ export default createStore({
       state.message.some((e) => {
         if (
           e.type === MESSAGE_TYPE.msg &&
-          (e.oId == oId || (e.oIds && e.oIds.some((e) => e === oId)))
+          (e.oId === oId || (e.oIds && e.oIds.some((e) => e === oId)))
         ) {
           e.revoke = true
           return true
         }
         return false
       })
-    },
+    }
   },
   actions: {
     getUser(context) {
       return new Promise((resolve, reject) => {
         getLocal([STORAGE.key, STORAGE.account], async (result) => {
           if (!result || !result[STORAGE.key]) {
-            reject()
+            reject(new Error('未登录'))
             return
           }
           let key = result[STORAGE.key]
           let res = await getUserInfo({ apiKey: key })
           if (res.code !== 0) {
-            let r = await getKey(result[STORAGE.account])
+            const r = await getKey(result[STORAGE.account])
             if (r.code !== 0) {
               setLocal({ [STORAGE.key]: '' })
-              reject()
+              reject(new Error('获取key请求失败'))
               return
             }
             key = r.Key
             setLocal({ [STORAGE.key]: key })
             res = await getUserInfo({ apiKey: key })
             if (r.code !== 0) {
-              reject()
+              reject(new Error('获取用户信息失败'))
               return
             }
           }
@@ -160,6 +160,6 @@ export default createStore({
           resolve()
         })
       })
-    },
-  },
+    }
+  }
 })

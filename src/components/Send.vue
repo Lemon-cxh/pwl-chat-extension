@@ -5,7 +5,7 @@
         placement="bottom-start"
         :width="150"
         trigger="manual"
-        v-model:visible="visible"
+        :visible="visible"
       >
         <template #reference>
           <el-input
@@ -48,7 +48,7 @@
       placement="bottom-start"
       width="auto"
       trigger="manual"
-      v-model:visible="quoteVisible"
+      :visible="quoteVisible"
     >
       <template #reference>
         <div style="width: 1px"></div>
@@ -78,10 +78,10 @@ import { Promotion, CircleCloseFilled } from '@element-plus/icons-vue'
  * 消息输入框
  */
 export default {
-  name: 'send',
+  name: 'send-component',
   components: {
     Promotion,
-    CircleCloseFilled,
+    CircleCloseFilled
   },
   inject: ['$message'],
   data() {
@@ -95,38 +95,38 @@ export default {
       quoteForm: {
         userName: '',
         md: '',
-        content: '',
-      },
+        content: ''
+      }
     }
   },
   computed: {
     ...mapGetters(['key', 'discuss']),
     form() {
       return { content: this.content, apiKey: this.key }
-    },
+    }
   },
   watch: {
     content(val) {
-      let matchAt = val.match(/@([^\s]+?)$/)
+      const matchAt = val.match(/@([^\s]+?)$/)
       if (!matchAt) {
         this.visible = false
         return
       }
       getUserName({ name: matchAt[1] }).then((res) => {
-        if (0 === res.code && res.data.length > 0) {
+        if (res.code === 0 && res.data.length > 0) {
           this.userList = res.data
           this.visible = true
         }
       })
-    },
+    }
   },
   methods: {
     pasteHandler(e) {
       if (e.clipboardData.types.some((e) => e === 'Files')) {
-        let type = e.clipboardData.files[0].type
+        const type = e.clipboardData.files[0].type
         upload(e.clipboardData.files[0]).then((res) => {
-          let succMap = res.data.succMap
-          for (let key in succMap) {
+          const succMap = res.data.succMap
+          for (const key in succMap) {
             this.content += `${type.startsWith('image') ? '!' : ''}[${key}](${
               succMap[key]
             })`
@@ -137,9 +137,8 @@ export default {
       }
     },
     selectAt(userName) {
-      let content = this.content
-      let index = content.lastIndexOf('@')
-      this.content = content.substr(0, index + 1) + userName + ' '
+      const index = this.content.lastIndexOf('@')
+      this.content = this.content.substr(0, index + 1) + userName + ' '
       this.visible = false
       this.$refs.contentInput.focus()
     },
@@ -178,13 +177,13 @@ export default {
       this.quoteVisible = false
     },
     sendMessage(content) {
-      send({ content: content, apiKey: this.key }).then()
+      send({ content, apiKey: this.key }).then()
       this.$refs.contentInput.focus()
     },
     send() {
-      let form = this.form
+      const form = this.form
       if (this.quoteVisible) {
-        let quoteForm = this.quoteForm
+        const quoteForm = this.quoteForm
         form.content = `${form.content}\n\n*引用* @${this.buildAtUser(
           quoteForm.userName
         )}:\n${quoteForm.md ? '> ' + quoteForm.md : quoteForm.content}\n`
@@ -195,7 +194,7 @@ export default {
       form.content += getMessageMark()
       send(form).then((res) => {
         this.disabled = false
-        if (0 === res.code) {
+        if (res.code === 0) {
           this.quoteVisible = false
           this.content = ''
           return
@@ -209,8 +208,8 @@ export default {
     buildContent(content, str) {
       this.content =
         content.substring(0, this.cursor) + str + content.substring(this.cursor)
-    },
-  },
+    }
+  }
 }
 </script>
 <style scoped>

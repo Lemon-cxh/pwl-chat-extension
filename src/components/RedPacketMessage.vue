@@ -3,7 +3,7 @@
     <el-row
       :class="[
         'red-packet',
-        { 'red-packet-mask': redPacket.got >= redPacket.count },
+        { 'red-packet-mask': redPacket.got >= redPacket.count }
       ]"
       @click="clickRedPacket"
     >
@@ -44,25 +44,25 @@ import { openRedPacket } from '../api/chat'
 import { mapGetters } from 'vuex'
 import {
   redPacketTypeMap,
-  rockPaperScissors,
+  rockPaperScissors
 } from '../constant/RedPacketConstant'
 /**
  * 红包消息组件
  */
 export default {
-  name: 'redPacketMessage',
+  name: 'red-packet-message',
   inject: ['$message'],
   props: {
     oId: String,
-    content: String,
+    content: String
   },
   emits: ['showRedpacketInfo'],
   data() {
     return {
       dialogVisible: false,
-      redPacketTypeMap: redPacketTypeMap,
+      redPacketTypeMap,
       dialogGestureVisible: false,
-      gesture: 0,
+      gesture: 0
     }
   },
   computed: {
@@ -72,11 +72,11 @@ export default {
     },
     form() {
       return { oId: this.oId, apiKey: this.key }
-    },
+    }
   },
   methods: {
     clickRedPacket() {
-      let redPacket = this.redPacket
+      const redPacket = this.redPacket
       if (
         redPacket.type === rockPaperScissors &&
         redPacket.got < redPacket.count
@@ -87,22 +87,22 @@ export default {
       this.openRedPacket(this.form)
     },
     selectGesture() {
-      let form = this.form
+      const form = this.form
       form.gesture = this.gesture
       this.openRedPacket(form)
       this.dialogGestureVisible = false
     },
     openRedPacket(form) {
       openRedPacket(form).then((res) => {
-        if (res.code == -1) {
+        if (res.code === -1) {
           this.$message.warning(res.msg)
           return
         }
         res.oId = this.oId
         this.$emit('showRedpacketInfo', res)
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

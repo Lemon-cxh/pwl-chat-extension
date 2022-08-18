@@ -3,7 +3,7 @@ import { TABS_EVENT } from '../constant/Constant'
 
 export function clickEventListener(clickUserFunction) {
   document.getElementById('messageList').addEventListener('click', (event) => {
-    let dom = event.target
+    const dom = event.target
     if (
       dom.tagName === 'IMG' &&
       dom.alt !== 'avatar' &&
@@ -24,8 +24,8 @@ function showImage(dom) {
     data: {
       src: dom.src,
       width: dom.naturalWidth,
-      height: dom.naturalHeight,
-    },
+      height: dom.naturalHeight
+    }
   })
 }
 
@@ -34,7 +34,7 @@ function clickA(dom, clickUserFunction) {
     clickUserFunction && clickUserFunction(dom.innerText)
     return
   }
-  let href = dom.href.replace(
+  const href = dom.href.replace(
     `${process.env.VUE_APP_BASE_URL}/forward?goto=`,
     ''
   )

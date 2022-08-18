@@ -5,38 +5,38 @@ export const typeArray = [
   {
     name: 'commented',
     title: '收到的回帖',
-    count: 'unreadCommentedNotificationCnt',
+    count: 'unreadCommentedNotificationCnt'
   },
   {
     name: 'reply',
     title: '收到的回复',
-    count: 'unreadReplyNotificationCnt',
+    count: 'unreadReplyNotificationCnt'
   },
   {
     name: 'point',
     title: '积分',
-    count: 'unreadPointNotificationCnt',
+    count: 'unreadPointNotificationCnt'
   },
   {
     name: 'at',
     title: '提及我的',
-    count: 'unreadAtNotificationCnt',
+    count: 'unreadAtNotificationCnt'
   },
   {
     name: 'following',
     title: '我关注的',
-    count: 'unreadFollowingNotificationCnt',
+    count: 'unreadFollowingNotificationCnt'
   },
   {
     name: 'broadcast',
     title: '同城',
-    count: 'unreadBroadcastNotificationCnt',
+    count: 'unreadBroadcastNotificationCnt'
   },
   {
     name: 'sys-announce',
     title: '系统',
-    count: 'unreadSysAnnounceNotificationCnt',
-  },
+    count: 'unreadSysAnnounceNotificationCnt'
+  }
 ]
 /**
  * 通知列表接口字段的映射
@@ -50,8 +50,8 @@ export const type = new Map([
       url: 'commentSharpURL',
       userName: 'commentAuthorName',
       content: 'commentContent',
-      time: 'commentCreateTime',
-    },
+      time: 'commentCreateTime'
+    }
   ],
   [
     'reply',
@@ -61,8 +61,8 @@ export const type = new Map([
       url: 'commentSharpURL',
       userName: 'commentAuthorName',
       content: 'commentContent',
-      time: 'commentCreateTime',
-    },
+      time: 'commentCreateTime'
+    }
   ],
   [
     'at',
@@ -72,44 +72,44 @@ export const type = new Map([
         avatar: 'userAvatarURL',
         userName: 'userName',
         content: 'content',
-        time: 'createTime',
+        time: 'createTime'
       },
       39: {
         title: '聊天室红包',
         avatar: 'userAvatarURL',
         userName: 'userName',
         content: 'content',
-        time: 'createTime',
+        time: 'createTime'
       },
       24: {
         title: '帖子',
         avatar: 'thumbnailURL',
         userName: 'userName',
         content: 'description',
-        time: 'createTime',
+        time: 'createTime'
       },
       25: {
         title: '帖子',
         avatar: 'thumbnailURL',
         userName: 'userName',
         content: 'description',
-        time: 'createTime',
+        time: 'createTime'
       },
       27: {
         title: '帖子',
         avatar: 'thumbnailURL',
         userName: 'userName',
         content: 'description',
-        time: 'createTime',
+        time: 'createTime'
       },
       2: {
         title: '帖子中提及了你',
         avatar: 'thumbnailURL',
         userName: 'authorName',
         content: 'articleTitle',
-        time: 'createTime',
-      },
-    },
+        time: 'createTime'
+      }
+    }
   ],
   [
     'following',
@@ -119,22 +119,22 @@ export const type = new Map([
       url: 'url',
       userName: 'authorName',
       content: 'articleTags',
-      time: 'createTime',
-    },
+      time: 'createTime'
+    }
   ],
   [
     'point',
     {
       content: 'description',
-      time: 'createTime',
-    },
+      time: 'createTime'
+    }
   ],
   ['broadcast', { label: '平分红包', count: 2, msg: '平分红包，人人有份!' }],
   [
     'sys-announce',
     {
       content: 'description',
-      time: 'createTime',
-    },
-  ],
+      time: 'createTime'
+    }
+  ]
 ])
