@@ -57,7 +57,7 @@ module.exports = {
       }),
       Icons()
     )
-    if (isProduction) {
+    if (!isProduction) {
       // webpack-extension-reloader 热加载
       config.plugins.push(
         new ExtensionReloader({
