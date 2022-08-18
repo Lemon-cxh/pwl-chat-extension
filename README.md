@@ -4,6 +4,8 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/Lemon-cxh/pwl-chat-extension)
 ![GitHub top language](https://img.shields.io/github/languages/top/Lemon-cxh/pwl-chat-extension)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Lemon-cxh/pwl-chat-extension)
+
+![GitHub package.json version](https://img.shields.io/github/package-json/v/Lemon-cxh/pwl-chat-extension?color=success)
 ![GitHub all releases](https://img.shields.io/github/downloads/Lemon-cxh/pwl-chat-extension/total?color=blue)
 ![GitHub watchers](https://img.shields.io/github/watchers/Lemon-cxh/pwl-chat-extension)
 ![GitHub forks](https://img.shields.io/github/forks/Lemon-cxh/pwl-chat-extension)
