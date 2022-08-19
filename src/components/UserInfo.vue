@@ -18,12 +18,12 @@
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item command="openHome">
-            <bell class="svg-icon" />
+            <house class="svg-icon" />
             主 页
             <el-badge> </el-badge>
           </el-dropdown-item>
           <el-dropdown-item command="openChat">
-            <bell class="svg-icon" />
+            <chat-round class="svg-icon" />
             私 聊
             <el-badge :value="unreadChat" :hidden="unreadChat === 0">
             </el-badge>
@@ -174,7 +174,13 @@ import { countNotifications, makeReadNotifications } from '../api/notification'
 import { STORAGE, defaultOptions } from '../constant/Constant'
 import { getDate } from '../utils/util'
 import { setLocal, getLocal, getSync, setSync } from '../utils/chromeUtil'
-import { Bell, Setting, SwitchButton } from '@element-plus/icons-vue'
+import {
+  House,
+  Bell,
+  ChatRound,
+  Setting,
+  SwitchButton
+} from '@element-plus/icons-vue'
 
 const REQUEST_INTERVAL = 40000
 /**
@@ -184,7 +190,9 @@ export default {
   name: 'userInfo',
   inject: ['$message'],
   components: {
+    House,
     Bell,
+    ChatRound,
     Setting,
     SwitchButton
   },
