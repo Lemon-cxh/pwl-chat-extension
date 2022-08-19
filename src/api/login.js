@@ -4,14 +4,14 @@ export function getKey(data) {
   return request({
     url: '/api/getKey',
     method: 'post',
-    data: data
+    data
   })
 }
 
-export function getUserInfo(parsms) {
+export function getUserInfo(params) {
   return request({
     url: '/api/user',
     method: 'get',
-    params: parsms
+    params
   })
 }
