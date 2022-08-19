@@ -102,7 +102,7 @@ import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
 import { clickEventListener } from '../utils/commonUtil'
 import { mapGetters, mapMutations } from 'vuex'
-import { revoke } from '../api/chat'
+import { revoke } from '../api/chatroom'
 import { InfoFilled } from '@element-plus/icons-vue'
 
 let port

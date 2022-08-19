@@ -8,7 +8,10 @@
         :color="colors"
         :show-text="false"
       >
-        <el-badge :value="unreadCount" :hidden="unreadCount == 0">
+        <el-badge
+          :value="unreadNotifications + unreadChat"
+          :hidden="unreadNotifications + unreadChat === 0"
+        >
           <el-avatar size="default" :src="userInfo.userAvatarURL"></el-avatar>
         </el-badge>
       </el-progress>
@@ -19,10 +22,19 @@
             主 页
             <el-badge> </el-badge>
           </el-dropdown-item>
+          <el-dropdown-item command="openChat">
+            <bell class="svg-icon" />
+            私 聊
+            <el-badge :value="unreadChat" :hidden="unreadChat === 0">
+            </el-badge>
+          </el-dropdown-item>
           <el-dropdown-item command="openNotifications">
             <bell class="svg-icon" />
             通 知
-            <el-badge :value="unreadCount" :hidden="unreadCount == 0">
+            <el-badge
+              :value="unreadNotifications"
+              :hidden="unreadNotifications === 0"
+            >
             </el-badge>
           </el-dropdown-item>
           <el-dropdown-item command="showSetting">
@@ -157,6 +169,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { liveness, isCollectedLiveness, getLivenessReward } from '../api/user'
+import { unread } from '../api/chat'
 import { countNotifications, makeReadNotifications } from '../api/notification'
 import { STORAGE, defaultOptions } from '../constant/Constant'
 import { getDate } from '../utils/util'
@@ -183,7 +196,8 @@ export default {
         { color: '#f56c6c', percentage: 10 },
         { color: '#1989fa', percentage: 100 }
       ],
-      unreadCount: 0,
+      unreadNotifications: 0,
+      unreadChat: 0,
       drawer: false,
       options: defaultOptions
     }
@@ -220,6 +234,7 @@ export default {
       this.options = result.options
     })
     this.countNotifications()
+    this.getUnreadChat()
   },
   beforeUnmount() {
     if (this.intervalId) {
@@ -265,38 +280,44 @@ export default {
         })
       })
     },
-    countNotifications() {
-      countNotifications(this.apiKey).then((res) => {
-        if (res.code !== 0) {
-          return
-        }
-        let count = res.unreadNotificationCnt
-        if (this.options.autoReadAtNotification) {
-          count -= res.unreadAtNotificationCnt
-        }
-        if (this.options.autoReadPointNotification) {
-          count -= res.unreadPointNotificationCnt
-        }
-        this.unreadCount = count
-        if (
-          this.options.autoReadAtNotification &&
-          res.unreadAtNotificationCnt > 0
-        ) {
-          makeReadNotifications('at', this.apiKey).then()
-        }
-        if (
-          this.options.autoReadPointNotification &&
-          res.unreadPointNotificationCnt > 0
-        ) {
-          makeReadNotifications('point', this.apiKey).then()
-        }
-      })
+    async countNotifications() {
+      const res = await countNotifications(this.apiKey)
+      if (res.code !== 0) {
+        return
+      }
+      let count = res.unreadNotificationCnt
+      if (this.options.autoReadAtNotification) {
+        count -= res.unreadAtNotificationCnt
+      }
+      if (this.options.autoReadPointNotification) {
+        count -= res.unreadPointNotificationCnt
+      }
+      this.unreadNotifications = count
+      if (
+        this.options.autoReadAtNotification &&
+        res.unreadAtNotificationCnt > 0
+      ) {
+        makeReadNotifications('at', this.apiKey).then()
+      }
+      if (
+        this.options.autoReadPointNotification &&
+        res.unreadPointNotificationCnt > 0
+      ) {
+        makeReadNotifications('point', this.apiKey).then()
+      }
+    },
+    async getUnreadChat() {
+      const res = await unread(this.apiKey)
+      this.unreadChat = res.data.length
     },
     handleCommand(command) {
       this[command]()
     },
     openHome() {
       window.open(process.env.VUE_APP_BASE_URL)
+    },
+    openChat() {
+      window.open(process.env.VUE_APP_BASE_URL + '/chat')
     },
     openNotifications() {
       this.$router.push({ name: 'Notification' })

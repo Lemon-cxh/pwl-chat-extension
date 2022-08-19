@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import { createApp } from 'vue'
 import store from './store/index'
-import { more, getMessages, send, openRedPacket } from './api/chat'
+import { more, getMessages, send, openRedPacket } from './api/chatroom'
 import {
   notifications,
   getLocal,

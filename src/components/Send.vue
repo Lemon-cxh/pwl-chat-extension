@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import { send, upload } from '../api/chat'
+import { send, upload } from '../api/chatroom'
 import { getUserName } from '../api/user'
 import { mapGetters } from 'vuex'
 import { getMessageMark } from '../utils/util'

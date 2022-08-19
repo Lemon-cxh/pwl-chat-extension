@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { openRedPacket } from '../api/chat'
+import { openRedPacket } from '../api/chatroom'
 import { mapGetters } from 'vuex'
 import {
   redPacketTypeMap,

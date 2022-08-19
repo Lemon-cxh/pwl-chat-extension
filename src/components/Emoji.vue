@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { getEmoji } from '../api/chat'
+import { getEmoji } from '../api/chatroom'
 import { mapGetters } from 'vuex'
 /**
  * emoji表情组件

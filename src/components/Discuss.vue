@@ -38,7 +38,7 @@
 <script>
 import { Comment } from '@element-plus/icons-vue'
 import { ObjectUtil } from '../utils/ObjectUtil'
-import { send } from '../api/chat'
+import { send } from '../api/chatroom'
 import { mapGetters, mapMutations } from 'vuex'
 /**
  * 话题组件

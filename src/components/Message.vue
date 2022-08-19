@@ -105,7 +105,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { isRedPacket } from '../utils/util'
-import { getMd } from '../api/chat'
+import { getMd } from '../api/chatroom'
 /**
  * 消息组件
  */

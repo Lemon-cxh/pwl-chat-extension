@@ -106,7 +106,7 @@
 </template>
 
 <script>
-import { send } from '../api/chat'
+import { send } from '../api/chatroom'
 import { getUserName } from '../api/user'
 import { mapGetters } from 'vuex'
 import {
