@@ -331,6 +331,9 @@ export default {
 .el-popover.el-popper {
   min-width: 0px;
 }
+.message-content img[alt="图片表情"] {
+  max-height: 100px;
+}
 .message-content * {
   max-width: 265px;
   overflow: auto;
