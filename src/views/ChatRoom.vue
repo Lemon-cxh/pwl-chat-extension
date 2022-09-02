@@ -256,7 +256,7 @@ export default {
     },
     newMessage(message) {
       this.unshiftMessage(message)
-      if (!this.isTop && message.userName !== this.userInfo.userName) {
+      if (!this.isTop && message.userName !== this.userInfo.userName && !isRedPacket(message)) {
         this.hasNewMessage = true
       }
     },
