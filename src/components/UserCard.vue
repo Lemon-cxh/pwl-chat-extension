@@ -50,7 +50,7 @@
               />
             </template>
           </el-row>
-          <el-row class="column intro">
+          <el-row class="column">
             {{ userInfo.userIntro }}
           </el-row>
           <a class="column" @click="openUrl"> {{ userInfo.userURL }}</a>
@@ -186,9 +186,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-}
-.intro {
-  flex-grow: 1;
 }
 </style>
 <style>
