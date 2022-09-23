@@ -133,7 +133,7 @@ export default {
           }
         })
       } else {
-        this.content += e.clipboardData.getData('Text')
+        this.buildContent(e.clipboardData.getData('Text'))
       }
     },
     selectAt(userName) {
@@ -155,14 +155,14 @@ export default {
       }
       if (event.ctrlKey) {
         this.handleInputBlur(event)
-        this.buildContent(this.content, '<br/>')
+        this.buildContent('<br/>')
         return
       }
       this.disabled = true
       this.send()
     },
     addContent(content) {
-      this.buildContent(this.content, content)
+      this.buildContent(content)
       this.$refs.contentInput.focus()
     },
     quote(quoteForm) {
@@ -205,9 +205,11 @@ export default {
     buildAtUser(userName) {
       return `<a href="${process.env.VUE_APP_BASE_URL}/member/${userName}" class="name-at" aria-label="${userName}" rel="nofollow">${userName}</a>`
     },
-    buildContent(content, str) {
+    buildContent(str) {
       this.content =
-        content.substring(0, this.cursor) + str + content.substring(this.cursor)
+        this.content.substring(0, this.cursor) +
+        str +
+        this.content.substring(this.cursor)
     }
   }
 }
