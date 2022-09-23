@@ -1,5 +1,5 @@
-import { TABS_EVENT, STORAGE, defaultOptions } from '../constant/Constant'
-import { getSync } from '../utils/chromeUtil'
+import { TABS_EVENT } from '../constant/Constant'
+import { getOptions } from '../utils/chromeUtil'
 import { isRedPacket } from '../utils/util'
 
 let height = 25
@@ -18,14 +18,12 @@ let options = {}
 /**
  * 获取设置参数，并创建弹幕
  */
-window.onload = function () {
-  getSync({ [STORAGE.options]: defaultOptions }, (result) => {
-    options = result.options
-    height = options.barrageOptions.fontSize
-    if (options.barrageOptions.enable) {
-      createBarrage()
-    }
-  })
+window.onload = async function () {
+  options = await getOptions()
+  height = options.barrageOptions.fontSize
+  if (options.barrageOptions.enable) {
+    createBarrage()
+  }
 }
 
 /**

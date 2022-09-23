@@ -58,6 +58,7 @@
               :date="date"
               :unlimited-revoke="unlimitedRevoke"
               :avatar-pendant="avatarPendant"
+              :hide-blockquote="options.hideBlockquote"
               @revoke-message="revokeMessage"
               @show-user-card="showUserCard"
               @collect-images="collectImages"
@@ -101,6 +102,7 @@ import { ref, defineAsyncComponent } from 'vue'
 import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
 import { clickEventListener } from '../utils/commonUtil'
+import { getOptions } from '../utils/chromeUtil'
 import { mapGetters, mapMutations } from 'vuex'
 import { revoke } from '../api/chatroom'
 import { InfoFilled } from '@element-plus/icons-vue'
@@ -128,7 +130,8 @@ export default {
       avatarPendant: {},
       showTop: false,
       isTop: true,
-      hasNewMessage: false
+      hasNewMessage: false,
+      options: {}
     }
   },
   inject: ['$message'],
@@ -171,12 +174,13 @@ export default {
       updateMessage
     }
   },
-  created() {
+  async created() {
     const that = this
     // 连接background.js
     /* global chrome */
     port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.onMessage.addListener((msg) => that.messageListener(msg))
+    this.options = await getOptions()
     // 是否展示圣诞头像挂件
     this.avatarPendant.isChristmas =
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
@@ -256,7 +260,11 @@ export default {
     },
     newMessage(message) {
       this.unshiftMessage(message)
-      if (!this.isTop && message.userName !== this.userInfo.userName && !isRedPacket(message)) {
+      if (
+        !this.isTop &&
+        message.userName !== this.userInfo.userName &&
+        !isRedPacket(message)
+      ) {
         this.hasNewMessage = true
       }
     },

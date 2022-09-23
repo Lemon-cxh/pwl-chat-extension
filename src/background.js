@@ -6,7 +6,8 @@ import {
   notifications,
   getLocal,
   sendTabsMessage,
-  getSync
+  getOptions,
+  formatOptions
 } from './utils/chromeUtil'
 import { getMessageMark } from './utils/util'
 import {
@@ -34,8 +35,8 @@ let careOnline = []
 /**
  * 获取设置
  */
-getSync({ [STORAGE.options]: defaultOptions }, (result) => {
-  options = formatOptions(result.options)
+getOptions((result) => {
+  options = formatOptions(result)
 })
 
 /**
@@ -357,16 +358,6 @@ function clearMessage() {
     store.commit('popMessage')
   }
   deleteMessage = false
-}
-
-function formatOptions(options) {
-  if (options.blacklist) {
-    options.blacklist = JSON.parse(options.blacklist)
-  }
-  if (options.care) {
-    options.care = JSON.parse(options.care)
-  }
-  return options
 }
 
 function isClosed() {

@@ -1,3 +1,5 @@
+import { STORAGE, defaultOptions } from '../constant/Constant'
+
 export function notifications(title, message) {
   /* global chrome */
   chrome.notifications.create({
@@ -37,4 +39,31 @@ export function sendTabsMessage(message, callback) {
       })
     }
   )
+}
+
+/**
+ * 获取配置
+ * @returns options
+ */
+export function getOptions() {
+  return new Promise((resolve) => {
+    getSync({ [STORAGE.options]: defaultOptions }, (result) => {
+      resolve(result.options)
+    })
+  })
+}
+
+/**
+ * 格式配置
+ * @param {*} options 配置
+ * @returns options
+ */
+export function formatOptions(options) {
+  if (options.blacklist) {
+    options.blacklist = JSON.parse(options.blacklist)
+  }
+  if (options.care) {
+    options.care = JSON.parse(options.care)
+  }
+  return options
 }

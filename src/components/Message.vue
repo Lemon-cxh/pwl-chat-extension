@@ -114,8 +114,15 @@ export default {
   props: {
     message: Object,
     date: String,
-    unlimitedRevoke: Boolean,
-    avatarPendant: Object
+    unlimitedRevoke: {
+      type: Boolean,
+      default: false
+    },
+    avatarPendant: Object,
+    hideBlockquote: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: [
     'quote',
@@ -189,9 +196,16 @@ export default {
     },
     modifyContent(content) {
       // <em><code># Yui女装呢 #</code></em>
-      return content.replaceAll(
+      const result = content.replaceAll(
         /(<em><code>#\s)(.{1,16})(\s#<\/code><\/em>)/g,
         '<span class="el-tag" style="margin: 1px 0;">$2</span>'
+      )
+      if (!this.hideBlockquote) {
+        return result
+      }
+      return result.replaceAll(
+        /((?<!引用(.|\n)+)<blockquote>)((.|\n)+)(<\/blockquote>)/g,
+        '<details><summary></summary><blockquote>$3</blockquote></details>'
       )
     },
     talkToHe() {
@@ -331,7 +345,7 @@ export default {
 .el-popover.el-popper {
   min-width: 0px;
 }
-.message-content img[alt="图片表情"] {
+.message-content img[alt='图片表情'] {
   max-height: 100px;
 }
 .message-content * {

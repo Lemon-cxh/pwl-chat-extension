@@ -168,7 +168,11 @@ export const defaultOptions = {
   /**
    * 显示未读消息总数
    */
-  showUnReadCount: true
+  showUnReadCount: true,
+  /**
+   * 隐藏引用格式的内容
+   */
+  hideBlockquote: false
 }
 
 export const MESSAGE_LIMIT = 25

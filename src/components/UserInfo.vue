@@ -75,7 +75,7 @@
                 active-color="#13ce66"
                 @change="optionsChange"
               />
-              <span class="option-text">显示未读数</span>
+              <span class="option-text">图标显示消息数</span>
             </el-col>
           </el-row>
           <el-row class="option-row">
@@ -112,6 +112,16 @@
                 @change="optionsChange"
               />
               <span class="option-text">自动已读积分通知</span>
+            </el-col>
+          </el-row>
+          <el-row class="option-row">
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.hideBlockquote"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">隐藏小尾巴</span>
             </el-col>
           </el-row>
         </el-tab-pane>
@@ -173,7 +183,13 @@ import { unread } from '../api/chat'
 import { countNotifications, makeReadNotifications } from '../api/notification'
 import { STORAGE, defaultOptions } from '../constant/Constant'
 import { getDate } from '../utils/util'
-import { setLocal, getLocal, getSync, setSync } from '../utils/chromeUtil'
+import {
+  setLocal,
+  getLocal,
+  setSync,
+  getOptions,
+  formatOptions
+} from '../utils/chromeUtil'
 import {
   House,
   Bell,
@@ -216,7 +232,7 @@ export default {
       return { apiKey: this.key }
     }
   },
-  created() {
+  async created() {
     // 获取活跃度
     getLocal([STORAGE.liveness], (res) => {
       const storage = res[STORAGE.liveness] ?? {}
@@ -232,15 +248,7 @@ export default {
       })
     })
     // 获取设置
-    getSync({ [STORAGE.options]: defaultOptions }, (result) => {
-      if (result.options.blacklist) {
-        result.options.blacklist = JSON.parse(result.options.blacklist)
-      }
-      if (result.options.care) {
-        result.options.care = JSON.parse(result.options.care)
-      }
-      this.options = result.options
-    })
+    this.options = formatOptions(await getOptions())
     this.countNotifications()
     this.getUnreadChat()
   },
