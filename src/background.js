@@ -35,7 +35,7 @@ let careOnline = []
 /**
  * 获取设置
  */
-getOptions((result) => {
+getOptions().then((result) => {
   options = formatOptions(result)
 })
 

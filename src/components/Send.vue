@@ -16,7 +16,6 @@
             ref="contentInput"
             class="dark-mode"
             @paste.capture.prevent="pasteHandler"
-            @blur="handleInputBlur"
             @keyup.enter="sendHandler"
           >
             <template #append>
@@ -87,7 +86,6 @@ export default {
   data() {
     return {
       content: '',
-      cursor: 0,
       disabled: false,
       visible: false,
       userList: [],
@@ -142,9 +140,6 @@ export default {
       this.visible = false
       this.$refs.contentInput.focus()
     },
-    handleInputBlur(e) {
-      this.cursor = e.srcElement.selectionStart
-    },
     sendHandler(event) {
       if (this.disabled) {
         return
@@ -154,7 +149,6 @@ export default {
         return
       }
       if (event.ctrlKey) {
-        this.handleInputBlur(event)
         this.buildContent('<br/>')
         return
       }
@@ -206,10 +200,9 @@ export default {
       return `<a href="${process.env.VUE_APP_BASE_URL}/member/${userName}" class="name-at" aria-label="${userName}" rel="nofollow">${userName}</a>`
     },
     buildContent(str) {
+      const index = this.$refs.contentInput.$el.children[0].selectionStart
       this.content =
-        this.content.substring(0, this.cursor) +
-        str +
-        this.content.substring(this.cursor)
+        this.content.substring(0, index) + str + this.content.substring(index)
     }
   }
 }
