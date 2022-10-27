@@ -21,7 +21,11 @@
             <div v-if="isRedPacket(item)" @click="clickRedPacket(item.oId)">
               {{ getRedPacketMsg(item) }}
             </div>
-            <div v-else class="content" v-html="item.content"></div>
+            <div
+              v-else
+              class="content"
+              v-html="modifyContent(item.content)"
+            ></div>
           </el-row>
         </template>
       </el-scrollbar>
@@ -35,6 +39,7 @@ import { ref } from 'vue'
 import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
 import { clickEventListener } from '../utils/commonUtil'
 import { isRedPacket } from '../utils/util'
+import { getOptions } from '../utils/chromeUtil'
 import XiaoIce from './components/XiaoIce.vue'
 
 let port
@@ -45,7 +50,8 @@ export default {
     return {
       port: undefined,
       userInfo: '',
-      input: ''
+      input: '',
+      options: {}
     }
   },
   components: {
@@ -81,11 +87,12 @@ export default {
       updateMessage
     }
   },
-  created() {
+  async created() {
     /* global chrome */
     chrome.devtools.panels.create('Finsh', 'icons/128.png', 'devtools.html')
     port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.onMessage.addListener((msg) => this.messageListener(msg))
+    this.options = await getOptions()
   },
   mounted() {
     clickEventListener()
@@ -148,6 +155,22 @@ export default {
         }
         return false
       })
+    },
+    modifyContent(content) {
+      if (content.indexOf('class="kaibai"') > 0) {
+        content = content.replaceAll(
+          /(<span class="kaibai">)(.+)(<\/span>)/g,
+          '<img alt="图片表情" src="https://sexy.1433.top/$2"/>'
+        )
+      }
+      // 隐藏小尾巴信息
+      if (!this.options.hideBlockquote) {
+        return content
+      }
+      return content.replaceAll(
+        /((?<!引用(.|\n)+)<blockquote>)((.|\n)+)(<\/blockquote>)/g,
+        '<details><summary></summary><blockquote>$3</blockquote></details>'
+      )
     }
   }
 }
