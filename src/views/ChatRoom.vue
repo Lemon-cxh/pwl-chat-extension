@@ -188,7 +188,7 @@ export default {
   mounted() {
     document.getElementById('messageList').oncontextmenu = (event) => {
       this.showMessageMenu(event)
-      return false
+      event.preventDefault()
     }
     clickEventListener((name) => {
       this.userName = name
@@ -294,17 +294,15 @@ export default {
       port.postMessage({ type: EVENT.getMore })
     },
     showMessageMenu(event) {
-      const dom = event.path.find(
-        (e) => e.id && e.id.indexOf('message_') !== -1
-      )
-      if (dom) {
-        const isImage =
-          event.path[0].nodeName === 'IMG' &&
-          event.path[0].className !== 'emoji'
-        this.$refs[dom.id][0].showMessageMenu(
-          isImage ? event.path[0].currentSrc : ''
-        )
+      let dom = event.target || event.srcElement
+      const imageSrc =
+        dom.nodeName === 'IMG' && dom.className !== 'emoji'
+          ? dom.currentSrc
+          : ''
+      while (!dom.id) {
+        dom = dom.parentNode
       }
+      this.$refs[dom.id] && this.$refs[dom.id][0].showMessageMenu(imageSrc)
     },
     showUserCard(name) {
       this.userName = name
