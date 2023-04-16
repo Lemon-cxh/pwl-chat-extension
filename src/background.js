@@ -40,6 +40,17 @@ getOptions().then((result) => {
 })
 
 /**
+ * 右键扩展图标时弹出的菜单
+ */
+chrome.contextMenus.create({
+  title: '刷新',
+  contexts: ['browser_action'],
+  onclick: function () {
+    initWebSocket()
+  }
+})
+
+/**
  * 监听storage修改
  */
 /* global chrome */
