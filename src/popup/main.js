@@ -21,7 +21,7 @@ import { STORAGE } from '../constant/Constant'
 
 // 自定义的SVG组件配置：导入svg
 const requireAll = (requireContext) => requireContext.keys().map(requireContext)
-const req = require.context('../svg', false, /\.svg$/)
+const req = require.context('../svg', true, /\.svg$/)
 requireAll(req)
 
 getLocal([STORAGE.key, STORAGE.account], async (result) => {

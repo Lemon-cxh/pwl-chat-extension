@@ -71,7 +71,10 @@
             </el-row>
           </el-popover>
         </div>
-        <el-row class="time">{{ getTime(message.time) }}</el-row>
+        <el-row class="footer">
+          <span>{{ getTime(message.time) }}</span>
+          <via :client="message.client"/>
+        </el-row>
       </el-row>
       <icon-svg
         v-if="message.users"
@@ -307,9 +310,12 @@ export default {
   border: 6px solid transparent;
   border-left: 8px solid #fffbe6;
 }
-.time {
+.footer {
   padding: 0 5px;
   color: #999999;
+  display: flex;
+  align-items: center;
+  height: 16px;
 }
 .menu {
   text-align: center;

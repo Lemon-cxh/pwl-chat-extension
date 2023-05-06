@@ -46,7 +46,6 @@
 
 <script>
 import { getCloudImage, syncCloudImage } from '../api/chatroom'
-import { getMessageMark } from '../utils/util'
 import { mapGetters } from 'vuex'
 import { CircleCloseFilled } from '@element-plus/icons-vue'
 /**
@@ -84,7 +83,7 @@ export default {
       })
     },
     selectImage(image) {
-      this.$emit('sendMessage', `![图片表情](${image})${getMessageMark()}`)
+      this.$emit('sendMessage', `![图片表情](${image})`)
     },
     syncCloudImage(url) {
       const that = this

@@ -9,7 +9,6 @@ import {
   getOptions,
   formatOptions
 } from './utils/chromeUtil'
-import { getMessageMark } from './utils/util'
 import {
   MESSAGE_TYPE,
   STORAGE,
@@ -339,7 +338,7 @@ async function getMoreEvent() {
 
 function sendMessage(data) {
   send({
-    content: data + getMessageMark(),
+    content: data,
     apiKey: store.getters.key
   }).then()
 }

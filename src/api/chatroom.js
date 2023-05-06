@@ -24,6 +24,10 @@ export function getMd(oId) {
 }
 
 export function send(data) {
+  data.client =
+    (window.navigator.userAgent.indexOf('Edg') > -1 ? 'Edge' : 'Chrome') +
+    '/v' +
+    process.env.VUE_APP_VERSION
   return request({
     url: '/chat-room/send',
     method: 'post',

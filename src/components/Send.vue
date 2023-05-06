@@ -71,7 +71,6 @@
 import { send, upload } from '../api/chatroom'
 import { getUserName } from '../api/user'
 import { mapGetters } from 'vuex'
-import { getMessageMark } from '../utils/util'
 import { Promotion, CircleCloseFilled } from '@element-plus/icons-vue'
 /**
  * 消息输入框
@@ -185,7 +184,6 @@ export default {
       if (this.discuss.enable) {
         form.content += '\n*`# ' + this.discuss.content + ' #`*'
       }
-      form.content += getMessageMark()
       send(form).then((res) => {
         this.disabled = false
         if (res.code === 0) {

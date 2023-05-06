@@ -5,6 +5,7 @@ const Icons = require('unplugin-icons/webpack')
 const IconsResolver = require('unplugin-icons/resolver')
 const ExtensionReloader = require('webpack-extension-reloader')
 
+process.env.VUE_APP_VERSION = require('./package.json').version
 const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
