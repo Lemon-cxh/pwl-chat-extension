@@ -1,7 +1,7 @@
 <template>
   <el-tooltip v-if="via" placement="right" hide-after="0">
     <template #content>
-      <div @click="handleClick">{{ via.content }}</div>
+      <div @click="handleClick">{{ via.content + ' ' + version }}</div>
     </template>
     <div><icon-svg class="via" :icon-class="via.icon" /></div>
   </el-tooltip>
@@ -16,16 +16,10 @@ export default {
       default: ''
     }
   },
-  computed: {
-    via() {
-      if (!this.client) {
-        return undefined
-      }
-      return this.vias.get(this.client.split('/')[0])
-    }
-  },
   data() {
     return {
+      via: undefined,
+      version: '',
       vias: new Map([
         [
           'Windows', {
@@ -93,7 +87,7 @@ export default {
         [
           'Web', {
             icon: 'web',
-            content: '来自 Web 客户端',
+            content: '来自 Web',
             url: `${process.env.VUE_APP_BASE_URL}/cr`
           }
         ],
@@ -137,6 +131,16 @@ export default {
         ]
       ])
     }
+  },
+  created() {
+    if (!this.client) {
+      return
+    }
+    const client = this.client.split('/')
+    if (client.length > 1) {
+      this.version = client[1]
+    }
+    this.via = this.vias.get(client[0])
   },
   methods: {
     handleClick() {
