@@ -27,6 +27,7 @@
           v-if="isRedPacket"
           :o-id="message.oId"
           :content="message.content"
+          :is-own="isOwn"
           @show-redpacket-info="showRedpacketInfo"
         />
         <!-- 内容消息 -->
@@ -73,7 +74,7 @@
         </div>
         <el-row class="footer">
           <span>{{ getTime(message.time) }}</span>
-          <via :client="message.client"/>
+          <via v-if="!isOwn" :client="message.client"/>
         </el-row>
       </el-row>
       <icon-svg

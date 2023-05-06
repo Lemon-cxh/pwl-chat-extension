@@ -1,5 +1,5 @@
 <template>
-  <el-tooltip v-if="via" placement="right" hide-after="0">
+  <el-tooltip v-if="via" placement="right" :hide-after="0">
     <template #content>
       <div @click="handleClick">{{ via.content + ' ' + version }}</div>
     </template>

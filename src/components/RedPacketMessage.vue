@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <el-row type="flex">
     <el-row
       :class="[
         'red-packet',
@@ -17,26 +17,12 @@
       </el-row>
     </el-row>
 
-    <el-dialog
-      v-if="dialogGestureVisible"
-      v-model="dialogGestureVisible"
-      width="60%"
-      center
-      :show-close="false"
-      title="出拳"
-    >
-      <el-radio-group v-model="gesture" style="margin: 0 15px">
-        <el-radio :label="0">石头</el-radio>
-        <el-radio :label="1">剪刀</el-radio>
-        <el-radio :label="2">布</el-radio>
-      </el-radio-group>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="selectGesture"> 出拳 </el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
+    <el-row v-if="!isOwn && showGesture" type="flex" class="gesture">
+      <icon-svg class="icon" icon-class="rock" @click="selectGesture(0)"/>
+      <icon-svg class="icon" icon-class="scissors" @click="selectGesture(1)"/>
+      <icon-svg class="icon" icon-class="paper" @click="selectGesture(2)"/>
+    </el-row>
+  </el-row>
 </template>
 
 <script>
@@ -54,15 +40,14 @@ export default {
   inject: ['$message'],
   props: {
     oId: String,
-    content: String
+    content: String,
+    isOwn: Boolean
   },
   emits: ['showRedpacketInfo'],
   data() {
     return {
       dialogVisible: false,
-      redPacketTypeMap,
-      dialogGestureVisible: false,
-      gesture: 0
+      redPacketTypeMap
     }
   },
   computed: {
@@ -72,25 +57,22 @@ export default {
     },
     form() {
       return { oId: this.oId, apiKey: this.key }
+    },
+    showGesture() {
+      return this.redPacket.type === rockPaperScissors &&
+      this.redPacket.got < this.redPacket.count
     }
   },
   methods: {
     clickRedPacket() {
-      const redPacket = this.redPacket
-      if (
-        redPacket.type === rockPaperScissors &&
-        redPacket.got < redPacket.count
-      ) {
-        this.dialogGestureVisible = true
-        return
+      if (!this.showGesture) {
+        this.openRedPacket(this.form)
       }
-      this.openRedPacket(this.form)
     },
-    selectGesture() {
+    selectGesture(gesture) {
       const form = this.form
-      form.gesture = this.gesture
+      form.gesture = gesture
       this.openRedPacket(form)
-      this.dialogGestureVisible = false
     },
     openRedPacket(form) {
       openRedPacket(form).then((res) => {
@@ -133,5 +115,10 @@ export default {
   line-height: 20px;
   text-align: center;
   overflow: hidden;
+}
+
+.gesture {
+  width: 80px;
+  justify-content: space-around;
 }
 </style>
