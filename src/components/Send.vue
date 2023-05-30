@@ -92,7 +92,8 @@ export default {
       quoteForm: {
         userName: '',
         md: '',
-        content: ''
+        content: '',
+        oId: ''
       }
     }
   },
@@ -177,9 +178,14 @@ export default {
       const form = this.form
       if (this.quoteVisible) {
         const quoteForm = this.quoteForm
+        // 引用 @** [↩](https://fishpi.cn/cr#chatroom*** "跳转至原消息")
         form.content = `${form.content}\n\n*引用* @${this.buildAtUser(
           quoteForm.userName
-        )}:\n${quoteForm.md ? '> ' + quoteForm.md : quoteForm.content}\n`
+        )} [↩️](${process.env.VUE_APP_BASE_URL}/cr#chatroom${
+          quoteForm.oId
+        } "跳转至原消息")\n${
+          quoteForm.md ? '> ' + quoteForm.md : quoteForm.content
+        }\n`
       }
       if (this.discuss.enable) {
         form.content += '\n*`# ' + this.discuss.content + ' #`*'
@@ -209,32 +215,38 @@ export default {
 .send {
   flex-grow: 1;
 }
+
 .at-box {
   max-height: 200px;
   overflow: auto;
 }
+
 .at-item {
   width: 130px;
   color: white;
   align-items: center;
 }
+
 .at-image {
   width: 25px;
   height: 25px;
   margin-right: 10px;
 }
+
 .quote-content {
   color: white;
   max-width: 230px;
   max-height: 200px;
   overflow: auto;
 }
+
 .quote-user {
   height: 20px;
   line-height: 20px;
   font-weight: bold;
   justify-content: space-between;
 }
+
 .quote-close {
   margin-left: 10px;
   font-size: 20px;
@@ -244,9 +256,11 @@ export default {
 .quote-popover {
   background-color: #a3db92;
 }
+
 .quote-content * {
   max-width: 220px;
 }
+
 .quote-content a {
   color: white;
 }

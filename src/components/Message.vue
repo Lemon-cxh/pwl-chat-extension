@@ -199,6 +199,7 @@ export default {
       })
     },
     modifyContent(content) {
+      // 美化话题格式
       // <em><code># Yui女装呢 #</code></em>
       let result = content.replaceAll(
         /(<em><code>#\s)(.{1,16})(\s#<\/code><\/em>)/g,

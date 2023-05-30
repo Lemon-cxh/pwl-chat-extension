@@ -41,9 +41,9 @@
           <!-- 提示类消息 -->
           <hint-message
             v-if="
-              type.redPacketStatus === item.type
-              || type.discussChanged === item.type
-              || type.customMessage === item.type
+              type.redPacketStatus === item.type ||
+              type.discussChanged === item.type ||
+              type.customMessage === item.type
             "
             :message="item"
             @show-user-card="showUserCard"
@@ -191,9 +191,28 @@ export default {
       this.showMessageMenu(event)
       event.preventDefault()
     }
-    clickEventListener((name) => {
-      this.userName = name
-      this.dialogVisible = true
+    clickEventListener((dom) => {
+      if (dom.className === 'name-at') {
+        this.userName = dom.innerText
+        this.dialogVisible = true
+        return
+      }
+      if (dom.href.startsWith(`${process.env.VUE_APP_BASE_URL}/cr#chatroom`)) {
+        document
+          .getElementById('message_' + dom.hash.replace('#chatroom', ''))
+          .scrollIntoView({
+            behavior: 'smooth',
+            block: 'end',
+            inline: 'nearest'
+          })
+        return
+      }
+      const href = dom.href.replace(
+        `${process.env.VUE_APP_BASE_URL}/forward?goto=`,
+        ''
+      )
+      dom.target = '_blank'
+      dom.href = decodeURIComponent(href)
     })
   },
   beforeUnmount() {

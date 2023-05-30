@@ -1,7 +1,11 @@
 import { sendTabsMessage } from '../utils/chromeUtil'
 import { TABS_EVENT } from '../constant/Constant'
 
-export function clickEventListener(clickUserFunction) {
+/**
+ * 消息中的点击事件
+ * @param {*} clickAFunction 点击用户的回调方法
+ */
+export function clickEventListener(clickAFunction) {
   document.getElementById('messageList').addEventListener('click', (event) => {
     const dom = event.target
     if (
@@ -13,11 +17,15 @@ export function clickEventListener(clickUserFunction) {
       return
     }
     if (dom.tagName === 'A') {
-      clickA(dom, clickUserFunction)
+      clickAFunction(dom)
     }
   })
 }
 
+/**
+ * 在网页上展示图片
+ * @param {*} dom dom
+ */
 function showImage(dom) {
   sendTabsMessage({
     type: TABS_EVENT.showImage,
@@ -27,17 +35,4 @@ function showImage(dom) {
       height: dom.naturalHeight
     }
   })
-}
-
-function clickA(dom, clickUserFunction) {
-  if (dom.className === 'name-at') {
-    clickUserFunction && clickUserFunction(dom.innerText)
-    return
-  }
-  const href = dom.href.replace(
-    `${process.env.VUE_APP_BASE_URL}/forward?goto=`,
-    ''
-  )
-  dom.target = '_blank'
-  dom.href = decodeURIComponent(href)
 }
