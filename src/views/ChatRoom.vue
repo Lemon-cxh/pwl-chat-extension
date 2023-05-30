@@ -41,8 +41,9 @@
           <!-- 提示类消息 -->
           <hint-message
             v-if="
-              type.redPacketStatus === item.type ||
-              type.discussChanged === item.type
+              type.redPacketStatus === item.type
+              || type.discussChanged === item.type
+              || type.customMessage === item.type
             "
             :message="item"
             @show-user-card="showUserCard"

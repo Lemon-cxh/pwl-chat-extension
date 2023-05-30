@@ -68,7 +68,9 @@ p {
   font-size: 30px;
   color: #f79533;
 }
-
+h1, h2, h3 {
+  font-size: 17px;
+}
 @keyframes rotate {
   from {
     transform: rotate(360deg);

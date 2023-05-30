@@ -13,7 +13,7 @@
         <span class="number" @click="openRedPacket"> 红包 </span>
         <span>({{ message.got }}/{{ message.count }})</span>
       </div>
-      <div v-else class="message-box">
+      <div v-else-if="type.discussStatus === message.type" class="message-box">
         <span class="text" @click="showUserCard(message.whoChanged)">
           {{ message.whoChanged }}
         </span>
@@ -21,6 +21,9 @@
         <span class="text">
           {{ message.newDiscuss }}
         </span>
+      </div>
+      <div v-else-if="type.customMessage === message.type" class="message-box text">
+        {{ message.message }}
       </div>
     </el-row>
   </div>

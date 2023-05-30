@@ -19,7 +19,11 @@ export const MESSAGE_TYPE = {
   /**
    * 话题变更
    */
-  discussChanged: 'discussChanged'
+  discussChanged: 'discussChanged',
+  /**
+   * 用户上下线消息
+   */
+  customMessage: 'customMessage'
 }
 
 // storage存储key
