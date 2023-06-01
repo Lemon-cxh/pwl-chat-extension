@@ -7,7 +7,7 @@
       label-width="100px"
       class="form"
     >
-      <img class="center" width="100" src="icons/1024.png" />
+      <img class="center" width="200" src="icons/logo.png" />
       <el-form-item label="用户名" prop="nameOrEmail">
         <el-input
           class="input"
