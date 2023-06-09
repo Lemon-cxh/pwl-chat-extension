@@ -170,26 +170,21 @@ export default {
       this.quoteForm = {}
       this.quoteVisible = false
     },
-    sendMessage(content) {
+    /**
+     * 发送消息
+     * @param {*} content 内容
+     * @param {*} includeExtra 是否携带额外信息(话题、引用)
+     */
+    sendMessage(content, includeExtra = false) {
+      if (includeExtra) {
+        content = this.buildExtraInfo(content)
+      }
       send({ content, apiKey: this.key }).then()
       this.$refs.contentInput.focus()
     },
     send() {
       const form = this.form
-      if (this.quoteVisible) {
-        const quoteForm = this.quoteForm
-        // 引用 @** [↩](https://fishpi.cn/cr#chatroom*** "跳转至原消息")
-        form.content = `${form.content}\n\n*引用* @${this.buildAtUser(
-          quoteForm.userName
-        )} [↩️](${process.env.VUE_APP_BASE_URL}/cr#chatroom${
-          quoteForm.oId
-        } "跳转至原消息")\n${
-          quoteForm.md ? '> ' + quoteForm.md : quoteForm.content
-        }\n`
-      }
-      if (this.discuss.enable) {
-        form.content += '\n*`# ' + this.discuss.content + ' #`*'
-      }
+      form.content = this.buildExtraInfo(form.content)
       send(form).then((res) => {
         this.disabled = false
         if (res.code === 0) {
@@ -199,6 +194,23 @@ export default {
         }
         this.$message.warning(res.msg)
       })
+    },
+    buildExtraInfo(content) {
+      if (this.quoteVisible) {
+        const quoteForm = this.quoteForm
+        // 引用 @** [↩](https://fishpi.cn/cr#chatroom*** "跳转至原消息")
+        content = `${content}\n\n*引用* @${this.buildAtUser(
+          quoteForm.userName
+        )} [↩️](${process.env.VUE_APP_BASE_URL}/cr#chatroom${
+          quoteForm.oId
+        } "跳转至原消息")\n${
+          quoteForm.md ? '> ' + quoteForm.md : quoteForm.content
+        }\n`
+      }
+      if (this.discuss.enable) {
+        content += '\n*`# ' + this.discuss.content + ' #`*'
+      }
+      return content
     },
     buildAtUser(userName) {
       return `<a href="${process.env.VUE_APP_BASE_URL}/member/${userName}" class="name-at" aria-label="${userName}" rel="nofollow">${userName}</a>`

@@ -89,7 +89,7 @@ export default {
   },
   async created() {
     /* global chrome */
-    chrome.devtools.panels.create('Finsh', 'icons/128.png', 'devtools.html')
+    chrome.devtools.panels.create('Fish', 'icons/128.png', 'devtools.html')
     port = chrome.runtime.connect({ name: 'pwl-chat' })
     port.onMessage.addListener((msg) => this.messageListener(msg))
     this.options = await getOptions()

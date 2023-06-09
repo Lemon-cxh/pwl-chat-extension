@@ -83,7 +83,7 @@ export default {
       })
     },
     selectImage(image) {
-      this.$emit('sendMessage', `![图片表情](${image})`)
+      this.$emit('sendMessage', `![图片表情](${image})`, true)
     },
     syncCloudImage(url) {
       const that = this

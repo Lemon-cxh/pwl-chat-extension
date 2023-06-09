@@ -375,8 +375,8 @@ export default {
       this.updateRedPacket(data)
       port.postMessage({ type: EVENT.markRedPacket, data })
     },
-    sendMessage(content) {
-      this.$refs.messageInput.sendMessage(content)
+    sendMessage(content, includeExtra) {
+      this.$refs.messageInput.sendMessage(content, includeExtra)
     },
     quote(quoteForm) {
       this.$refs.messageInput.quote(quoteForm)
