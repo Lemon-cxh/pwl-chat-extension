@@ -58,7 +58,7 @@ export default {
         ],
         [
           'VSCode', {
-            icon: 'vsCode',
+            icon: 'vscode',
             content: '来自 VsCode 扩展',
             url: 'https://marketplace.visualstudio.com/items?itemName=hancel.pwl-chat'
           }
