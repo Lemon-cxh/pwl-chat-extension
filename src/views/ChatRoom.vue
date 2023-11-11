@@ -43,7 +43,8 @@
             v-if="
               type.redPacketStatus === item.type ||
               type.discussChanged === item.type ||
-              type.customMessage === item.type
+              type.customMessage === item.type ||
+              type.barrager === item.type
             "
             :message="item"
             @show-user-card="showUserCard"
@@ -400,6 +401,7 @@ export default {
 .menu-row {
   height: 30px;
   padding: 0 5px;
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
 }

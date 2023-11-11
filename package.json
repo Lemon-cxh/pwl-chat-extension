@@ -1,6 +1,6 @@
 {
   "name": "pwl-chat-extension",
-  "version": "1.1.17",
+  "version": "1.1.18",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service build --mode development --watch",
@@ -23,7 +23,7 @@
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
     "babel-eslint": "^10.1.0",
-    "element-plus": "^1.3.0-beta.1",
+    "element-plus": "^2.4.2",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",

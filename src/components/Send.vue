@@ -19,9 +19,18 @@
             @keyup.enter="sendHandler"
           >
             <template #append>
-              <el-button @click="sendHandler" :loading="disabled">
-                <promotion v-if="!disabled" class="svg-icon" />
-              </el-button>
+              <icon-svg
+                :icon-class="enableBarrage ? 'barrageEnable' : 'barrageDisable'"
+                @click="barrageClickHandler"
+                class="svg-icon"
+                :style="'font-size: 32px;color:' + barrageColor"
+              />
+              <el-color-picker
+                ref="colorPicker"
+                v-if="enableBarrage"
+                v-model="barrageColor"
+                show-alpha
+              />
             </template>
           </el-input>
         </template>
@@ -71,21 +80,22 @@
 import { send, upload } from '../api/chatroom'
 import { getUserName } from '../api/user'
 import { mapGetters } from 'vuex'
-import { Promotion, CircleCloseFilled } from '@element-plus/icons-vue'
+import { CircleCloseFilled } from '@element-plus/icons-vue'
 /**
  * 消息输入框
  */
 export default {
   name: 'send-component',
   components: {
-    Promotion,
     CircleCloseFilled
   },
   inject: ['$message'],
   data() {
     return {
       content: '',
-      disabled: false,
+      // 是否启用弹幕
+      enableBarrage: false,
+      barrageColor: '',
       visible: false,
       userList: [],
       quoteVisible: false,
@@ -141,9 +151,6 @@ export default {
       this.$refs.contentInput.focus()
     },
     sendHandler(event) {
-      if (this.disabled) {
-        return
-      }
       this.content = this.content.trim()
       if (this.content === '') {
         return
@@ -152,8 +159,22 @@ export default {
         this.buildContent('<br/>')
         return
       }
-      this.disabled = true
+      // 弹幕消息
+      if (this.enableBarrage) {
+        const barrageContent = JSON.stringify({
+          color: this.barrageColor,
+          content: this.content
+        })
+        this.content = `[barrager]${barrageContent}[/barrager]`
+      }
       this.send()
+    },
+    barrageClickHandler() {
+      this.enableBarrage = !this.enableBarrage
+      // 避免携带引用信息
+      if (this.enableBarrage) {
+        this.quoteVisible = false
+      }
     },
     addContent(content) {
       this.buildContent(content)
@@ -186,7 +207,6 @@ export default {
       const form = this.form
       form.content = this.buildExtraInfo(form.content)
       send(form).then((res) => {
-        this.disabled = false
         if (res.code === 0) {
           this.quoteVisible = false
           this.content = ''
@@ -275,5 +295,9 @@ export default {
 
 .quote-content a {
   color: white;
+}
+
+.send .el-color-picker__trigger {
+  /* display: none; */
 }
 </style>

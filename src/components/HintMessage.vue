@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row class="message" v-if="!message.hidden">
+    <el-row class="message">
       <div v-if="type.redPacketStatus === message.type" class="message-box">
         <span class="text" @click="showUserCard(message.whoGot)">
           {{ message.whoGot }}
@@ -22,8 +22,20 @@
           {{ message.newDiscuss }}
         </span>
       </div>
-      <div v-else-if="type.customMessage === message.type" class="message-box text">
+      <div
+        v-else-if="type.customMessage === message.type"
+        class="message-box text"
+      >
         {{ message.message }}
+      </div>
+      <div
+        v-else-if="type.barrager === message.type"
+        class="message-box"
+        :style="'color:' + message.barragerColor"
+      >
+        <el-avatar size="small" :src="message.userAvatarURL" class="avatar" />
+        <span>{{ message.userNickname ?? message.userName }}</span>
+        <span>{{ ': ' + message.barragerContent }}</span>
       </div>
     </el-row>
   </div>
@@ -34,7 +46,7 @@ import { openRedPacket } from '../api/chatroom'
 import { mapGetters } from 'vuex'
 import { MESSAGE_TYPE } from '../constant/Constant'
 /**
- * 提示信息：红包领取、更新话题
+ * 提示信息：红包领取、更新话题、弹幕消息
  */
 export default {
   name: 'hint-message',
@@ -78,11 +90,16 @@ export default {
 }
 .message-box {
   max-width: 300px;
+  display: flex;
+  align-items: center;
 }
 .text {
   color: #4183c4;
 }
 .number {
   color: #c7254e;
+}
+.avatar {
+  margin-right: 10px;
 }
 </style>

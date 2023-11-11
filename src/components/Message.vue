@@ -86,7 +86,7 @@
     </el-row>
     <!-- 多少人+1显示 -->
     <el-row
-      v-if="message.users"
+      v-if="message.users?.length > 0"
       type="flex"
       :class="[{ 'own-plus-one-box': isOwn }, 'plus-one-box']"
     >

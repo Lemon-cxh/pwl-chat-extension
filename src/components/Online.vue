@@ -1,7 +1,7 @@
 <template>
   <el-popover placement="bottom" width="auto" trigger="click">
     <template #reference>
-      <div tabindex="0" style="margin-right: 27px">
+      <div tabindex="0" style="width: 65px">
         <el-badge
           id="online-badge"
           type="success"

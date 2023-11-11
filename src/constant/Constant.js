@@ -23,7 +23,11 @@ export const MESSAGE_TYPE = {
   /**
    * 用户上下线消息
    */
-  customMessage: 'customMessage'
+  customMessage: 'customMessage',
+  /**
+   * 弹幕消息
+   */
+  barrager: 'barrager'
 }
 
 // storage存储key

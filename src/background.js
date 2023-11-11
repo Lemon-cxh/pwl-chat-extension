@@ -20,6 +20,8 @@ import {
 
 const URL = 'wss://fishpi.cn/chat-room-channel'
 let socketLock = false
+// 是否为主动关闭
+let isIntentionalClose = false
 // 最大保留两页消息
 const MAX_PAGE = 2
 let intervalId
@@ -70,12 +72,21 @@ window.openSocket = () => {
       }
     })
     .catch(() => {
-      window.webSocket && window.webSocket.close()
+      if (!isClosed()) {
+        window.webSocket && window.webSocket.close()
+      }
     })
 }
 
+/**
+ * 手动关闭连接
+ */
 window.closeSocket = () => {
+  isIntentionalClose = true
   window.webSocket && window.webSocket.close()
+  if (intervalId !== undefined) {
+    clearInterval(intervalId)
+  }
   store.commit('logout')
 }
 
@@ -85,8 +96,11 @@ window.openSocket()
  * 创建WS连接
  */
 function initWebSocket() {
-  window.closeSocket()
+  if (!isClosed()) {
+    window.webSocket && window.webSocket.close()
+  }
   getLocal([STORAGE.key], (result) => {
+    isIntentionalClose = false
     window.webSocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
     if (intervalId !== undefined) {
       clearInterval(intervalId)
@@ -100,7 +114,9 @@ function initWebSocket() {
     }
     window.webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
-      reconnect()
+      if (!isIntentionalClose) {
+        reconnect()
+      }
     }
     getMoreEvent()
   })
@@ -155,9 +171,6 @@ function messageHandler(event) {
  */
 chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
-  if (isClosed()) {
-    reconnect()
-  }
   port = p
   port.postMessage({ type: EVENT.userInfo, data: store.getters.userInfo })
   port.postMessage({
@@ -270,7 +283,7 @@ function onlineEvent(data) {
  * @param {*} message 消息内容
  */
 function atNotifications(message) {
-  if (options.showUnReadCount) {
+  if (options.showUnReadCount && message.type === MESSAGE_TYPE.msg) {
     chrome.browserAction.setBadgeText({ text: '' + ++count })
     chrome.browserAction.setBadgeBackgroundColor({ color: [64, 158, 255, 1] })
   }
@@ -378,13 +391,13 @@ function isClosed() {
   )
 }
 
-function reconnect() {
+async function reconnect() {
   if (socketLock) {
     return
   }
   socketLock = true
   if (isClosed()) {
-    window.openSocket()
+    await initWebSocket()
     console.log('重新连接了')
   }
   socketLock = false
