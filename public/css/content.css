@@ -25,7 +25,6 @@
   width: fit-content;
   max-width: 40vw;
   margin-right: 50px;
-  background-color: rgba(63, 49, 49, 0.4);
 }
 .pwl-message-child audio, .pwl-message-child iframe {
   max-width: 100px;
@@ -37,7 +36,9 @@
 }
 .pwl-message-child * {
   margin: 0px;
+  margin-right: 5px;
   padding: 0px;
+  font-size: 1em;
 }
 .pwl-message-child img[class="emoji"] {
   pointer-events: none;

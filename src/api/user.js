@@ -1,34 +1,34 @@
 import request from '@/utils/request'
 
-export function liveness(data) {
+export function liveness(params) {
   return request({
     url: '/user/liveness',
     method: 'get',
-    params: data
+    params
   })
 }
 
-export function getLivenessReward(data) {
+export function getLivenessReward(params) {
   return request({
     url: '/activity/yesterday-liveness-reward-api',
     method: 'get',
-    params: data
+    params
   })
 }
 
-export function isCollectedLiveness(data) {
+export function isCollectedLiveness(params) {
   return request({
     url: '/api/activity/is-collected-liveness',
     method: 'get',
-    params: data
+    params
   })
 }
 
-export function getUserInfo(name, data) {
+export function getUserInfo(name, params) {
   return request({
     url: '/user/' + name,
     method: 'get',
-    params: data
+    params
   })
 }
 
@@ -36,6 +36,6 @@ export function getUserName(data) {
   return request({
     url: '/users/names',
     method: 'post',
-    data: data
+    data
   })
 }

@@ -1,13 +1,15 @@
 <template>
-  <el-popover placement="left-start" width="211px" trigger="focus">
+  <el-popover placement="bottom" width="211px" trigger="hover">
     <template #reference>
-      <div tabindex="0"><icon-svg icon-class="emojiBtn" /></div
-    ></template>
+      <div tabindex="0">
+        <icon-svg icon-class="emojiBtn" />
+      </div>
+    </template>
     <el-row class="emoji-box">
       <div
-        class="emoji"
         v-for="(item, index) in emojis"
         :key="index"
+        class="emoji"
         @click="selectEmoji(item.name)"
       >
         <img
@@ -22,22 +24,24 @@
 </template>
 
 <script>
-import { getEmoji } from '../api/chat'
+import { getEmoji } from '../api/chatroom'
 import { mapGetters } from 'vuex'
-
+/**
+ * emoji表情组件
+ */
 export default {
-  name: 'emoji',
+  name: 'emoji-component',
   emits: ['addContent'],
   data() {
     return {
-      emojis: [],
+      emojis: []
     }
   },
   computed: {
     ...mapGetters(['key']),
     apiKey() {
       return { apiKey: this.key }
-    },
+    }
   },
   created() {
     this.getEmoji()
@@ -45,11 +49,10 @@ export default {
   methods: {
     getEmoji() {
       getEmoji(this.apiKey).then((res) => {
-        if (0 === res.code) {
-          let emojis = []
-          let key
+        if (res.code === 0) {
+          const emojis = []
           res.data.forEach((e) => {
-            for (key in e) {
+            for (const key in e) {
               emojis.push({ name: key, value: e[key] })
             }
           })
@@ -62,8 +65,8 @@ export default {
     },
     judgeEmojiIsImage(value) {
       return value.startsWith('http')
-    },
-  },
+    }
+  }
 }
 </script>
 

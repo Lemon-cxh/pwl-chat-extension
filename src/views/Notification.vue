@@ -46,61 +46,66 @@
       height="480px"
       @scroll="scroll"
     >
-      <template v-for="item in list" :key="item.oId">
-        <el-row :class="{ read: item.hasRead }">
-          <el-divider content-position="left" style="margin-top: 15px"
-            ><a
-              class="title"
-              target="_blank"
-              :href="getUrl(item[attributes.url])"
-              >{{
-                isAt ? attributes[item.dataType].title : item[attributes.title]
-              }}</a
-            ></el-divider
-          >
-          <el-row
-            class="flex-cloumn avatar-cloumn"
-            v-if="attributes.avatar || isAt"
-          >
-            <el-avatar
-              size="default"
-              :src="
-                isAt
-                  ? item[attributes[item.dataType].avatar]
-                  : item[attributes.avatar]
-              "
-            ></el-avatar>
-            <el-row>{{
+      <el-row
+        v-for="item in list"
+        :key="item.oId"
+        :class="{ read: item.hasRead }"
+      >
+        <el-divider content-position="left" style="margin-top: 15px"
+          ><a
+            class="title"
+            target="_blank"
+            :href="getUrl(item[attributes.url])"
+            >{{
+              isAt ? attributes[item.dataType].title : item[attributes.title]
+            }}</a
+          ></el-divider
+        >
+        <el-row
+          class="flex-cloumn avatar-cloumn"
+          v-if="attributes.avatar || isAt"
+        >
+          <el-avatar
+            size="default"
+            :src="
               isAt
-                ? item[attributes[item.dataType].userName]
-                : item[attributes.userName]
-            }}</el-row>
-          </el-row>
-          <el-row class="flex-cloumn content-cloumn">
-            <el-row
-              :class="
-                onlyContent ? 'notification-html' : 'notification-content'
-              "
-              ><span
-                v-html="
-                  isAt
-                    ? item[attributes[item.dataType].content]
-                    : item[attributes.content]
-                "
-              ></span
-            ></el-row>
-            <el-row class="time">{{
-              getDateTime(
-                isAt
-                  ? item[attributes[item.dataType].time]
-                  : item[attributes.time]
-              )
-            }}</el-row>
-          </el-row>
+                ? item[attributes[item.dataType].avatar]
+                : item[attributes.avatar]
+            "
+          ></el-avatar>
+          <el-row>{{
+            isAt
+              ? item[attributes[item.dataType].userName]
+              : item[attributes.userName]
+          }}</el-row>
         </el-row>
-      </template>
-      <el-empty v-show="!loading && list.length === 0" class="dark-mode"></el-empty>
-      <el-row class="tip" v-show="list.length > 0 && nodata">没有数据啦~</el-row>
+        <el-row class="flex-cloumn content-cloumn">
+          <el-row
+            :class="onlyContent ? 'notification-html' : 'notification-content'"
+            ><span
+              v-html="
+                isAt
+                  ? item[attributes[item.dataType].content]
+                  : item[attributes.content]
+              "
+            ></span
+          ></el-row>
+          <el-row class="time">{{
+            getDateTime(
+              isAt
+                ? item[attributes[item.dataType].time]
+                : item[attributes.time]
+            )
+          }}</el-row>
+        </el-row>
+      </el-row>
+      <el-empty
+        v-show="!loading && list.length === 0"
+        class="dark-mode"
+      ></el-empty>
+      <el-row class="tip" v-show="list.length > 0 && nodata"
+        >没有数据啦~</el-row
+      >
       <div class="loading-box">
         <icon-svg icon-class="loading" class="loading" v-if="loading" />
       </div>
@@ -124,14 +129,14 @@ import { mapGetters } from 'vuex'
 import {
   getNotifications,
   countNotifications,
-  makeReadNotifications,
+  makeReadNotifications
 } from '../api/notification'
 import { getDateTime } from '../utils/util'
 import { type, typeArray } from '../constant/NotificationConstant'
 import { Finished } from '@element-plus/icons-vue'
 
 export default {
-  name: 'Notification',
+  name: 'notification-component',
   components: { Finished },
   data() {
     return {
@@ -139,8 +144,8 @@ export default {
       page: 0,
       loadDisabled: true,
       list: [],
-      type: type,
-      typeArray: typeArray,
+      type,
+      typeArray,
       count: {
         unreadNotificationCnt: 0,
         code: 0,
@@ -152,13 +157,13 @@ export default {
         unreadSysAnnounceNotificationCnt: 0,
         unreadNewFollowerNotificationCnt: 0,
         unreadFollowingNotificationCnt: 0,
-        unreadCommentedNotificationCnt: 0,
+        unreadCommentedNotificationCnt: 0
       },
       showTop: false,
       nodata: false,
       loading: true,
       userName: '',
-      dialogVisible: false,
+      dialogVisible: false
     }
   },
   computed: {
@@ -177,7 +182,7 @@ export default {
     },
     onlyContent() {
       return this.tabsName === 'point' || this.tabsName === 'sys-announce'
-    },
+    }
   },
   created() {
     this.getCountNotifications()
@@ -187,7 +192,7 @@ export default {
     document
       .getElementById('notification-box')
       .addEventListener('click', (event) => {
-        let dom = event.target
+        const dom = event.target
         if (dom.tagName !== 'A') {
           return
         }
@@ -226,14 +231,14 @@ export default {
     },
     scroll({ scrollTop }) {
       this.showTop = scrollTop > 100
-      let height = this.$refs.notificationScrollbar.wrap$.scrollHeight - 480
+      const height = this.$refs.notificationScrollbar.wrap$.scrollHeight - 480
       if (!this.loading && scrollTop === height) {
         this.load()
       }
     },
     getCountNotifications() {
       countNotifications(this.apiKey).then((res) => {
-        if (0 === res.code) {
+        if (res.code === 0) {
           this.count = res
         }
       })
@@ -246,7 +251,7 @@ export default {
       this.page += 1
       getNotifications(this.params).then((res) => {
         this.loading = false
-        if (0 === res.code) {
+        if (res.code === 0) {
           if (res.data.length === 0) {
             this.nodata = true
             return
@@ -258,7 +263,7 @@ export default {
     },
     makeReadNotifications() {
       makeReadNotifications(this.tabsName, this.apiKey).then((res) => {
-        if (0 === res.code) {
+        if (res.code === 0) {
           this.getCountNotifications()
           this.handleClick()
         }
@@ -266,8 +271,8 @@ export default {
     },
     getDateTime(str) {
       return getDateTime(str)
-    },
-  },
+    }
+  }
 }
 </script>
 

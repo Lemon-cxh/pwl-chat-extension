@@ -16,27 +16,27 @@
               {{ userInfo.userAppRole == 0 ? '黑客' : '画家' }}</span
             >
           </el-row>
-          <el-row class="column"
-            ><span
-              ><avatar class="svg-icon" />{{ userInfo.userRole }}</span
-            ></el-row
-          >
           <el-row class="column">
-            <span><coin class="svg-icon" />{{ userInfo.userPoint }}</span>
-            <span
-              ><location-filled class="svg-icon" />{{ userInfo.userCity }}</span
-            >
+            <span> <avatar class="svg-icon" />{{ userInfo.userRole }} </span>
+          </el-row>
+          <el-row class="column">
+            <span @click="openPoints">
+              <coin class="svg-icon" />{{ userInfo.userPoint }}
+            </span>
+            <span>
+              <location-filled class="svg-icon" />{{ userInfo.userCity }}
+            </span>
           </el-row>
         </el-row>
 
         <el-row class="flex-column info">
-          <el-row class="name-column" @click="goto">
+          <el-row class="name-column" @click="openMember">
             <span class="name">{{
               userInfo.userNickname ? userInfo.userNickname : userInfo.userName
             }}</span>
             <span>{{ userInfo.userNickname ? userInfo.userName : '' }}</span>
           </el-row>
-          <el-row style="height: 20px; margin: 3px 5px">
+          <el-row style="height: 20px; margin: 3px 5px; flex-grow: 2">
             <template v-if="userInfo.sysMetal">
               <img
                 v-for="(item, index) in userInfo.sysMetal.list"
@@ -50,7 +50,7 @@
               />
             </template>
           </el-row>
-          <el-row class="column intro">
+          <el-row class="column">
             {{ userInfo.userIntro }}
           </el-row>
           <a class="column" @click="openUrl"> {{ userInfo.userURL }}</a>
@@ -64,41 +64,43 @@
 import { mapGetters } from 'vuex'
 import { getUserInfo } from '../api/user'
 import { Medal, Avatar, Coin, LocationFilled } from '@element-plus/icons-vue'
-
+/**
+ * 用户信息卡片
+ */
 export default {
   name: 'userCard',
   components: {
     Medal,
     Avatar,
     Coin,
-    LocationFilled,
+    LocationFilled
   },
-  emits: ['closeDialog'],
   props: {
     dialogVisible: Boolean,
-    userName: String,
+    userName: String
   },
+  emits: ['closeDialog'],
   data() {
     return {
-      userInfo: {},
+      userInfo: {}
     }
   },
   computed: {
     ...mapGetters(['key']),
     visible() {
       return this.dialogVisible
-    },
+    }
   },
   watch: {
     userName(newValue) {
       getUserInfo(newValue, { apiKey: this.key }).then((res) => {
-        let info = res
+        const info = res
         if (info.sysMetal) {
           info.sysMetal = JSON.parse(info.sysMetal)
         }
         this.userInfo = info
       })
-    },
+    }
   },
   methods: {
     getBackgroundImage(url) {
@@ -106,9 +108,14 @@ export default {
         ? `background-image:url('${url}')`
         : 'background-color: #1b4f8f;'
     },
-    goto() {
+    openMember() {
       window.open(
         `${process.env.VUE_APP_BASE_URL}/member/${this.userInfo.userName}`
+      )
+    },
+    openPoints() {
+      window.open(
+        `${process.env.VUE_APP_BASE_URL}/member/${this.userInfo.userName}/points`
       )
     },
     openUrl() {
@@ -118,8 +125,8 @@ export default {
     },
     closeHandler() {
       this.$emit('closeDialog')
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -173,12 +180,12 @@ export default {
 .column {
   height: 20px;
   margin: 2px 0;
-  padding: 0 10px;
+  padding: 0 5px;
   justify-content: space-between;
-}
-.intro {
-  height: 60px;
+  text-align: center;
   overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
 }
 </style>
 <style>

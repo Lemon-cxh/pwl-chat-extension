@@ -1,11 +1,16 @@
 <template>
   <div>
-    <el-popover placement="left-start" width="auto" trigger="focus">
+    <el-popover placement="bottom" width="auto" trigger="hover">
       <template #reference>
         <div tabindex="0"><icon-svg icon-class="imageBtn" /></div>
       </template>
       <el-row class="image-box">
-        <div class="image" v-for="(item, index) in images" :key="index">
+        <icon-svg
+          class="image-add"
+          icon-class="imageAdd"
+          @click=";(url = ''), (drawer = true)"
+        />
+        <div v-for="(item, index) in images" :key="index" class="image">
           <div class="image-item">
             <img :src="item" class="image" @click="selectImage(item)" />
             <circle-close-filled
@@ -14,11 +19,6 @@
             />
           </div>
         </div>
-        <icon-svg
-          class="image-add"
-          icon-class="imageAdd"
-          @click=";(url = ''), (drawer = true)"
-        />
       </el-row>
     </el-popover>
     <el-drawer
@@ -29,44 +29,47 @@
       size="auto"
     >
       <el-row class="title">从URL导入表情</el-row>
-      <el-row type="flex"
-        ><el-input
+      <el-row type="flex">
+        <el-input
           size="small"
           width="80%"
           placeholder="请输入URL"
           v-model="url"
-        /><el-button size="small" type="primary" @click="addImage"
-          >提交</el-button
-        ></el-row
-      >
+        />
+        <el-button size="small" type="primary" @click="addImage">
+          提交
+        </el-button>
+      </el-row>
     </el-drawer>
   </div>
 </template>
 
 <script>
-import { getCloudImage, syncCloudImage } from '../api/chat'
+import { getCloudImage, syncCloudImage } from '../api/chatroom'
 import { mapGetters } from 'vuex'
 import { CircleCloseFilled } from '@element-plus/icons-vue'
-
+/**
+ * 图片表情组件
+ */
 export default {
-  name: 'images',
-  emits: ['sendMessage'],
+  name: 'images-component',
   components: {
-    CircleCloseFilled,
+    CircleCloseFilled
   },
+  inject: ['$message'],
+  emits: ['sendMessage'],
   data() {
     return {
       drawer: false,
       url: '',
-      images: [],
+      images: []
     }
   },
-  inject: ['$message'],
   computed: {
     ...mapGetters(['key']),
     form() {
       return { gameId: 'emojis', apiKey: this.key }
-    },
+    }
   },
   created() {
     this.getCloudImage()
@@ -74,16 +77,16 @@ export default {
   methods: {
     getCloudImage() {
       getCloudImage(this.form).then((res) => {
-        if (0 === res.code) {
-          this.images = JSON.parse(res.data)
+        if (res.code === 0) {
+          this.images = res.data ? JSON.parse(res.data).reverse() : []
         }
       })
     },
     selectImage(image) {
-      this.$emit('sendMessage', `![image.png](${image})`)
+      this.$emit('sendMessage', `![图片表情](${image})`, true)
     },
     syncCloudImage(url) {
-      let that = this
+      const that = this
       this.getCloud((images) => {
         if (images.some((e) => e === url)) {
           that.$message.info('已添加过该表情')
@@ -107,7 +110,7 @@ export default {
     },
     deleteImage(url) {
       this.getCloud((images) => {
-        let index = images.indexOf(url)
+        const index = images.indexOf(url)
         if (index === -1) {
           return
         }
@@ -117,23 +120,22 @@ export default {
     },
     getCloud(fun) {
       getCloudImage(this.form).then((res) => {
-        if (0 === res.code) {
-          fun(JSON.parse(res.data))
+        if (res.code === 0) {
+          fun(res.data ? JSON.parse(res.data) : [])
         }
       })
     },
     syncCloud(images) {
-      let form = this.form
-      images = images.reverse()
+      const form = this.form
       form.data = JSON.stringify(images)
       syncCloudImage(form).then((r) => {
-        if (0 === r.code) {
+        if (r.code === 0) {
           this.$message.success('表情包同步成功')
           this.getCloudImage()
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -154,6 +156,7 @@ export default {
 .image {
   width: 80px;
   height: 80px;
+  object-fit: contain;
   margin: 3px;
 }
 .image-item {

@@ -4,9 +4,11 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/Lemon-cxh/pwl-chat-extension)
 ![GitHub top language](https://img.shields.io/github/languages/top/Lemon-cxh/pwl-chat-extension)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Lemon-cxh/pwl-chat-extension)
+
+![GitHub package.json version](https://img.shields.io/github/package-json/v/Lemon-cxh/pwl-chat-extension?color=success)
 ![GitHub all releases](https://img.shields.io/github/downloads/Lemon-cxh/pwl-chat-extension/total?color=blue)
 ![GitHub watchers](https://img.shields.io/github/watchers/Lemon-cxh/pwl-chat-extension)
-![GitHub followers](https://img.shields.io/github/followers/Lemon-cxh)
+![GitHub forks](https://img.shields.io/github/forks/Lemon-cxh/pwl-chat-extension)
 ![GitHub User's stars](https://img.shields.io/github/stars/Lemon-cxh/pwl-chat-extension)
 
 [Chrome Web Store](https://chrome.google.com/webstore/detail/%E6%91%B8%E9%B1%BC%E6%B4%BE%E8%81%8A%E5%A4%A9%E5%AE%A4/fkaomdjjdbglkbcmfhhlioejkpacbbpe?hl=zh-CN&authuser=0)
@@ -27,8 +29,7 @@
   - 点击输入框旁的头像可以查看通知、设置
     - 可以开启弹幕消息，在网页中以弹幕的形式展示消息
     - 可以设置黑名单(屏蔽某人的消息)、特别关心(上下线通知提醒)
-  - 有红包时会自动抢红包(延时三秒)
-  - 点击用户头像展示用户信息卡片，卡片中点击用户名跳转用户页面
+  - 点击用户头像展示用户信息卡片，卡片中点击用户名跳转用户页面，点击积分跳转用户积分记录页面
 
 ### 项目说明
 
@@ -46,7 +47,7 @@
 ├── src/
 │   ├── api/                    - 所有请求
 │   ├── components/             - 各个组件
-│   ├── components/             - 常量
+│   ├── constant/               - 常量
 │   ├── content-scripts/
 │   │   └── content-script.js   - 需要向网页注入的js
 │   ├── popup/                  - 点击扩展图标展示的入口页面
@@ -66,7 +67,18 @@
 npm run serve
 ```
 
+在谷歌浏览器中选择`拓展程序` -> `管理拓展程序` -> `加载已解压的拓展程序` 然后选择当前目录下的`dist`目录打开。
+
+
+
 #### 打包
 ```
 npm run build
 ```
+
+进入`artifacts`目录解压zip包
+```
+unzip pwl-chat-extension-v1.0.19-production.zip
+```
+
+在谷歌浏览器中选择`拓展程序` -> `管理拓展程序` -> `加载已解压的拓展程序` 然后选择当前目录下的`artifacts`目录打开。

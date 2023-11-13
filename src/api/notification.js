@@ -1,25 +1,25 @@
 import request from '@/utils/request'
 
-export function getNotifications(data) {
+export function getNotifications(params) {
   return request({
     url: '/api/getNotifications',
     method: 'get',
-    params: data
+    params
   })
 }
 
-export function countNotifications(data) {
+export function countNotifications(params) {
   return request({
     url: '/notifications/unread/count',
     method: 'get',
-    params: data
+    params
   })
 }
 
-export function makeReadNotifications(type, data) {
+export function makeReadNotifications(type, params) {
   return request({
     url: `/notifications/make-read/${type}`,
     method: 'get',
-    params: data
+    params
   })
 }

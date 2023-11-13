@@ -1,11 +1,12 @@
 <template>
-  <el-popover placement="bottom" width="auto" trigger="focus">
+  <el-popover placement="bottom" width="auto" trigger="click">
     <template #reference>
-      <div tabindex="0">
+      <div tabindex="0" style="width: 65px">
         <el-badge
           id="online-badge"
           type="success"
           :value="online.onlineChatCnt"
+          :max="999"
           class="badge"
         >
           <icon-svg class="icon" icon-class="whale" />
@@ -14,11 +15,11 @@
     </template>
     <el-row class="avatar-box">
       <el-avatar
-        class="avatar"
         v-for="(item, index) in online.users"
         :key="index"
         :size="30"
         :src="item.userAvatarURL"
+        class="avatar"
         @click="$emit('showUserCard', item.userName)"
       >
       </el-avatar>
@@ -27,22 +28,25 @@
 </template>
 
 <script>
+/**
+ * 在线人数组件
+ */
 export default {
-  name: 'online',
+  name: 'online-component',
   props: {
     online: {
       type: Object,
       default() {
         return { onlineChatCnt: 0, users: [] }
-      },
-    },
+      }
+    }
   },
   emits: ['showUserCard'],
   data() {
     return {
-      visible: false,
+      visible: false
     }
-  },
+  }
 }
 </script>
 <style scoped>

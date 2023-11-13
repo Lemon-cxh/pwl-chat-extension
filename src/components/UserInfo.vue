@@ -2,23 +2,39 @@
   <el-row class="avatar">
     <el-dropdown @command="handleCommand">
       <el-progress
-        class="progress"
         type="circle"
         :percentage="percentage"
         :width="50"
         :color="colors"
         :show-text="false"
       >
-        <el-badge :value="unreadCount" :hidden="unreadCount == 0">
+        <el-badge
+          :value="unreadNotifications + unreadChat"
+          :hidden="unreadNotifications + unreadChat === 0"
+        >
           <el-avatar size="default" :src="userInfo.userAvatarURL"></el-avatar>
         </el-badge>
       </el-progress>
       <template #dropdown>
         <el-dropdown-menu>
+          <el-dropdown-item command="openHome">
+            <house class="svg-icon" />
+            主 页
+            <el-badge> </el-badge>
+          </el-dropdown-item>
+          <el-dropdown-item command="openChat">
+            <chat-round class="svg-icon" />
+            私 聊
+            <el-badge :value="unreadChat" :hidden="unreadChat === 0">
+            </el-badge>
+          </el-dropdown-item>
           <el-dropdown-item command="openNotifications">
             <bell class="svg-icon" />
             通 知
-            <el-badge :value="unreadCount" :hidden="unreadCount == 0">
+            <el-badge
+              :value="unreadNotifications"
+              :hidden="unreadNotifications === 0"
+            >
             </el-badge>
           </el-dropdown-item>
           <el-dropdown-item command="showSetting">
@@ -44,69 +60,122 @@
     >
       <el-tabs>
         <el-tab-pane label="基础设置">
-          <el-row justify="space-around">
-            <el-row class="option-item">
+          <el-row class="option-row">
+            <el-col :span="10" :offset="2">
               <el-switch
                 v-model="options.atNotification"
                 active-color="#13ce66"
                 @change="optionsChange"
               />
-              <span class="option-text">被@通知</span>
-            </el-row>
-            <el-row class="option-item">
+              <span class="option-text">被@时通知</span>
+            </el-col>
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.showUnReadCount"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">图标显示消息数</span>
+            </el-col>
+          </el-row>
+          <el-row class="option-row">
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.hideRedPacketMessage"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">隐藏红包领取</span>
+            </el-col>
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.hideBlockquote"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">隐藏小尾巴</span>
+            </el-col>
+          </el-row>
+          <el-row class="option-row">
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.autoReadAtNotification"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">自动已读被@通知</span>
+            </el-col>
+            <el-col :span="10" :offset="2">
+              <el-switch
+                v-model="options.autoReadPointNotification"
+                active-color="#13ce66"
+                @change="optionsChange"
+              />
+              <span class="option-text">自动已读积分通知</span>
+            </el-col>
+          </el-row>
+        </el-tab-pane>
+        <el-tab-pane label="弹幕设置">
+          <el-row class="option-row">
+            <el-col :span="10" :offset="2">
               <el-switch
                 v-model="options.barrageOptions.enable"
                 active-color="#13ce66"
                 @change="optionsChange"
               />
-              <span class="option-text">弹幕消息</span>
-            </el-row>
+              <el-tooltip placement="bottom">
+                <template #content>
+                  在网页上以弹幕的形式显示聊天消息<br />开启后需要刷新页面才会显示
+                </template>
+                <span class="option-text">弹幕消息</span>
+              </el-tooltip>
+            </el-col>
           </el-row>
-        </el-tab-pane>
-        <el-tab-pane label="弹幕设置">
-          <el-row justify="space-between" class="option-row">
-            <el-row class="option-item">
-              <el-input-number
-                v-model="options.barrageOptions.fontSize"
-                @change="optionsChange"
-                size="small"
-                :min="6"
-                :max="30"
-              ></el-input-number>
-              <span class="option-text">字体大小</span>
+          <template v-if="options.barrageOptions.enable">
+            <el-row class="option-row">
+              <el-col :span="10" :offset="2">
+                <el-input-number
+                  v-model="options.barrageOptions.fontSize"
+                  @change="optionsChange"
+                  size="small"
+                  :min="6"
+                  :max="30"
+                ></el-input-number>
+                <span class="option-text">字体</span>
+              </el-col>
+              <el-col :span="10" :offset="2">
+                <el-input-number
+                  v-model="options.barrageOptions.opacity"
+                  @change="optionsChange"
+                  :precision="1"
+                  :step="0.1"
+                  :min="0.1"
+                  :max="1"
+                  size="small"
+                ></el-input-number>
+                <span class="option-text">透明度</span>
+              </el-col>
             </el-row>
-            <el-row class="option-item">
-              <el-input-number
-                v-model="options.barrageOptions.opacity"
-                @change="optionsChange"
-                :precision="1"
-                :step="0.1"
-                :min="0.1"
-                :max="1"
-                size="small"
-              ></el-input-number>
-              <span class="option-text">透明度</span>
+            <el-row class="option-row">
+              <el-col :span="10" :offset="2">
+                <el-color-picker
+                  v-model="options.barrageOptions.color"
+                  @change="optionsChange"
+                  size="small"
+                ></el-color-picker>
+                <span class="option-text">字体颜色</span>
+              </el-col>
             </el-row>
-          </el-row>
-          <el-row class="option-row">
-            <el-row class="option-item">
-              <el-color-picker
-                v-model="options.barrageOptions.color"
-                @change="optionsChange"
-                size="small"
-              ></el-color-picker>
-              <span class="option-text">字体颜色</span>
-            </el-row>
-          </el-row>
+          </template>
         </el-tab-pane>
         <el-tab-pane label="黑名单">
           <el-row>
-            <user-select :user="options.blacklist" @change="blacklistChange"/>
+            <user-select :user="options.blacklist" @change="blacklistChange" />
           </el-row>
         </el-tab-pane>
         <el-tab-pane label="特别关心">
           <el-row>
-            <user-select :user="options.care" @change="careChange"/>
+            <user-select :user="options.care" @change="careChange" />
           </el-row>
         </el-tab-pane>
       </el-tabs>
@@ -115,27 +184,40 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
-import {
-  liveness,
-  isCollectedLiveness,
-  getLivenessReward
-} from '../api/user'
+import { mapGetters } from 'vuex'
+import { liveness, isCollectedLiveness, getLivenessReward } from '../api/user'
+import { unread } from '../api/chat'
 import { countNotifications, makeReadNotifications } from '../api/notification'
 import { STORAGE, defaultOptions } from '../constant/Constant'
 import { getDate } from '../utils/util'
-import { setLocal, getLocal, getSync, setSync } from '../utils/chromeUtil'
-import { Bell, Setting, SwitchButton } from '@element-plus/icons-vue'
+import {
+  setLocal,
+  getLocal,
+  setSync,
+  getOptions,
+  formatOptions
+} from '../utils/chromeUtil'
+import {
+  House,
+  Bell,
+  ChatRound,
+  Setting,
+  SwitchButton
+} from '@element-plus/icons-vue'
 
-const REQUEST_INTERVAL = 30000
-
+const REQUEST_INTERVAL = 40000
+/**
+ * 左上角用户信息(活跃度进度条，下拉菜单)
+ */
 export default {
   name: 'userInfo',
-  emits: ['syncOptions'],
+  inject: ['$message'],
   components: {
+    House,
     Bell,
+    ChatRound,
     Setting,
-    SwitchButton,
+    SwitchButton
   },
   data() {
     return {
@@ -143,44 +225,39 @@ export default {
       intervalId: null,
       colors: [
         { color: '#f56c6c', percentage: 10 },
-        { color: '#1989fa', percentage: 100 },
+        { color: '#1989fa', percentage: 100 }
       ],
-      unreadCount: 0,
+      unreadNotifications: 0,
+      unreadChat: 0,
       drawer: false,
-      options: defaultOptions,
+      options: defaultOptions
     }
   },
-  inject: ['$message'],
   computed: {
     ...mapGetters(['userInfo', 'key']),
     apiKey() {
       return { apiKey: this.key }
-    },
+    }
   },
-  created() {
+  async created() {
+    // 获取活跃度
     getLocal([STORAGE.liveness], (res) => {
-      let storage = res[STORAGE.liveness] ? res[STORAGE.liveness] : {}
-      let date = getDate()
+      const storage = res[STORAGE.liveness] ?? {}
+      const date = getDate()
       if (storage && date === storage.date) {
-        this.init(storage)
+        this.initLiveness(storage)
         return
       }
       this.getLivenessReward(() => {
         storage.date = date
         storage.percentage = 0
-        this.init(storage)
+        this.initLiveness(storage)
       })
     })
-    getSync({ [STORAGE.options]: defaultOptions }, (result) => {
-      if (result.options.blacklist) {
-        result.options.blacklist = JSON.parse(result.options.blacklist)
-      }
-      if (result.options.care) {
-        result.options.care = JSON.parse(result.options.care)
-      }
-      this.options = result.options
-    })
+    // 获取设置
+    this.options = formatOptions(await getOptions())
     this.countNotifications()
+    this.getUnreadChat()
   },
   beforeUnmount() {
     if (this.intervalId) {
@@ -188,9 +265,8 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['clearMessage']),
-    init(storage) {
-      this.percentage = storage.percentage ? storage.percentage : 0
+    initLiveness(storage) {
+      this.percentage = storage.percentage ?? 0
       if (
         storage.percentage >= 100 ||
         (storage.time && new Date().getTime() - storage.time < REQUEST_INTERVAL)
@@ -227,20 +303,44 @@ export default {
         })
       })
     },
-    countNotifications() {
-      countNotifications(this.apiKey).then((res) => {
-        if (0 !== res.code) {
-          return
-        }
-        this.unreadCount =
-          res.unreadNotificationCnt - res.unreadAtNotificationCnt
-        if (res.unreadAtNotificationCnt > 0) {
-          makeReadNotifications('at', this.apiKey).then()
-        }
-      })
+    async countNotifications() {
+      const res = await countNotifications(this.apiKey)
+      if (res.code !== 0) {
+        return
+      }
+      let count = res.unreadNotificationCnt
+      if (this.options.autoReadAtNotification) {
+        count -= res.unreadAtNotificationCnt
+      }
+      if (this.options.autoReadPointNotification) {
+        count -= res.unreadPointNotificationCnt
+      }
+      this.unreadNotifications = count
+      if (
+        this.options.autoReadAtNotification &&
+        res.unreadAtNotificationCnt > 0
+      ) {
+        makeReadNotifications('at', this.apiKey).then()
+      }
+      if (
+        this.options.autoReadPointNotification &&
+        res.unreadPointNotificationCnt > 0
+      ) {
+        makeReadNotifications('point', this.apiKey).then()
+      }
+    },
+    async getUnreadChat() {
+      const res = await unread(this.apiKey)
+      this.unreadChat = res.data.length
     },
     handleCommand(command) {
       this[command]()
+    },
+    openHome() {
+      window.open(process.env.VUE_APP_BASE_URL)
+    },
+    openChat() {
+      window.open(process.env.VUE_APP_BASE_URL + '/chat')
     },
     openNotifications() {
       this.$router.push({ name: 'Notification' })
@@ -249,46 +349,36 @@ export default {
       this.drawer = true
     },
     logout() {
+      /* global chrome */
       chrome.extension.getBackgroundPage().closeSocket()
       setLocal({ [STORAGE.key]: '' })
-      this.clearMessage()
       this.$router.push({ name: 'Login' })
     },
     blacklistChange(val) {
-      this.options.blacklist = val;
+      this.options.blacklist = val
       this.optionsChange()
     },
     careChange(val) {
-      this.options.care = val;
+      this.options.care = val
       this.optionsChange()
     },
     optionsChange() {
-      let options = {...this.options}
-      this.$emit('syncOptions', this.options)
+      const options = { ...this.options }
       options.blacklist = JSON.stringify(options.blacklist)
-      options.care  = JSON.stringify(options.care)
+      options.care = JSON.stringify(options.care)
       setSync({ [STORAGE.options]: options })
-    },
-  },
+    }
+  }
 }
 </script>
 
 <style scoped>
-.progress {
-  left: -3px;
-  top: -5px;
-}
 .avatar {
   width: 60px;
   height: 40px;
-  margin-right: 5px;
 }
 .option-row {
   margin-bottom: 20px;
-  padding: 0 20px;
-}
-.option-item {
-  height: 30px;
   align-items: center;
 }
 .option-text {
@@ -302,8 +392,9 @@ export default {
 .el-progress--without-text .el-progress__text {
   display: block !important;
 }
-.el-progress--circle .el-progress__text, .el-progress--dashboard .el-progress__text {
-  top: 26px !important
+.el-progress--circle .el-progress__text,
+.el-progress--dashboard .el-progress__text {
+  top: 26px !important;
 }
 .el-dropdown-menu,
 .el-drawer__body {

@@ -2,28 +2,26 @@
   <div id="chatRoom">
     <!-- 活跃度，头像，输入框 -->
     <el-row class="user-box">
-      <user-info @sync-options="syncOptions" />
+      <user-info />
       <send ref="messageInput" />
     </el-row>
     <!-- 菜单按钮 -->
     <el-row class="menu-row">
       <online :online="online" @show-user-card="showUserCard" />
+      <discuss />
       <el-row class="menu">
         <red-packet class="menu-item" />
         <emoji class="menu-item" @add-content="addContent" />
-        <images
-          ref="cloudImages"
-          class="menu-item"
-          @send-message="sendMessage"
-        />
+        <images ref="cloudImages" @send-message="sendMessage" />
       </el-row>
     </el-row>
-    <!-- 消息列表 -->
+    <!-- 新消息提示 -->
     <transition name="fade">
-      <div v-show="hasNewMessage" class="new-message-tip">
+      <div v-show="hasNewMessage" class="new-message-tip" @click="backTop()">
         <info-filled class="svg-icon" />有新消息啦
       </div>
     </transition>
+    <!-- 消息列表 -->
     <el-scrollbar
       id="messageList"
       ref="messageScrollbar"
@@ -40,21 +38,29 @@
             type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
           "
         >
+          <!-- 提示类消息 -->
           <hint-message
-            v-if="item.type && type.redPacketStatus === item.type"
+            v-if="
+              type.redPacketStatus === item.type ||
+              type.discussChanged === item.type ||
+              type.customMessage === item.type ||
+              type.barrager === item.type
+            "
             :message="item"
             @show-user-card="showUserCard"
             @show-redpacket-info="showRedpacketInfo"
           />
+          <!-- 聊天消息 -->
           <div v-else-if="!item.type || type.msg === item.type">
             <message
-              v-if="!item.revoke && !item.isBlack"
+              v-if="!item.revoke && !item.hidden"
               class="list-complete-item"
               :ref="'message_' + item.oId"
               :message="item"
               :date="date"
-              :unlimitedRevoke="unlimitedRevoke"
-              :avatarPendant="avatarPendant"
+              :unlimited-revoke="unlimitedRevoke"
+              :avatar-pendant="avatarPendant"
+              :hide-blockquote="options.hideBlockquote"
               @revoke-message="revokeMessage"
               @show-user-card="showUserCard"
               @collect-images="collectImages"
@@ -69,6 +75,7 @@
       <div class="loading-box">
         <icon-svg icon-class="loading" class="loading" v-if="loading" />
       </div>
+      <!-- 回到顶部 -->
       <icon-svg
         icon-class="top"
         class="back-top"
@@ -76,15 +83,17 @@
         @click="backTop()"
       />
     </el-scrollbar>
+    <!-- 用户信息卡片 -->
     <user-card
-      :userName="userName"
-      :dialogVisible="dialogVisible"
+      :user-name="userName"
+      :dialog-visible="dialogVisible"
       @close-dialog="dialogVisible = false"
     />
+    <!-- 领取红包信息 -->
     <red-packet-info
-      :userInfo="userInfo"
+      :user-info="userInfo"
       :info="redPacketInfo"
-      :dialogVisible="redPacketVisible"
+      :dialog-visible="redPacketVisible"
       @close="redPacketVisible = false"
     ></red-packet-info>
   </div>
@@ -92,20 +101,21 @@
 
 <script>
 import { ref, defineAsyncComponent } from 'vue'
-import { EVENT, MESSAGE_TYPE, TABS_EVENT } from '../constant/Constant'
+import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
 import { getDate, isRedPacket } from '../utils/util'
-import { sendTabsMessage } from '../utils/chromeUtil'
-import { mapGetters } from 'vuex'
-import { revoke } from '../api/chat'
+import { clickEventListener } from '../utils/commonUtil'
+import { getOptions } from '../utils/chromeUtil'
+import { mapGetters, mapMutations } from 'vuex'
+import { revoke } from '../api/chatroom'
 import { InfoFilled } from '@element-plus/icons-vue'
 
 let port
 
 export default {
-  name: 'chatRoom',
+  name: 'chat-room',
   components: {
     InfoFilled,
-    UserInfo: defineAsyncComponent(() => import('../components/UserInfo.vue')),
+    UserInfo: defineAsyncComponent(() => import('../components/UserInfo.vue'))
   },
   data() {
     return {
@@ -114,7 +124,7 @@ export default {
       dialogVisible: false,
       userName: '',
       redPacketInfo: {
-        info: {},
+        info: {}
       },
       online: {},
       redPacketVisible: false,
@@ -123,6 +133,7 @@ export default {
       showTop: false,
       isTop: true,
       hasNewMessage: false,
+      options: {}
     }
   },
   inject: ['$message'],
@@ -133,7 +144,7 @@ export default {
     },
     unlimitedRevoke() {
       return ['协警', 'OP', '管理员'].some((e) => e === this.userInfo.userRole)
-    },
+    }
   },
   setup() {
     const messageArray = ref([])
@@ -141,10 +152,14 @@ export default {
       messageArray.value.unshift(msg)
     }
     const pushMessage = (msg) => {
-      let index = messageArray.value.length - 1
-      let last = messageArray.value[index]
-      let message = msg[0]
-      if (!last || last.content !== message.content) {
+      const index = messageArray.value.length - 1
+      if (index < 0) {
+        messageArray.value.push(...msg)
+        return
+      }
+      const last = messageArray.value[index]
+      const message = msg[0]
+      if (last.content !== message.content) {
         messageArray.value.push(...msg)
         return
       }
@@ -158,15 +173,16 @@ export default {
       messageArray,
       unshiftMessage,
       pushMessage,
-      updateMessage,
+      updateMessage
     }
   },
-  created() {
-    let that = this
+  async created() {
+    const that = this
     // 连接background.js
+    /* global chrome */
     port = chrome.runtime.connect({ name: 'pwl-chat' })
-    port.postMessage({ type: EVENT.syncUserInfo, data: that.userInfo })
     port.onMessage.addListener((msg) => that.messageListener(msg))
+    this.options = await getOptions()
     // 是否展示圣诞头像挂件
     this.avatarPendant.isChristmas =
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
@@ -174,19 +190,31 @@ export default {
   mounted() {
     document.getElementById('messageList').oncontextmenu = (event) => {
       this.showMessageMenu(event)
-      return false
+      event.preventDefault()
     }
-    document
-      .getElementById('messageList')
-      .addEventListener('click', (event) => {
-        let dom = event.target
-        if (dom.tagName === 'IMG' && dom.className !== 'emoji') {
-          this.showImage(dom, event)
-        }
-        if (dom.tagName === 'A') {
-          this.clickA(dom)
-        }
-      })
+    clickEventListener((dom) => {
+      if (dom.className === 'name-at') {
+        this.userName = dom.innerText
+        this.dialogVisible = true
+        return
+      }
+      if (dom.href.startsWith(`${process.env.VUE_APP_BASE_URL}/cr#chatroom`)) {
+        document
+          .getElementById('message_' + dom.hash.replace('#chatroom', ''))
+          .scrollIntoView({
+            behavior: 'smooth',
+            block: 'end',
+            inline: 'nearest'
+          })
+        return
+      }
+      const href = dom.href.replace(
+        `${process.env.VUE_APP_BASE_URL}/forward?goto=`,
+        ''
+      )
+      dom.target = '_blank'
+      dom.href = decodeURIComponent(href)
+    })
   },
   beforeUnmount() {
     if (port) {
@@ -194,16 +222,21 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['setUserInfo', 'setDiscussContent']),
     messageListener(msg) {
       switch (msg.type) {
-        case EVENT.loadMessage:
-          if (msg.data.message.length === 0) {
-            this.load()
-          } else {
-            this.pushMessage(msg.data.message)
-            this.loading = false
+        case EVENT.userInfo:
+          if (!msg.data.oId) {
+            this.$router.push({ name: 'Error' })
+            return
           }
+          this.setUserInfo(msg.data)
+          break
+        case EVENT.loadMessage:
+          this.pushMessage(msg.data.message)
+          this.loading = false
           this.online = msg.data.online
+          this.setDiscussContent(msg.data.discuss)
           break
         case EVENT.message:
           this.messageEvent(msg.data)
@@ -220,6 +253,10 @@ export default {
           break
         case EVENT.online:
           this.online = msg.data
+          this.setDiscussContent(msg.data.discussing)
+          break
+        case EVENT.discussChanged:
+          this.setDiscussContent(msg.data)
           break
         default:
           break
@@ -230,21 +267,25 @@ export default {
         this.newMessage(message)
         return
       }
-      let last = this.messageArray[0]
+      const last = this.messageArray[0]
       if (!last || !last.md || message.md !== last.md || isRedPacket(message)) {
         this.newMessage(message)
         return
       }
-      let users = last.users ? last.users : []
+      const users = last.users ? last.users : []
       users.unshift({
         userName: message.userName,
-        userAvatarURL: message.userAvatarURL,
+        userAvatarURL: message.userAvatarURL
       })
       this.updateMessage(0, 'users', users)
     },
     newMessage(message) {
       this.unshiftMessage(message)
-      if (!this.isTop && message.userName !== this.userInfo.userName) {
+      if (
+        !this.isTop &&
+        message.userName !== this.userInfo.userName &&
+        !isRedPacket(message)
+      ) {
         this.hasNewMessage = true
       }
     },
@@ -256,7 +297,7 @@ export default {
         this.isTop = false
       }
       this.showTop = scrollTop > 100
-      let distance =
+      const distance =
         this.$refs.messageScrollbar.wrap$.scrollHeight - scrollTop - 420
       if (!this.loading && distance < 10) {
         this.load()
@@ -274,57 +315,29 @@ export default {
       port.postMessage({ type: EVENT.getMore })
     },
     showMessageMenu(event) {
-      let dom = event.path.find((e) => e.id && -1 !== e.id.indexOf('message_'))
-      if (dom) {
-        let isImage =
-          event.path[0].nodeName === 'IMG' &&
-          event.path[0].className !== 'emoji'
-        this.$refs[dom.id][0].showMessageMenu(
-          isImage ? event.path[0].currentSrc : ''
-        )
+      let dom = event.target || event.srcElement
+      const imageSrc =
+        dom.nodeName === 'IMG' && dom.className !== 'emoji'
+          ? dom.currentSrc
+          : ''
+      while (!dom.id) {
+        dom = dom.parentNode
       }
-    },
-    showImage(dom, event) {
-      let message = event.path.find(
-        (e) => e.id && -1 !== e.id.indexOf('message_')
-      )
-      if (!message) {
-        return false
-      }
-      sendTabsMessage({
-        type: TABS_EVENT.showImage,
-        data: {
-          src: dom.src,
-          width: dom.naturalWidth,
-          height: dom.naturalHeight,
-        },
-      })
-    },
-    clickA(dom) {
-      if (dom.className === 'name-at') {
-        this.showUserCard(dom.innerText)
-      } else {
-        let href = dom.href.replace(
-          `${process.env.VUE_APP_BASE_URL}/forward?goto=`,
-          ''
-        )
-        dom.target = '_blank'
-        dom.href = decodeURIComponent(href)
-      }
+      this.$refs[dom.id] && this.$refs[dom.id][0].showMessageMenu(imageSrc)
     },
     showUserCard(name) {
       this.userName = name
       this.dialogVisible = true
     },
-    updateRedPacket(oId) {
+    updateRedPacket(data) {
       let msg
       this.messageArray.some((e, index) => {
-        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
+        if (e.oId === data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
           msg = JSON.parse(e.content)
           if (msg.got >= msg.count) {
             return true
           }
-          msg.got += 1
+          msg.got = data.got ? data.got : msg.count
           this.updateMessage(index, 'content', JSON.stringify(msg))
           return true
         }
@@ -333,7 +346,7 @@ export default {
     },
     revoke(oId) {
       this.messageArray.some((e, index) => {
-        if (e.oId == oId && e.type === MESSAGE_TYPE.msg) {
+        if (e.oId === oId && e.type === MESSAGE_TYPE.msg) {
           this.updateMessage(index, 'revoke', true)
           return true
         }
@@ -347,11 +360,11 @@ export default {
         message.oIds.forEach((oId) => {
           revoke(oId).then((res) => (count += res.code === 0 ? 1 : 0))
         })
-        this.$message.success(`批量撤回${count }条消息`)
+        this.$message.success(`批量撤回${count}条消息`)
         return
       }
       revoke(message.oId).then((res) => {
-        0 === res.code
+        res.code === 0
           ? this.$message.success(res.msg)
           : this.$message.info(res.msg)
       })
@@ -359,23 +372,12 @@ export default {
     showRedpacketInfo(info) {
       this.redPacketVisible = true
       this.redPacketInfo = info
-      if (info.info.got >= info.info.count) {
-        return
-      }
-      let msg
-      this.messageArray.some((e, index) => {
-        if (e.oId == info.oId && (!e.type || e.type === MESSAGE_TYPE.msg)) {
-          msg = JSON.parse(e.content)
-          msg.got = msg.count
-          this.updateMessage(index, 'content', JSON.stringify(msg))
-          return true
-        }
-        return false
-      })
-      port.postMessage({ type: EVENT.markRedPacket, data: info.oId })
+      const data = { oId: info.oId, got: info.info.count }
+      this.updateRedPacket(data)
+      port.postMessage({ type: EVENT.markRedPacket, data })
     },
-    sendMessage(content) {
-      this.$refs.messageInput.sendMessage(content)
+    sendMessage(content, includeExtra) {
+      this.$refs.messageInput.sendMessage(content, includeExtra)
     },
     quote(quoteForm) {
       this.$refs.messageInput.quote(quoteForm)
@@ -388,11 +390,8 @@ export default {
     },
     closeRedapcket() {
       this.redPacketVisible = false
-    },
-    syncOptions(options) {
-      port.postMessage({ type: EVENT.syncOptions, data: options })
-    },
-  },
+    }
+  }
 }
 </script>
 <style scoped>
@@ -401,7 +400,10 @@ export default {
 }
 .menu-row {
   height: 30px;
+  padding: 0 5px;
+  flex-wrap: nowrap;
   justify-content: space-between;
+  align-items: center;
 }
 .menu {
   font-size: 24px;

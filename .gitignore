@@ -2,6 +2,7 @@
 node_modules
 /dist
 .history
+yarn.lock
 
 
 # local env files

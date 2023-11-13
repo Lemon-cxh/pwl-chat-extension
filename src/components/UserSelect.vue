@@ -27,9 +27,11 @@
 
 <script>
 import { getUserName } from '../api/user'
-
+/**
+ * 用户名联想的用户列表
+ */
 export default {
-  name: 'userSelect',
+  name: 'user-select',
   emits: ['change'],
   props: {
     user: Array
@@ -38,13 +40,13 @@ export default {
     return {
       userList: this.user,
       loading: false,
-      list: [],
+      list: []
     }
   },
   methods: {
     remoteMethod(query) {
       getUserName({ name: query }).then((res) => {
-        if (0 === res.code) {
+        if (res.code === 0) {
           this.list = res.data
         }
       })

@@ -13,15 +13,25 @@
       <el-row class="count">{{
         (info.info.got >= info.info.count ? '总计: ' : '已抢: ') + count
       }}</el-row>
+      <el-row v-if="info.info.gesture != undefined">
+        {{ info.info.userName }} 出了:
+        {{
+          info.info.gesture === 0
+            ? '石头'
+            : info.info.gesture === 1
+            ? '剪刀'
+            : '布'
+        }}
+      </el-row>
       <el-row v-if="message">
         {{ message }}
       </el-row>
       <div class="who-box">
         <el-row
-          class="item"
-          type="flex"
           v-for="(item, index) in info.who"
           :key="index"
+          class="item"
+          type="flex"
         >
           <el-row type="flex">
             <el-avatar
@@ -53,33 +63,36 @@
 
 <script>
 import { toRefs } from 'vue'
+/**
+ * 红包详情组件
+ */
 export default {
-  name: 'redPacket',
+  name: 'red-packet',
   props: {
     info: Object,
     dialogVisible: Boolean,
-    userInfo: Object,
+    userInfo: Object
   },
   emits: ['close'],
-  data() {
-    return {
-      message: '',
-      max: 0,
-      count: 0,
-    }
-  },
   setup(props) {
     const { dialogVisible: visible } = toRefs(props)
     return { visible }
   },
+  data() {
+    return {
+      message: '',
+      max: 0,
+      count: 0
+    }
+  },
   watch: {
     info(val) {
-      let userName = this.userInfo.userName
+      const userName = this.userInfo.userName
       let max = 0
       let count = 0
-      let info = {
+      const info = {
         has: false,
-        userMoney: 0,
+        userMoney: 0
       }
       val.who.forEach((e) => {
         max = Math.max(max, e.userMoney)
@@ -102,7 +115,7 @@ export default {
         !val.recivers.some((e) => e === userName)
           ? '终究还是错付了'
           : '很遗憾，没有抢到'
-    },
+    }
   },
   methods: {
     showMessage(userMoney) {
@@ -110,8 +123,8 @@ export default {
     },
     close() {
       this.$emit('close')
-    },
-  },
+    }
+  }
 }
 </script>
 

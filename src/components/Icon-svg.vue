@@ -5,6 +5,9 @@
 </template>
 
 <script>
+/**
+ * 自定义的SVG组件
+ */
 export default {
   name: 'icon-svg',
   props: {

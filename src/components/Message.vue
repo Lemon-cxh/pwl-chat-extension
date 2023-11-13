@@ -1,14 +1,13 @@
 <template>
   <div>
     <el-row :class="[{ 'own-chat-item': isOwn }, 'chat-item']">
-      <el-row
-        :class="[{ 'own-avatar': isOwn }, 'avatar']"
-        @click="$emit('showUserCard', message.userName)"
-      >
+      <el-row :class="[{ 'own-avatar': isOwn }, 'avatar']">
         <el-avatar
-          size="default"
           :id="'avatar_' + message.oId"
+          alt="avatar"
+          size="default"
           :src="message.userAvatarURL"
+          @click="$emit('showUserCard', message.userName)"
         ></el-avatar>
         <img
           v-if="avatarPendant && avatarPendant.isChristmas"
@@ -26,8 +25,9 @@
         <!-- 红包消息 -->
         <red-packet-message
           v-if="isRedPacket"
-          :oId="message.oId"
+          :o-id="message.oId"
           :content="message.content"
+          :is-own="isOwn"
           @show-redpacket-info="showRedpacketInfo"
         />
         <!-- 内容消息 -->
@@ -35,19 +35,19 @@
           v-else
           :class="[
             isOwn ? 'own-content-background' : 'content-background',
-            'message-content',
+            'message-content'
           ]"
         >
           <el-popover
             width="auto"
             placement="bottom"
             trigger="manual"
-            v-model:visible="visible"
+            :visible="visible"
           >
             <template #reference>
               <span
                 :id="'message_' + message.oId"
-                v-html="message.content"
+                v-html="modifyContent(message.content)"
               ></span>
             </template>
             <!-- 消息菜单 -->
@@ -72,7 +72,10 @@
             </el-row>
           </el-popover>
         </div>
-        <el-row class="time">{{ getTime(message.time) }}</el-row>
+        <el-row class="footer">
+          <span>{{ getTime(message.time) }}</span>
+          <via v-if="!isOwn" :client="message.client"/>
+        </el-row>
       </el-row>
       <icon-svg
         v-if="message.users"
@@ -83,20 +86,20 @@
     </el-row>
     <!-- 多少人+1显示 -->
     <el-row
-      v-if="message.users"
+      v-if="message.users?.length > 0"
       type="flex"
-      :class="isOwn ? 'own-plus-one-box plus-one-box' : 'plus-one-box'"
+      :class="[{ 'own-plus-one-box': isOwn }, 'plus-one-box']"
     >
       <el-avatar
         v-for="(item, index) in message.users"
         :key="index"
         :src="item.userAvatarURL"
         :size="20"
+        alt="avatar"
         class="plus-one-avatar"
         @click="$emit('showUserCard', item.userName)"
       />
-      <el-row
-        :class="isOwn ? 'plus-one-text own-plus-one-text' : 'plus-one-text'"
+      <el-row :class="[{ 'own-plus-one-text': isOwn }, 'plus-one-text']"
         >{{ message.users.length }} 人+1
       </el-row>
     </el-row>
@@ -106,15 +109,24 @@
 <script>
 import { mapGetters } from 'vuex'
 import { isRedPacket } from '../utils/util'
-import { getMd } from '../api/chat'
-
+import { getMd } from '../api/chatroom'
+/**
+ * 消息组件
+ */
 export default {
-  name: 'message',
+  name: 'message-component',
   props: {
     message: Object,
     date: String,
-    unlimitedRevoke: Boolean,
+    unlimitedRevoke: {
+      type: Boolean,
+      default: false
+    },
     avatarPendant: Object,
+    hideBlockquote: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: [
     'quote',
@@ -123,7 +135,7 @@ export default {
     'showRedpacketInfo',
     'showUserCard',
     'sendMessage',
-    'revokeMessage',
+    'revokeMessage'
   ],
   data() {
     return {
@@ -134,8 +146,8 @@ export default {
         oId: '',
         userName: '',
         md: '',
-        content: '',
-      },
+        content: ''
+      }
     }
   },
   computed: {
@@ -145,11 +157,11 @@ export default {
     },
     isRedPacket() {
       return isRedPacket(this.message)
-    },
+    }
   },
   methods: {
     getTime(time) {
-      if (-1 === time.indexOf(this.date)) {
+      if (time.indexOf(this.date) === -1) {
         return time
       }
       return time.slice(11)
@@ -160,13 +172,13 @@ export default {
         return
       }
       this.visible = true
-      let message = this.message
+      const message = this.message
       this.userName = `@${message.userName} `
       this.quoteForm = {
         oId: message.oId,
         userName: message.userName,
         md: message.md,
-        content: message.content,
+        content: message.content
       }
       this.imageUrl = imageUrl
       setTimeout(() => {
@@ -174,7 +186,7 @@ export default {
       }, 2000)
     },
     quote() {
-      let form = this.quoteForm
+      const form = this.quoteForm
       if (form.md) {
         this.$emit('quote', this.quoteForm)
         this.closePopover()
@@ -185,6 +197,29 @@ export default {
         this.$emit('quote', form)
         this.closePopover()
       })
+    },
+    modifyContent(content) {
+      // 美化话题格式
+      // <em><code># Yui女装呢 #</code></em>
+      let result = content.replaceAll(
+        /(<em><code>#\s)(.{1,16})(\s#<\/code><\/em>)/g,
+        '<span class="el-tag" style="margin: 1px 0;">$2</span>'
+      )
+      // 解析开摆的图片
+      if (result.indexOf('class="kaibai"') > 0) {
+        result = result.replaceAll(
+          /(<span class="kaibai">)(.+)(<\/span>)/g,
+          '<img alt="图片表情" src="https://sexy.1433.top/$2"/>'
+        )
+      }
+      // 隐藏小尾巴信息
+      if (!this.hideBlockquote) {
+        return result
+      }
+      return result.replaceAll(
+        /((?<!引用(.|\n)+)<blockquote>)((.|\n)+)(<\/blockquote>)/g,
+        '<details><summary></summary><blockquote>$3</blockquote></details>'
+      )
     },
     talkToHe() {
       this.$emit('addContent', this.userName)
@@ -199,8 +234,8 @@ export default {
     },
     showRedpacketInfo(info) {
       this.$emit('showRedpacketInfo', info)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -232,7 +267,7 @@ export default {
   align-items: flex-end;
 }
 .name {
-  color: white;
+  color: #999999;
   margin-bottom: 2px;
 }
 .nick-name {
@@ -242,12 +277,14 @@ export default {
   margin-left: 5px;
 }
 .message-content {
+  color: black;
   padding: 5px;
   border-radius: 5px;
   font-size: 14px;
   width: fit-content;
   word-wrap: break-word;
   max-width: 265px;
+  position: relative;
 }
 .content-background {
   background-color: #a3db92;
@@ -255,7 +292,7 @@ export default {
 .content-background::after {
   content: '';
   position: absolute;
-  top: 22px;
+  top: 4px;
   left: -14px;
   width: 0;
   height: 0;
@@ -268,16 +305,19 @@ export default {
 .own-content-background::after {
   content: '';
   position: absolute;
-  top: 22px;
+  top: 4px;
   right: -14px;
   width: 0;
   height: 0;
   border: 6px solid transparent;
   border-left: 8px solid #fffbe6;
 }
-.time {
+.footer {
   padding: 0 5px;
-  color: white;
+  color: #999999;
+  display: flex;
+  align-items: center;
+  height: 16px;
 }
 .menu {
   text-align: center;
@@ -314,14 +354,33 @@ export default {
   font-size: 26px;
   color: yellow;
   align-self: center;
+  margin-left: 12px;
 }
 </style>
 <style>
 .el-popover.el-popper {
   min-width: 0px;
 }
+.message-content img[alt='图片表情'] {
+  max-height: 100px;
+}
 .message-content * {
   max-width: 265px;
   overflow: auto;
+  margin: 0px;
+}
+.message-content hr {
+  margin: 3px 0;
+}
+.message-content blockquote {
+  margin-top: 5px;
+  border-left: 3px solid #6e6e6e;
+  padding-left: 5px;
+}
+.message-content blockquote * {
+  max-width: 257px;
+}
+.message-content iframe {
+  border: none;
 }
 </style>

@@ -5,10 +5,9 @@
 </template>
 
 <script>
-
 export default {
-  name: "app",
-};
+  name: 'app'
+}
 </script>
 <style>
 #app {
@@ -17,7 +16,7 @@ export default {
 }
 body {
   background: #333333;
-  margin: 5px;
+  margin: 1px;
 }
 .el-popover {
   --el-popover-bg-color: #333333 !important;
@@ -32,7 +31,8 @@ body {
 .el-popover.el-popper {
   background: var(--el-popover-bg-color) !important;
 }
-.el-popper.is-light .el-popper__arrow::before, .el-divider__text {
+.el-popper.is-light .el-popper__arrow::before,
+.el-divider__text {
   background: #333333 !important;
 }
 .el-tabs__nav-wrap::after {
@@ -67,6 +67,9 @@ p {
   animation: rotate 1s linear infinite;
   font-size: 30px;
   color: #f79533;
+}
+h1, h2, h3 {
+  font-size: 17px;
 }
 @keyframes rotate {
   from {

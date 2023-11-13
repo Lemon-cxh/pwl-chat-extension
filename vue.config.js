@@ -5,6 +5,7 @@ const Icons = require('unplugin-icons/webpack')
 const IconsResolver = require('unplugin-icons/resolver')
 const ExtensionReloader = require('webpack-extension-reloader')
 
+process.env.VUE_APP_VERSION = require('./package.json').version
 const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
@@ -13,19 +14,24 @@ module.exports = {
     popup: {
       template: 'public/browser-extension.html',
       entry: './src/popup/main.js',
-      title: 'Popup',
+      title: 'Popup'
     },
+    devtools: {
+      template: 'public/browser-extension.html',
+      entry: './src/devtools/main.js',
+      title: 'Devtools'
+    }
   },
   pluginOptions: {
     browserExtension: {
       manifestSync: ['version'],
       components: {
         background: true,
-        contentScripts: true,
+        contentScripts: true
       },
       componentOptions: {
         background: {
-          entry: 'src/background.js',
+          entry: 'src/background.js'
         },
         contentScripts: {
           entries: {
@@ -42,29 +48,28 @@ module.exports = {
       }
     },
   },
-  productionSourceMap: isProduction ? false : true,
+  productionSourceMap: !isProduction,
   css: {
     // 打包提示警告信息:warning Conflicting order
     // see https://github.com/vuejs/vue-cli/issues/3771#issuecomment-593360794
-    extract: isProduction ? { ignoreOrder: true } : false,
+    extract: isProduction ? { ignoreOrder: true } : false
   },
   configureWebpack: (config) => {
     // 自动导入Element Plus 以及 Element Icon
     config.plugins.push(
       AutoImport({
-        resolvers: [ElementPlusResolver()],
+        resolvers: [ElementPlusResolver()]
       }),
       Components({
-        resolvers: [ElementPlusResolver(), IconsResolver()],
+        resolvers: [ElementPlusResolver(), IconsResolver()]
       }),
       Icons()
     )
-    config.devtool = 'source-map'
-    if (isProduction) {
+    if (!isProduction) {
       // webpack-extension-reloader 热加载
       config.plugins.push(
         new ExtensionReloader({
-          port: 9091,
+          port: 9091
         })
       )
     }
@@ -78,7 +83,7 @@ module.exports = {
       .loader('svg-sprite-loader')
       .options({
         symbolId: 'icon-[name]',
-        include: ['./src/svg'],
+        include: ['./src/svg']
       })
-  },
+  }
 }
