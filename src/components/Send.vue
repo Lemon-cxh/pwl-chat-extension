@@ -159,14 +159,6 @@ export default {
         this.buildContent('<br/>')
         return
       }
-      // 弹幕消息
-      if (this.enableBarrage) {
-        const barrageContent = JSON.stringify({
-          color: this.barrageColor,
-          content: this.content
-        })
-        this.content = `[barrager]${barrageContent}[/barrager]`
-      }
       this.send()
     },
     barrageClickHandler() {
@@ -204,7 +196,7 @@ export default {
       this.$refs.contentInput.focus()
     },
     send() {
-      const form = this.form
+      const form = { ...this.form }
       form.content = this.buildExtraInfo(form.content)
       send(form).then((res) => {
         if (res.code === 0) {
@@ -216,6 +208,16 @@ export default {
       })
     },
     buildExtraInfo(content) {
+      // 弹幕消息
+      if (this.enableBarrage) {
+        const barrageContent = JSON.stringify({
+          color: this.barrageColor,
+          content
+        })
+        // 不携带引用、话题
+        return `[barrager]${barrageContent}[/barrager]`
+      }
+      // 引用
       if (this.quoteVisible) {
         const quoteForm = this.quoteForm
         // 引用 @** [↩](https://fishpi.cn/cr#chatroom*** "跳转至原消息")
@@ -227,6 +229,7 @@ export default {
           quoteForm.md ? '> ' + quoteForm.md : quoteForm.content
         }\n`
       }
+      // 话题
       if (this.discuss.enable) {
         content += '\n*`# ' + this.discuss.content + ' #`*'
       }
@@ -296,5 +299,4 @@ export default {
 .quote-content a {
   color: white;
 }
-
 </style>
