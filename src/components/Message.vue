@@ -201,17 +201,10 @@ export default {
     modifyContent(content) {
       // 美化话题格式
       // <em><code># Yui女装呢 #</code></em>
-      let result = content.replaceAll(
+      const result = content.replaceAll(
         /(<em><code>#\s)(.{1,16})(\s#<\/code><\/em>)/g,
         '<span class="el-tag" style="margin: 1px 0;">$2</span>'
       )
-      // 解析开摆的图片
-      if (result.indexOf('class="kaibai"') > 0) {
-        result = result.replaceAll(
-          /(<span class="kaibai">)(.+)(<\/span>)/g,
-          '<img alt="图片表情" src="https://sexy.1433.top/$2"/>'
-        )
-      }
       // 隐藏小尾巴信息
       if (!this.hideBlockquote) {
         return result

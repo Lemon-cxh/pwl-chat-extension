@@ -157,12 +157,6 @@ export default {
       })
     },
     modifyContent(content) {
-      if (content.indexOf('class="kaibai"') > 0) {
-        content = content.replaceAll(
-          /(<span class="kaibai">)(.+)(<\/span>)/g,
-          '<img alt="图片表情" src="https://sexy.1433.top/$2"/>'
-        )
-      }
       // 隐藏小尾巴信息
       if (!this.options.hideBlockquote) {
         return content
