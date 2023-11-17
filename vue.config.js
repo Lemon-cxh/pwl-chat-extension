@@ -35,18 +35,20 @@ module.exports = {
         },
         contentScripts: {
           entries: {
-            'content-script': ['src/content-scripts/content-script.js'],
-          },
-        },
+            'content-script': ['src/content-scripts/content-script.js']
+          }
+        }
       },
       artifactFilename: ({ name, version, mode }) => {
-        return `${name}-v${version}-${mode}.zip`;
+        return `${name}-v${version}-${mode}.zip`
       },
       manifestTransformer: (manifest) => {
-        manifest.content_security_policy = {"extension_pages": "script-src 'self'; object-src 'self';"}
-        return manifest;
+        manifest.content_security_policy = {
+          extension_pages: "script-src 'self'; object-src 'self';"
+        }
+        return manifest
       }
-    },
+    }
   },
   productionSourceMap: !isProduction,
   css: {
