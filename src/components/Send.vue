@@ -297,7 +297,4 @@ export default {
   color: white;
 }
 
-.send .el-color-picker__trigger {
-  /* display: none; */
-}
 </style>

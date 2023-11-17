@@ -231,7 +231,7 @@ export default {
     },
     scroll({ scrollTop }) {
       this.showTop = scrollTop > 100
-      const height = this.$refs.notificationScrollbar.wrap$.scrollHeight - 480
+      const height = this.$refs.notificationScrollbar.wrapRef.scrollHeight - 480
       if (!this.loading && scrollTop === height) {
         this.load()
       }
