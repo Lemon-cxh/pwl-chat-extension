@@ -161,7 +161,7 @@ function messageHandler(event) {
       store.commit('setDiscuss', data.newDiscuss)
       break
     default:
-      messageEvent(data, true)
+      messageEvent(data, data.type === MESSAGE_TYPE.msg)
       clearMessage()
   }
 }

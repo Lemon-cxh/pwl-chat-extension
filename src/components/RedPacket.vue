@@ -110,8 +110,8 @@ import { send } from '../api/chatroom'
 import { getUserName } from '../api/user'
 import { mapGetters } from 'vuex'
 import {
-  redPacketTypeMap,
-  redPacketTypeArray,
+  RED_PACKET_TYPE,
+  RED_PACKET_MAP,
   defaultType
 } from '../constant/RedPacketConstant'
 import { inputRule, selectRule, numberRule } from '../constant/RuleConstant'
@@ -125,15 +125,15 @@ export default {
     return {
       redPacketForm: {
         money: 32,
-        count: redPacketTypeMap.get(defaultType).count,
-        msg: redPacketTypeMap.get(defaultType).msg,
+        count: RED_PACKET_MAP.get(defaultType).count,
+        msg: RED_PACKET_MAP.get(defaultType).msg,
         type: defaultType,
         recivers: undefined,
         gesture: undefined
       },
       redPacketDialogVisible: false,
-      redPacketTypeMap,
-      redPacketTypeArray,
+      redPacketTypeMap: RED_PACKET_MAP,
+      redPacketTypeArray: RED_PACKET_TYPE,
       userList: [],
       userListLoading: false,
       rules: {
@@ -199,7 +199,7 @@ export default {
       })
     },
     redPacketTypeChange(value) {
-      const map = redPacketTypeMap.get(value)
+      const map = RED_PACKET_MAP.get(value)
       this.redPacketForm.count = map.count
       this.redPacketForm.msg = map.msg
       this.redPacketForm.recivers = undefined

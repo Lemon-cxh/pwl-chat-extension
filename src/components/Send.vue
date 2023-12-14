@@ -146,7 +146,7 @@ export default {
     },
     selectAt(userName) {
       const index = this.content.lastIndexOf('@')
-      this.content = this.content.substr(0, index + 1) + userName + ' '
+      this.content = this.content.substring(0, index + 1) + userName + ' '
       this.visible = false
       this.$refs.contentInput.focus()
     },
@@ -239,7 +239,7 @@ export default {
       return `<a href="${process.env.VUE_APP_BASE_URL}/member/${userName}" class="name-at" aria-label="${userName}" rel="nofollow">${userName}</a>`
     },
     buildContent(str) {
-      const index = this.$refs.contentInput.$el.children[0].selectionStart
+      const index = this.$refs.contentInput.input.selectionStart
       this.content =
         this.content.substring(0, index) + str + this.content.substring(index)
     }
