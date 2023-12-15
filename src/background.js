@@ -107,7 +107,7 @@ function initWebSocket() {
     }
     intervalId = setInterval(() => {
       window.webSocket.send('-hb-')
-    }, 1000 * 60)
+    }, 1000 * 60 * 3)
     window.webSocket.onmessage = (event) => messageHandler(event)
     window.webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
@@ -118,6 +118,7 @@ function initWebSocket() {
         reconnect()
       }
     }
+    store.commit('cleanMessage')
     getMoreEvent()
   })
 }
@@ -237,6 +238,9 @@ chrome.runtime.onMessage.addListener((request) => {
  */
 function messageEvent(message, isMsg) {
   if (isMsg) {
+    if (reconnectEvent(message)) {
+      return
+    }
     markCareAndBlack(message)
   }
   store.commit('addMessage', { message, isMsg })
@@ -276,6 +280,25 @@ function onlineEvent(data) {
       notifications('特别关心', `[${e}]下线了`)
     })
   careOnline = currentOnline
+}
+
+/**
+ * 重连消息事件处理
+ */
+function reconnectEvent(message) {
+  if (message.userName !== '摸鱼派官方巡逻机器人') {
+    return false
+  }
+  let matchMsg = message.md.match(/您超过6小时未活跃/)
+  if (matchMsg) {
+    initWebSocket()
+    return true
+  }
+  matchMsg = message.md.match(/你的连接被管理员断开/)
+  if (matchMsg) {
+    initWebSocket()
+    return true
+  }
 }
 
 /**
