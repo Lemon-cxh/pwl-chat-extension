@@ -43,7 +43,7 @@ createApp(App)
   // 自定义 v-focus 指令
   .directive('focus', {
     mounted(el) {
-      el.children[0].focus()
+      el.children[0].children[0].focus()
     }
   })
   .mount('#app')
