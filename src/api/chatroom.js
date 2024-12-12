@@ -84,3 +84,11 @@ export function syncCloudImage(data) {
     data
   })
 }
+
+export function getChannel(params) {
+  return request({
+    url: '/chat-room/node/get',
+    method: 'get',
+    params
+  })
+}

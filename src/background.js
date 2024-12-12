@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import { createApp } from 'vue'
 import store from './store/index'
-import { more, getMessages, send, openRedPacket } from './api/chatroom'
+import { more, getMessages, send, openRedPacket, getChannel } from './api/chatroom'
 import {
   notifications,
   getLocal,
@@ -18,7 +18,7 @@ import {
   defaultOptions
 } from './constant/Constant'
 
-const URL = 'wss://fishpi.cn/chat-room-channel'
+let URL = 'wss://fishpi.cn/chat-room-channel'
 let socketLock = false
 // 是否为主动关闭
 let isIntentionalClose = false
@@ -99,8 +99,10 @@ function initWebSocket() {
   if (!isClosed()) {
     window.webSocket && window.webSocket.close()
   }
-  getLocal([STORAGE.key], (result) => {
+  getLocal([STORAGE.key], async (result) => {
     isIntentionalClose = false
+    const nodeData = await getChannel({ apiKey: store.getters.key })
+    if (nodeData.code === 0) URL = nodeData.data
     window.webSocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
     if (intervalId !== undefined) {
       clearInterval(intervalId)
