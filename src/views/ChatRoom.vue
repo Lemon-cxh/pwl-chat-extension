@@ -227,7 +227,6 @@ export default {
       switch (msg.type) {
         case EVENT.userInfo:
           if (!msg.data.oId) {
-            this.$router.push({ name: 'Error' })
             return
           }
           this.setUserInfo(msg.data)

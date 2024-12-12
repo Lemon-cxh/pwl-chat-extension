@@ -93,7 +93,8 @@ export default createStore({
     },
     logout(state) {
       state.message = []
-      state.userInfo = {}
+      state.user.userInfo = {}
+      state.user.key = ''
     },
     setOnline(state, online) {
       state.online = {
