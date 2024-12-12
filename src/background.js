@@ -103,7 +103,7 @@ function initWebSocket() {
     isIntentionalClose = false
     const nodeData = await getChannel({ apiKey: store.getters.key })
     if (nodeData.code === 0) URL = nodeData.data
-    window.webSocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
+    window.webSocket = new WebSocket(URL)
     if (intervalId !== undefined) {
       clearInterval(intervalId)
     }
@@ -116,7 +116,7 @@ function initWebSocket() {
     }
     window.webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
-      if (!isIntentionalClose) {
+      if (!isIntentionalClose && e.code !== 1000 && e.code !== 1001) {
         reconnect()
       }
     }
