@@ -29,7 +29,7 @@
 import { openRedPacket } from '../api/chatroom'
 import { mapGetters } from 'vuex'
 import {
-  redPacketTypeMap,
+  RED_PACKET_MAP,
   rockPaperScissors
 } from '../constant/RedPacketConstant'
 /**
@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       dialogVisible: false,
-      redPacketTypeMap
+      redPacketTypeMap: RED_PACKET_MAP
     }
   },
   computed: {

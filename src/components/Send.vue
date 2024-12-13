@@ -146,7 +146,7 @@ export default {
     },
     selectAt(userName) {
       const index = this.content.lastIndexOf('@')
-      this.content = this.content.substr(0, index + 1) + userName + ' '
+      this.content = this.content.substring(0, index + 1) + userName + ' '
       this.visible = false
       this.$refs.contentInput.focus()
     },
@@ -158,14 +158,6 @@ export default {
       if (event.ctrlKey) {
         this.buildContent('<br/>')
         return
-      }
-      // 弹幕消息
-      if (this.enableBarrage) {
-        const barrageContent = JSON.stringify({
-          color: this.barrageColor,
-          content: this.content
-        })
-        this.content = `[barrager]${barrageContent}[/barrager]`
       }
       this.send()
     },
@@ -204,7 +196,7 @@ export default {
       this.$refs.contentInput.focus()
     },
     send() {
-      const form = this.form
+      const form = { ...this.form }
       form.content = this.buildExtraInfo(form.content)
       send(form).then((res) => {
         if (res.code === 0) {
@@ -216,6 +208,16 @@ export default {
       })
     },
     buildExtraInfo(content) {
+      // 弹幕消息
+      if (this.enableBarrage) {
+        const barrageContent = JSON.stringify({
+          color: this.barrageColor,
+          content
+        })
+        // 不携带引用、话题
+        return `[barrager]${barrageContent}[/barrager]`
+      }
+      // 引用
       if (this.quoteVisible) {
         const quoteForm = this.quoteForm
         // 引用 @** [↩](https://fishpi.cn/cr#chatroom*** "跳转至原消息")
@@ -227,6 +229,7 @@ export default {
           quoteForm.md ? '> ' + quoteForm.md : quoteForm.content
         }\n`
       }
+      // 话题
       if (this.discuss.enable) {
         content += '\n*`# ' + this.discuss.content + ' #`*'
       }
@@ -236,7 +239,7 @@ export default {
       return `<a href="${process.env.VUE_APP_BASE_URL}/member/${userName}" class="name-at" aria-label="${userName}" rel="nofollow">${userName}</a>`
     },
     buildContent(str) {
-      const index = this.$refs.contentInput.$el.children[0].selectionStart
+      const index = this.$refs.contentInput.input.selectionStart
       this.content =
         this.content.substring(0, index) + str + this.content.substring(index)
     }
@@ -295,9 +298,5 @@ export default {
 
 .quote-content a {
   color: white;
-}
-
-.send .el-color-picker__trigger {
-  /* display: none; */
 }
 </style>

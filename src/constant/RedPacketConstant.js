@@ -2,7 +2,7 @@ export const defaultType = 'random'
 
 export const rockPaperScissors = 'rockPaperScissors'
 
-export const redPacketTypeArray = [
+export const RED_PACKET_TYPE = [
   { label: '手气红包', value: 'random' },
   { label: '心跳红包', value: 'heartbeat' },
   { label: '专属红包', value: 'specify' },
@@ -10,7 +10,7 @@ export const redPacketTypeArray = [
   { label: '石头剪刀布', value: 'rockPaperScissors' }
 ]
 
-export const redPacketTypeMap = new Map([
+export const RED_PACKET_MAP = new Map([
   ['random', { label: '手气红包', count: 2, msg: '摸鱼者，事竟成!' }],
   ['heartbeat', { label: '心跳红包', count: 2, msg: '玩的就是心跳!' }],
   [

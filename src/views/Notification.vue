@@ -32,7 +32,7 @@
         <finished class="svg-icon" />
       </span>
     </el-row>
-    <el-tabs v-model="tabsName" @tab-click="handleClick">
+    <el-tabs v-model="tabsName" @tab-change="handleChange">
       <el-tab-pane v-for="item in typeArray" :key="item.name" :name="item.name">
         <template #label>
           <span>{{ item.title }}</span>
@@ -132,7 +132,7 @@ import {
   makeReadNotifications
 } from '../api/notification'
 import { getDateTime } from '../utils/util'
-import { type, typeArray } from '../constant/NotificationConstant'
+import { NOTIFICATION_TYPE, NOTIFICATION_MAPPING } from '../constant/NotificationConstant'
 import { Finished } from '@element-plus/icons-vue'
 
 export default {
@@ -144,8 +144,8 @@ export default {
       page: 0,
       loadDisabled: true,
       list: [],
-      type,
-      typeArray,
+      typeMapping: NOTIFICATION_MAPPING,
+      typeArray: NOTIFICATION_TYPE,
       count: {
         unreadNotificationCnt: 0,
         code: 0,
@@ -175,7 +175,7 @@ export default {
       return { apiKey: this.key, type: this.tabsName, p: this.page }
     },
     attributes() {
-      return this.type.get(this.tabsName)
+      return this.typeMapping.get(this.tabsName)
     },
     isAt() {
       return this.tabsName === 'at'
@@ -222,7 +222,7 @@ export default {
     backTop() {
       this.$refs.notificationScrollbar.setScrollTop(0)
     },
-    handleClick() {
+    handleChange() {
       this.nodata = false
       this.page = 0
       this.list = []
@@ -231,7 +231,7 @@ export default {
     },
     scroll({ scrollTop }) {
       this.showTop = scrollTop > 100
-      const height = this.$refs.notificationScrollbar.wrap$.scrollHeight - 480
+      const height = this.$refs.notificationScrollbar.wrapRef.scrollHeight - 480
       if (!this.loading && scrollTop === height) {
         this.load()
       }
@@ -265,7 +265,7 @@ export default {
       makeReadNotifications(this.tabsName, this.apiKey).then((res) => {
         if (res.code === 0) {
           this.getCountNotifications()
-          this.handleClick()
+          this.handleChange()
         }
       })
     },

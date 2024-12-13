@@ -227,7 +227,6 @@ export default {
       switch (msg.type) {
         case EVENT.userInfo:
           if (!msg.data.oId) {
-            this.$router.push({ name: 'Error' })
             return
           }
           this.setUserInfo(msg.data)
@@ -290,6 +289,7 @@ export default {
       }
     },
     scroll({ scrollTop }) {
+      // 是否显示回到顶部的图标
       if (scrollTop < 50) {
         this.isTop = true
         this.hasNewMessage = false
@@ -297,8 +297,9 @@ export default {
         this.isTop = false
       }
       this.showTop = scrollTop > 100
+      // 判断是否需要加载更多消息
       const distance =
-        this.$refs.messageScrollbar.wrap$.scrollHeight - scrollTop - 420
+        this.$refs.messageScrollbar.wrapRef.scrollHeight - scrollTop - 420
       if (!this.loading && distance < 10) {
         this.load()
       }

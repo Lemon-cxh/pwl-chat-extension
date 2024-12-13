@@ -22,110 +22,126 @@ export default {
       version: '',
       vias: new Map([
         [
-          'Windows', {
+          'Windows',
+          {
             icon: 'windows',
             content: '来自桌面客户端',
             url: 'https://github.com/imlinhanchao/fishpi-desktop/releases'
           }
         ],
         [
-          'macOS', {
+          'macOS',
+          {
             icon: 'mac',
             content: '来自桌面客户端',
             url: 'https://github.com/imlinhanchao/fishpi-desktop/releases'
           }
         ],
         [
-          'Linux', {
+          'Linux',
+          {
             icon: 'linux',
             content: '来自桌面客户端',
             url: 'https://github.com/imlinhanchao/fishpi-desktop/releases'
           }
         ],
         [
-          'Chrome', {
+          'Chrome',
+          {
             icon: 'chrome',
             content: '来自 Chrome 扩展',
             url: 'https://chrome.google.com/webstore/detail/fkaomdjjdbglkbcmfhhlioejkpacbbpe'
           }
         ],
         [
-          'Edge', {
+          'Edge',
+          {
             icon: 'edge',
             content: '来自 Edge 扩展',
             url: 'https://microsoftedge.microsoft.com/addons/detail/oldbilakhdpiamjbkocdcdnlnakainfm'
           }
         ],
         [
-          'VSCode', {
+          'VSCode',
+          {
             icon: 'vscode',
             content: '来自 VsCode 扩展',
             url: 'https://marketplace.visualstudio.com/items?itemName=hancel.pwl-chat'
           }
         ],
         [
-          'IDEA', {
+          'IDEA',
+          {
             icon: 'jetbrains',
             content: '来自 IDEA 扩展',
             url: 'https://plugins.jetbrains.com/plugin/18091-pwl-chat'
           }
         ],
         [
-          'Python', {
+          'Python',
+          {
             icon: 'python',
             content: '来自 Python 客户端',
             url: `${process.env.VUE_APP_BASE_URL}/article/1641135630423`
           }
         ],
         [
-          'Golang', {
+          'Golang',
+          {
             icon: 'golang',
             content: '来自 Golang 客户端',
             url: `${process.env.VUE_APP_BASE_URL}/article/1641661864119`
           }
         ],
         [
-          'Web', {
+          'Web',
+          {
             icon: 'web',
             content: '来自 Web',
             url: `${process.env.VUE_APP_BASE_URL}/cr`
           }
         ],
         [
-          'iOS', {
+          'iOS',
+          {
             icon: 'ios',
             content: '来自 iPhone 客户端',
             url: 'https://apps.apple.com/cn/app/%E6%91%B8%E9%B1%BC%E6%B4%BE/id1617385824'
           }
         ],
         [
-          'Android', {
+          'Android',
+          {
             icon: 'android',
             content: '来自 Android 客户端',
             url: `${process.env.VUE_APP_BASE_URL}/article/1641291342622`
           }
         ],
         [
-          'Mobile', {
+          'Mobile',
+          {
             icon: 'mobile',
             content: '来自移动端'
           }
         ],
         [
-          'Extension', {
+          'Extension',
+          {
             icon: 'extension',
             content: '来自扩展程序'
           }
         ],
         [
-          'PC', {
+          'PC',
+          {
             icon: 'pc',
             content: '来自桌面客户端'
           }
         ],
         [
-          'Other', {
-            icon: 'other',
+          'Other',
+          {
+            icon: 'others',
             content: '来自其他客户端'
           }
         ]
@@ -140,7 +156,7 @@ export default {
     if (client.length > 1) {
       this.version = client[1]
     }
-    this.via = this.vias.get(client[0])
+    this.via = this.vias.get(client[0]) ?? { icon: 'others', content: client[0] }
   },
   methods: {
     handleClick() {

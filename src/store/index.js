@@ -88,9 +88,13 @@ export default createStore({
       state.message[index] = message
       state.message = state.message.concat(data.slice(1))
     },
+    cleanMessage(state) {
+      state.message = []
+    },
     logout(state) {
       state.message = []
-      state.userInfo = {}
+      state.user.userInfo = {}
+      state.user.key = ''
     },
     setOnline(state, online) {
       state.online = {

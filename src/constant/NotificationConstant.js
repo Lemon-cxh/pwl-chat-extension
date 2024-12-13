@@ -1,7 +1,7 @@
 /**
  * 未读通知的类型及接口字段key
  */
-export const typeArray = [
+export const NOTIFICATION_TYPE = [
   {
     name: 'commented',
     title: '收到的回帖',
@@ -41,7 +41,7 @@ export const typeArray = [
 /**
  * 通知列表接口字段的映射
  */
-export const type = new Map([
+export const NOTIFICATION_MAPPING = new Map([
   [
     'commented',
     {

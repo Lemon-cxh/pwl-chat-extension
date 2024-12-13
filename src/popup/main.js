@@ -1,12 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import store from '../store/popup'
+import store from '../store/index'
 import router from '../router'
 import IconSvg from '../components/Icon-svg'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
-import { getLocal } from '../utils/chromeUtil'
-import { STORAGE } from '../constant/Constant'
 
 // 设置ElMessage显示时间
 ;['success', 'warning', 'info', 'error'].forEach((type) => {
@@ -24,15 +22,14 @@ const requireAll = (requireContext) => requireContext.keys().map(requireContext)
 const req = require.context('../svg', true, /\.svg$/)
 requireAll(req)
 
-getLocal([STORAGE.key, STORAGE.account], async (result) => {
-  const key = result[STORAGE.key]
-  if (!key) {
+store
+  .dispatch('getUser')
+  .then(() => {
+    router.push({ name: 'ChatRoom' })
+  })
+  .catch(() => {
     router.push({ name: 'Login' })
-    return
-  }
-  store.commit('setKey', key)
-  router.push({ name: 'ChatRoom' })
-})
+  })
 
 // 自定义的SVG组件Icon-svg、ElMessage注册为全局组件，
 createApp(App)
@@ -43,7 +40,7 @@ createApp(App)
   // 自定义 v-focus 指令
   .directive('focus', {
     mounted(el) {
-      el.children[0].focus()
+      el.children[0].children[0].focus()
     }
   })
   .mount('#app')

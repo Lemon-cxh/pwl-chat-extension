@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import { createApp } from 'vue'
 import store from './store/index'
-import { more, getMessages, send, openRedPacket } from './api/chatroom'
+import { more, getMessages, send, openRedPacket, getChannel } from './api/chatroom'
 import {
   notifications,
   getLocal,
@@ -18,7 +18,7 @@ import {
   defaultOptions
 } from './constant/Constant'
 
-const URL = 'wss://fishpi.cn/chat-room-channel'
+let URL = 'wss://fishpi.cn/chat-room-channel'
 let socketLock = false
 // 是否为主动关闭
 let isIntentionalClose = false
@@ -99,25 +99,28 @@ function initWebSocket() {
   if (!isClosed()) {
     window.webSocket && window.webSocket.close()
   }
-  getLocal([STORAGE.key], (result) => {
+  getLocal([STORAGE.key], async (result) => {
     isIntentionalClose = false
-    window.webSocket = new WebSocket(URL + '?apiKey=' + result[STORAGE.key])
+    const nodeData = await getChannel({ apiKey: store.getters.key })
+    if (nodeData.code === 0) URL = nodeData.data
+    window.webSocket = new WebSocket(URL)
     if (intervalId !== undefined) {
       clearInterval(intervalId)
     }
     intervalId = setInterval(() => {
       window.webSocket.send('-hb-')
-    }, 1000 * 60)
+    }, 1000 * 60 * 3)
     window.webSocket.onmessage = (event) => messageHandler(event)
     window.webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
     }
     window.webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
-      if (!isIntentionalClose) {
+      if (!isIntentionalClose && e.code !== 1000 && e.code !== 1001) {
         reconnect()
       }
     }
+    store.commit('cleanMessage')
     getMoreEvent()
   })
 }
@@ -161,7 +164,7 @@ function messageHandler(event) {
       store.commit('setDiscuss', data.newDiscuss)
       break
     default:
-      messageEvent(data, true)
+      messageEvent(data, data.type === MESSAGE_TYPE.msg)
       clearMessage()
   }
 }
@@ -237,6 +240,9 @@ chrome.runtime.onMessage.addListener((request) => {
  */
 function messageEvent(message, isMsg) {
   if (isMsg) {
+    if (reconnectEvent(message)) {
+      return
+    }
     markCareAndBlack(message)
   }
   store.commit('addMessage', { message, isMsg })
@@ -276,6 +282,25 @@ function onlineEvent(data) {
       notifications('特别关心', `[${e}]下线了`)
     })
   careOnline = currentOnline
+}
+
+/**
+ * 重连消息事件处理
+ */
+function reconnectEvent(message) {
+  if (message.userName !== '摸鱼派官方巡逻机器人') {
+    return false
+  }
+  let matchMsg = message.md.match(/您超过6小时未活跃/)
+  if (matchMsg) {
+    initWebSocket()
+    return true
+  }
+  matchMsg = message.md.match(/你的连接被管理员断开/)
+  if (matchMsg) {
+    initWebSocket()
+    return true
+  }
 }
 
 /**
