@@ -44,6 +44,8 @@ module.exports = defineConfig({
     extract: isProduction ? { ignoreOrder: true } : false
   },
   configureWebpack: (config) => {
+    // 使用不依赖 eval 的 source map
+    config.devtool = 'cheap-source-map'
     config.entry = {
       ...config.entry,
       background: path.resolve('src/background/index.js'),
