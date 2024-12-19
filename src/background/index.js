@@ -1,14 +1,18 @@
-/* eslint-disable indent */
-import { createApp } from 'vue'
-import store from './store/index'
-import { more, getMessages, send, openRedPacket, getChannel } from './api/chatroom'
+import store from '../store/index'
+import {
+  more,
+  getMessages,
+  send,
+  openRedPacket,
+  getChannel
+} from '../api/chatroom'
 import {
   notifications,
   getLocal,
   sendTabsMessage,
   getOptions,
   formatOptions
-} from './utils/chromeUtil'
+} from '../utils/chromeUtil'
 import {
   MESSAGE_TYPE,
   STORAGE,
@@ -16,7 +20,7 @@ import {
   MESSAGE_LIMIT,
   TABS_EVENT,
   defaultOptions
-} from './constant/Constant'
+} from '../constant/Constant'
 
 let URL = 'wss://fishpi.cn/chat-room-channel'
 let socketLock = false
@@ -32,6 +36,7 @@ let deleteMessage = false
 let count = 0
 let options = defaultOptions
 let careOnline = []
+let webSocket
 
 /**
  * 获取设置
@@ -62,7 +67,7 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 })
 
-window.openSocket = () => {
+function openSocket() {
   store
     .dispatch('getUser')
     .then(() => {
@@ -72,49 +77,48 @@ window.openSocket = () => {
       }
     })
     .catch(() => {
-      if (!isClosed()) {
-        window.webSocket && window.webSocket.close()
-      }
+      !isClosed() && closeSocket()
     })
 }
 
 /**
  * 手动关闭连接
  */
-window.closeSocket = () => {
+function closeSocket() {
   isIntentionalClose = true
-  window.webSocket && window.webSocket.close()
+  webSocket && webSocket.close()
   if (intervalId !== undefined) {
     clearInterval(intervalId)
   }
-  store.commit('logout')
 }
 
-window.openSocket()
+openSocket()
 
 /**
  * 创建WS连接
  */
 function initWebSocket() {
   if (!isClosed()) {
-    window.webSocket && window.webSocket.close()
+    closeSocket()
   }
   getLocal([STORAGE.key], async (result) => {
     isIntentionalClose = false
     const nodeData = await getChannel({ apiKey: store.getters.key })
-    if (nodeData.code === 0) URL = nodeData.data
-    window.webSocket = new WebSocket(URL)
+    if (nodeData.code === 0) {
+      URL = nodeData.data
+    }
+    webSocket = new WebSocket(URL)
     if (intervalId !== undefined) {
       clearInterval(intervalId)
     }
     intervalId = setInterval(() => {
-      window.webSocket.send('-hb-')
+      webSocket.send('-hb-')
     }, 1000 * 60 * 3)
-    window.webSocket.onmessage = (event) => messageHandler(event)
-    window.webSocket.onerror = (e) => {
+    webSocket.onmessage = (event) => messageHandler(event)
+    webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
     }
-    window.webSocket.onclose = (e) => {
+    webSocket.onclose = (e) => {
       console.log('WebSocket close observed:', e)
       if (!isIntentionalClose && e.code !== 1000 && e.code !== 1001) {
         reconnect()
@@ -209,7 +213,7 @@ chrome.runtime.onConnect.addListener((p) => {
 })
 
 /**
- * 监听content-script的短链接
+ * 监听content-scripts的短链接
  */
 chrome.runtime.onMessage.addListener((request) => {
   if (TABS_EVENT.sendMessage === request.type) {
@@ -335,11 +339,11 @@ async function getMoreEvent() {
   const lastId = store.getters.lastMessageId
   const res = lastId
     ? await getMessages({
-        apiKey: store.getters.key,
-        oId: lastId,
-        mode: 1,
-        size: MESSAGE_LIMIT
-      })
+      apiKey: store.getters.key,
+      oId: lastId,
+      mode: 1,
+      size: MESSAGE_LIMIT
+    })
     : await more({ apiKey: store.getters.key, page: 1 })
   if (res.code !== 0) {
     return
@@ -410,9 +414,9 @@ function clearMessage() {
 
 function isClosed() {
   return (
-    !window.webSocket ||
-    window.webSocket.readyState === WebSocket.CLOSING ||
-    window.webSocket.readyState === WebSocket.CLOSED
+    !webSocket ||
+    webSocket.readyState === WebSocket.CLOSING ||
+    webSocket.readyState === WebSocket.CLOSED
   )
 }
 
@@ -427,5 +431,3 @@ async function reconnect() {
   }
   socketLock = false
 }
-
-createApp().use(store)

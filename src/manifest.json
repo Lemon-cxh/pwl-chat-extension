@@ -4,14 +4,15 @@
   "homepage_url": "https://github.com/Lemon-cxh/pwl-chat-extension",
   "description": "摸鱼派聊天室插件",
   "default_locale": "zh_CN",
-  "permissions": ["background", "storage", "notifications", "contextMenus"],
+  "permissions": ["background", "storage", "notifications", "contextMenus", "tabs"],
   "icons": {
     "16": "icons/128.png",
     "48": "icons/128.png",
     "128": "icons/128.png"
   },
   "background": {
-    "service_worker": "js/background.js"
+    "service_worker": "js/background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html",
@@ -25,9 +26,17 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["js/content-script.js"],
+      "js": ["js/content-scripts.js"],
       "css": ["css/content.css"],
       "run_at": "document_start"
     }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
+  "host_permissions": [
+    "http://fishpi.cn/*",
+    "https://fishpi.cn/*",
+    "wss://fishpi.cn/*"
   ]
 }

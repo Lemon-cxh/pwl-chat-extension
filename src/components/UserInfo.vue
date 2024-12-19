@@ -184,7 +184,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import { liveness, isCollectedLiveness, getLivenessReward } from '../api/user'
 import { unread } from '../api/chat'
 import { countNotifications, makeReadNotifications } from '../api/notification'
@@ -265,6 +265,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['logout']),
     initLiveness(storage) {
       this.percentage = storage.percentage ?? 0
       if (
@@ -351,6 +352,7 @@ export default {
     logout() {
       /* global chrome */
       chrome.extension.getBackgroundPage().closeSocket()
+      this.logout()
       setLocal({ [STORAGE.key]: '' })
       this.$router.push({ name: 'Login' })
     },
