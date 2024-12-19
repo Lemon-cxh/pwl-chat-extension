@@ -7,7 +7,6 @@ const IconsResolver = require('unplugin-icons/resolver')
 const webpack = require('webpack')
 const webpackHotMiddleware = require('webpack-hot-middleware')
 const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
@@ -97,30 +96,25 @@ module.exports = defineConfig({
     }
   },
   chainWebpack: (config) => {
-    // 设置 source-map
-    config.devtool('source-map')
-    // 自定义的 Icon-svg 组件配置
+    // 配置 svg-sprite-loader
+    config.module.rule('svg').exclude.add(path.resolve('src/svg')).end()
+
     config.module
-      .rule('svg')
+      .rule('icons')
       .test(/\.svg$/)
-      .exclude.add(/node_modules/)
+      .include.add(path.resolve('src/svg'))
       .end()
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')
       .options({
         symbolId: 'icon-[name]',
-        include: ['src/svg'],
+        debug: true,
+        runtimeCompat: true
       })
+      .end()
   },
   devServer: {
     before: (app, server) => {
-      // 使用 webpack-dev-middleware
-      app.use(
-        webpackDevMiddleware(server.compiler, {
-          publicPath: '/'
-        })
-      )
-
       // 使用 webpack-hot-middleware
       app.use(
         webpackHotMiddleware(server.compiler, {
@@ -133,9 +127,8 @@ module.exports = defineConfig({
     // 启用热重载
     hot: true
   },
-  // 关闭生产环境source map
-  // 原因：减小打包体积，保护源代码
-  productionSourceMap: !isProduction,
+  // 禁用生产环境的 source map
+  productionSourceMap: false,
   // 输出目录
   outputDir: path.resolve(rootPath, 'dist')
 })
