@@ -111,9 +111,12 @@ function initWebSocket() {
     if (intervalId !== undefined) {
       clearInterval(intervalId)
     }
+    webSocket.open((e) => {
+      console.log('WebSocket open:', e)
     intervalId = setInterval(() => {
       webSocket.send('-hb-')
-    }, 1000 * 60 * 3)
+      }, 20 * 1000)
+    })
     webSocket.onmessage = (event) => messageHandler(event)
     webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)

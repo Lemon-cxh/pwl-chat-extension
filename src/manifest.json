@@ -34,9 +34,19 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
   },
+  "externally_connectable": {
+    "ids": [
+      "kbbneidihhfodkmoncmkihccmhkgfebn",
+      "oldbilakhdpiamjbkocdcdnlnakainfm"
+    ],
+    "matches": [
+      "https://*.google.com/*"
+    ]
+  },
   "host_permissions": [
     "http://fishpi.cn/*",
     "https://fishpi.cn/*",
     "wss://fishpi.cn/*"
-  ]
+  ],
+  "minimum_chrome_version": "116"
 }
