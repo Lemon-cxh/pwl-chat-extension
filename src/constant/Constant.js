@@ -57,6 +57,10 @@ export const STORAGE = {
 // background和popup、devtools通信类型
 export const EVENT = {
   /**
+   * 登录事件，由 POPUP 页面触发，background 处理事件
+   */
+  LOGIN: 0,
+  /**
    * 初始化页面加载消息
    */
   loadMessage: 1,

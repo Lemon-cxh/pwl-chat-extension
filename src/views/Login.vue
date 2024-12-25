@@ -45,7 +45,7 @@ import { getKey } from '../api/login'
 import { mapMutations } from 'vuex'
 import md5 from 'js-md5'
 import { setLocal, getLocal } from '../utils/chromeUtil'
-import { STORAGE } from '../constant/Constant'
+import { STORAGE, EVENT } from '../constant/Constant'
 
 export default {
   name: 'login-component',
@@ -101,7 +101,7 @@ export default {
           [STORAGE.account]: data
         })
         /* global chrome */
-        chrome.extension.getBackgroundPage().openSocket()
+        chrome.runtime.sendMessage({ type: EVENT.LOGIN })
         this.$router.push({ name: 'ChatRoom' })
       })
     },

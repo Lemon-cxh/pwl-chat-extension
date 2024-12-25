@@ -219,6 +219,10 @@ chrome.runtime.onConnect.addListener((p) => {
  * 监听content-scripts的短链接
  */
 chrome.runtime.onMessage.addListener((request) => {
+  // 登录事件触发链接 WebSocket
+  if (EVENT.LOGIN === request.type) {
+    openSocket()
+  }
   if (TABS_EVENT.sendMessage === request.type) {
     sendMessage(request.data)
     return
