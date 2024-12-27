@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
-import App from './App.vue'
-import store from '../store/index'
-import router from '../router'
-import IconSvg from '../components/Icon-svg'
+import App from '@/popup/App.vue'
+import store from '@/popup/store/index'
+import router from '@/popup/router'
+import IconSvg from '@/popup/components/Icon-svg'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
 
@@ -19,7 +19,7 @@ import 'element-plus/es/components/message/style/css'
 
 // 自定义的SVG组件配置：导入svg
 const requireAll = (requireContext) => requireContext.keys().map(requireContext)
-const req = require.context('../svg', true, /\.svg$/)
+const req = require.context('@/popup/svg', true, /\.svg$/)
 requireAll(req)
 
 store

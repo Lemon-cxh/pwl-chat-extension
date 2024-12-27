@@ -30,17 +30,15 @@
         </template>
       </el-scrollbar>
     </div>
-    <xiao-ice :userInfo="userInfo" />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-import { EVENT, MESSAGE_TYPE } from '../constant/Constant'
-import { clickEventListener } from '../utils/commonUtil'
-import { isRedPacket } from '../utils/util'
-import { getOptions } from '../utils/chromeUtil'
-import XiaoIce from './components/XiaoIce.vue'
+import { EVENT, MESSAGE_TYPE } from '@/common/constant/Constant'
+import { clickEventListener } from '@/common/utils/commonUtil'
+import { isRedPacket } from '@/common/utils/util'
+import { getOptions } from '@/common/utils/chromeUtil'
 
 let port
 
@@ -53,9 +51,6 @@ export default {
       input: '',
       options: {}
     }
-  },
-  components: {
-    'xiao-ice': XiaoIce
   },
   setup() {
     const messageArray = ref([])
@@ -90,7 +85,7 @@ export default {
   async created() {
     /* global chrome */
     chrome.devtools.panels.create('Fish', 'icons/128.png', 'devtools.html')
-    port = chrome.runtime.connect({ name: 'pwl-chat' })
+    port = chrome.runtime.connect()
     port.onMessage.addListener((msg) => this.messageListener(msg))
     this.options = await getOptions()
   },

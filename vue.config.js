@@ -47,8 +47,18 @@ module.exports = defineConfig({
     config.devtool = 'cheap-source-map'
     config.entry = {
       ...config.entry,
-      background: path.resolve('src/background/index.js'),
+      background: path.resolve(rootPath, 'src/background/index.js'),
       'content-scripts': path.resolve(rootPath, 'src/content-scripts/index.js')
+    }
+    // 禁用代码分割
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        cacheGroups: {
+          default: false
+        }
+      },
+      runtimeChunk: false
     }
     // 插件配置
     config.plugins.push(
@@ -77,6 +87,14 @@ module.exports = defineConfig({
         ]
       })
     )
+    // 添加 resolve.alias 配置
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...config.resolve.alias,
+        '@': path.resolve(__dirname, 'src')
+      }
+    }
     // 如果是生产环境，添加 Terser 插件以压缩代码
     if (isProduction) {
       config.optimization = {
@@ -102,7 +120,7 @@ module.exports = defineConfig({
     config.module
       .rule('icons')
       .test(/\.svg$/)
-      .include.add(path.resolve('src/svg'))
+      .include.add(path.resolve('src/popup/svg'))
       .end()
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')

@@ -1,33 +1,30 @@
-import store from '../store/index'
+import { refreshKey, user, key } from '@/background/storage/index'
 import {
-  more,
-  getMessages,
   send,
   openRedPacket,
   getChannel
-} from '../api/chatroom'
+} from '@/popup/api/chatroom'
 import {
   notifications,
   getLocal,
   sendTabsMessage,
   getOptions,
   formatOptions
-} from '../utils/chromeUtil'
+} from '@/common/utils/chromeUtil'
 import {
   MESSAGE_TYPE,
   STORAGE,
   EVENT,
-  MESSAGE_LIMIT,
   TABS_EVENT,
   defaultOptions
-} from '../constant/Constant'
+} from '@/common/constant/Constant'
 
 let URL = 'wss://fishpi.cn/chat-room-channel'
 let socketLock = false
 // 是否为主动关闭
 let isIntentionalClose = false
 // 最大保留两页消息
-const MAX_PAGE = 2
+// const MAX_PAGE = 2
 let intervalId
 // 与popup页面的通信
 let port = null
@@ -68,17 +65,10 @@ chrome.storage.onChanged.addListener((changes) => {
 })
 
 function openSocket() {
-  store
-    .dispatch('getUser')
-    .then(() => {
-      initWebSocket()
-      if (port) {
-        port.postMessage({ type: EVENT.userInfo, data: store.getters.userInfo })
-      }
-    })
-    .catch(() => {
-      !isClosed() && closeSocket()
-    })
+  console.log('openSocket()')
+  refreshKey()
+    .then(() => initWebSocket())
+    .catch(() => !isClosed() && closeSocket())
 }
 
 /**
@@ -103,7 +93,7 @@ function initWebSocket() {
   }
   getLocal([STORAGE.key], async (result) => {
     isIntentionalClose = false
-    const nodeData = await getChannel({ apiKey: store.getters.key })
+    const nodeData = await getChannel({ apiKey: result[STORAGE.key] })
     if (nodeData.code === 0) {
       URL = nodeData.data
     }
@@ -113,8 +103,8 @@ function initWebSocket() {
     }
     webSocket.open((e) => {
       console.log('WebSocket open:', e)
-    intervalId = setInterval(() => {
-      webSocket.send('-hb-')
+      intervalId = setInterval(() => {
+        webSocket.send('-hb-')
       }, 20 * 1000)
     })
     webSocket.onmessage = (event) => messageHandler(event)
@@ -127,8 +117,8 @@ function initWebSocket() {
         reconnect()
       }
     }
-    store.commit('cleanMessage')
-    getMoreEvent()
+    // store.commit('cleanMessage')
+    // getMoreEvent()
   })
 }
 
@@ -144,14 +134,14 @@ function messageHandler(event) {
       if (port) {
         port.postMessage({ type: EVENT.online, data })
       }
-      store.commit('setOnline', data)
+      // store.commit('setOnline', data)
       onlineEvent(data)
       break
     case MESSAGE_TYPE.revoke:
       if (port) {
         port.postMessage({ type: EVENT.revoke, data: data.oId })
       }
-      store.commit('revoke', data.oId)
+      // store.commit('revoke', data.oId)
       break
     case MESSAGE_TYPE.redPacketStatus:
       if (options.hideRedPacketMessage) {
@@ -161,14 +151,14 @@ function messageHandler(event) {
       if (port) {
         port.postMessage({ type: EVENT.redPacketStatus, data })
       }
-      store.commit('updateRedPacket', data)
+      // store.commit('updateRedPacket', data)
       break
     case MESSAGE_TYPE.discussChanged:
       messageEvent(data, false)
       if (port) {
         port.postMessage({ type: EVENT.discussChanged, data: data.newDiscuss })
       }
-      store.commit('setDiscuss', data.newDiscuss)
+      // store.commit('setDiscuss', data.newDiscuss)
       break
     default:
       messageEvent(data, data.type === MESSAGE_TYPE.msg)
@@ -182,28 +172,28 @@ function messageHandler(event) {
 chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
   port = p
-  port.postMessage({ type: EVENT.userInfo, data: store.getters.userInfo })
-  port.postMessage({
-    type: EVENT.loadMessage,
-    data: {
-      message: store.getters.message,
-      online: store.getters.online,
-      discuss: store.getters.discuss
-    }
-  })
+  // port.postMessage({ type: EVENT.userInfo, data: store.getters.userInfo })
+  // port.postMessage({
+  //   type: EVENT.loadMessage,
+  //   data: {
+  //     message: store.getters.message,
+  //     online: store.getters.online,
+  //     discuss: store.getters.discuss
+  //   }
+  // })
   port.onMessage.addListener((msg) => {
     switch (msg.type) {
       case EVENT.getMore:
-        getMoreEvent()
+        // getMoreEvent()
         break
       case EVENT.markRedPacket:
-        store.commit('updateRedPacket', msg.data)
+        // store.commit('updateRedPacket', msg.data)
         break
       case EVENT.sendMessage:
         sendMessage(msg.data)
         break
       case EVENT.openRedPacket:
-        openRedPacket({ oId: msg.data, apiKey: store.getters.key })
+        // openRedPacket({ oId: msg.data, apiKey: store.getters.key })
         break
       default:
         break
@@ -228,18 +218,20 @@ chrome.runtime.onMessage.addListener((request) => {
     return
   }
   if (TABS_EVENT.openRedPacket === request.type) {
-    openRedPacket({ oId: request.data, apiKey: store.getters.key }).then(
-      (res) => {
-        sendTabsMessage({
-          type: TABS_EVENT.markRedPacket,
-          data: {
-            data: res,
-            userName: store.getters.userInfo.userName,
-            oId: request.data
-          }
-        })
-      }
-    )
+    getLocal([STORAGE.key], async (result) => {
+      openRedPacket({ oId: request.data, apiKey: result[STORAGE.key] }).then(
+        (res) => {
+          sendTabsMessage({
+            type: TABS_EVENT.markRedPacket,
+            data: {
+              data: res,
+              // userName: store.getters.userInfo.userName,
+              oId: request.data
+            }
+          })
+        }
+      )
+    })
   }
 })
 
@@ -256,7 +248,7 @@ function messageEvent(message, isMsg) {
     }
     markCareAndBlack(message)
   }
-  store.commit('addMessage', { message, isMsg })
+  // store.commit('addMessage', { message, isMsg })
   if (port) {
     port.postMessage({ type: EVENT.message, data: message })
     return
@@ -330,7 +322,7 @@ function atNotifications(message) {
   if (
     options.atNotification &&
     message.md &&
-    message.md.indexOf('@' + store.getters.userInfo.userName) !== -1
+    message.md.indexOf('@' + user().userName) !== -1
   ) {
     notifications(
       `${message.userName}@了你`,
@@ -342,53 +334,53 @@ function atNotifications(message) {
 /**
  * 获取聊天记录
  */
-async function getMoreEvent() {
-  const lastId = store.getters.lastMessageId
-  const res = lastId
-    ? await getMessages({
-      apiKey: store.getters.key,
-      oId: lastId,
-      mode: 1,
-      size: MESSAGE_LIMIT
-    })
-    : await more({ apiKey: store.getters.key, page: 1 })
-  if (res.code !== 0) {
-    return
-  }
-  const data = lastId ? res.data.slice(1).reverse() : res.data.reverse()
-  const arr = []
-  for (let index = 0; index < data.length; index++) {
-    if (index === 0) {
-      markCareAndBlack(data[index])
-      arr.unshift(data[index])
-      continue
-    }
-    const e = data[index]
-    const last = arr[0]
-    if (last.content !== e.content) {
-      markCareAndBlack(e)
-      arr.unshift(e)
-      continue
-    }
-    const { users = [], oIds = [] } = last
-    users.push({
-      userName: e.userName,
-      userAvatarURL: e.userAvatarURL
-    })
-    oIds.push(e.oId)
-    arr[0].users = users
-    arr[0].oIds = oIds
-  }
-  store.commit('concatMessage', arr)
-  if (port) {
-    port.postMessage({ type: EVENT.more, data: arr })
-  }
-}
+// async function getMoreEvent() {
+//   const lastId = store.getters.lastMessageId
+//   const res = lastId
+//     ? await getMessages({
+//         apiKey: key(),
+//         oId: lastId,
+//         mode: 1,
+//         size: MESSAGE_LIMIT
+//       })
+//     : await more({ apiKey: store.getters.key, page: 1 })
+//   if (res.code !== 0) {
+//     return
+//   }
+//   const data = lastId ? res.data.slice(1).reverse() : res.data.reverse()
+//   const arr = []
+//   for (let index = 0; index < data.length; index++) {
+//     if (index === 0) {
+//       markCareAndBlack(data[index])
+//       arr.unshift(data[index])
+//       continue
+//     }
+//     const e = data[index]
+//     const last = arr[0]
+//     if (last.content !== e.content) {
+//       markCareAndBlack(e)
+//       arr.unshift(e)
+//       continue
+//     }
+//     const { users = [], oIds = [] } = last
+//     users.push({
+//       userName: e.userName,
+//       userAvatarURL: e.userAvatarURL
+//     })
+//     oIds.push(e.oId)
+//     arr[0].users = users
+//     arr[0].oIds = oIds
+//   }
+//   store.commit('concatMessage', arr)
+//   if (port) {
+//     port.postMessage({ type: EVENT.more, data: arr })
+//   }
+// }
 
 function sendMessage(data) {
   send({
     content: data,
-    apiKey: store.getters.key
+    apiKey: key()
   }).then()
 }
 
@@ -413,9 +405,9 @@ function clearMessage() {
     return
   }
   deleteMessage = true
-  while (store.getters.messageLength > MAX_PAGE * MESSAGE_LIMIT) {
-    store.commit('popMessage')
-  }
+  // while (store.getters.messageLength > MAX_PAGE * MESSAGE_LIMIT) {
+  //   store.commit('popMessage')
+  // }
   deleteMessage = false
 }
 

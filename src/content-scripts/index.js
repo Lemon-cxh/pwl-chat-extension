@@ -1,6 +1,6 @@
-import { TABS_EVENT } from '../constant/Constant'
-import { getOptions } from '../utils/chromeUtil'
-import { isRedPacket } from '../utils/util'
+import { TABS_EVENT } from '@/common/constant/Constant'
+import { getOptions } from '@/common/utils/chromeUtil'
+import { isRedPacket } from '@/common/utils/util'
 
 let height = 25
 // 弹幕滚动速度：屏幕宽 / 时间
