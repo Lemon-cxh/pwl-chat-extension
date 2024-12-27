@@ -1,6 +1,6 @@
 import { setLocal, getLocal } from '@/common/utils/chromeUtil'
 import { STORAGE } from '@/common/constant/Constant'
-import { getUserInfo, getKey } from '@/popup/api/login'
+import { getUserInfo, getKey } from '@/background/api/login'
 
 /**
  * 刷新Key

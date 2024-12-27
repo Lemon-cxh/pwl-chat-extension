@@ -1,9 +1,5 @@
 import { refreshKey, user, key } from '@/background/storage/index'
-import {
-  send,
-  openRedPacket,
-  getChannel
-} from '@/popup/api/chatroom'
+import { send, openRedPacket, getChannel } from '@/popup/api/chatroom'
 import {
   notifications,
   getLocal,
@@ -101,12 +97,9 @@ function initWebSocket() {
     if (intervalId !== undefined) {
       clearInterval(intervalId)
     }
-    webSocket.open((e) => {
-      console.log('WebSocket open:', e)
-      intervalId = setInterval(() => {
-        webSocket.send('-hb-')
-      }, 20 * 1000)
-    })
+    intervalId = setInterval(() => {
+      webSocket.send('-hb-')
+    }, 20 * 1000)
     webSocket.onmessage = (event) => messageHandler(event)
     webSocket.onerror = (e) => {
       console.log('WebSocket error observed:', e)
