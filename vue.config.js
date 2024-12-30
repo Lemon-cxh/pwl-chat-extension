@@ -66,14 +66,18 @@ module.exports = defineConfig({
         resolvers: [ElementPlusResolver()]
       }),
       Components({
-        resolvers: [ElementPlusResolver(), IconsResolver()]
+        resolvers: [ElementPlusResolver(), IconsResolver()],
+        dirs: [path.resolve(rootPath, 'src/popup/components')], // 指定自定义组件的目录
+        extensions: ['vue'], // 文件扩展名
+        deep: true, // 是否递归扫描子目录
+        dts: true // 生成类型声明文件
       }),
       Icons(),
       new CleanWebpackPlugin(),
       new CopyWebpackPlugin({
         patterns: [
           {
-            from: path.resolve('src/manifest.json'),
+            from: path.resolve(rootPath, 'src/manifest.json'),
             to: path.resolve(rootPath, 'dist/manifest.json'),
             transform: (content) => {
               // 将内容解析为对象
@@ -115,7 +119,7 @@ module.exports = defineConfig({
   },
   chainWebpack: (config) => {
     // 配置 svg-sprite-loader
-    config.module.rule('svg').exclude.add(path.resolve('src/svg')).end()
+    config.module.rule('svg').exclude.add(path.resolve('src/popup/svg')).end()
 
     config.module
       .rule('icons')
