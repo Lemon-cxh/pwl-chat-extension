@@ -24,6 +24,7 @@ body {
 }
 .el-dialog {
   margin: 50px auto 0 !important;
+  padding: 0px !important;
 }
 .el-divider__text {
   color: white !important;
