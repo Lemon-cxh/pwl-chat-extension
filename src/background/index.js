@@ -1,5 +1,6 @@
-import { refreshKey, user, key } from '@/background/storage/index'
-import { send, openRedPacket, getChannel } from '@/popup/api/chatroom'
+import { refreshKey, getUser } from '@/background/manager/StorageManager'
+import { openWebSocket, closeWebSocket } from '@/background/manager/WebSocketManager'
+import { sendMessage, openRedPacket } from '@/popup/api/chatroom'
 import {
   notifications,
   getLocal,
@@ -15,38 +16,18 @@ import {
   defaultOptions
 } from '@/common/constant/Constant'
 
-let URL = 'wss://fishpi.cn/chat-room-channel'
-let socketLock = false
-// 是否为主动关闭
-let isIntentionalClose = false
-// 最大保留两页消息
-// const MAX_PAGE = 2
-let intervalId
 // 与popup页面的通信
 let port = null
-let deleteMessage = false
 // 未读消息数
 let count = 0
 let options = defaultOptions
 let careOnline = []
-let webSocket
 
 /**
  * 获取设置
  */
 getOptions().then((result) => {
   options = formatOptions(result)
-})
-
-/**
- * 右键扩展图标时弹出的菜单
- */
-chrome.contextMenus.create({
-  title: '刷新',
-  contexts: ['browser_action'],
-  onclick: function () {
-    initWebSocket()
-  }
 })
 
 /**
@@ -60,60 +41,13 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 })
 
-function openSocket() {
-  console.log('openSocket()')
+function init() {
   refreshKey()
-    .then(() => initWebSocket())
-    .catch(() => !isClosed() && closeSocket())
+    .then(() => openWebSocket(messageHandler))
+    .catch(() => closeWebSocket())
 }
 
-/**
- * 手动关闭连接
- */
-function closeSocket() {
-  isIntentionalClose = true
-  webSocket && webSocket.close()
-  if (intervalId !== undefined) {
-    clearInterval(intervalId)
-  }
-}
-
-openSocket()
-
-/**
- * 创建WS连接
- */
-function initWebSocket() {
-  if (!isClosed()) {
-    closeSocket()
-  }
-  getLocal([STORAGE.key], async (result) => {
-    isIntentionalClose = false
-    const nodeData = await getChannel({ apiKey: result[STORAGE.key] })
-    if (nodeData.code === 0) {
-      URL = nodeData.data
-    }
-    webSocket = new WebSocket(URL)
-    if (intervalId !== undefined) {
-      clearInterval(intervalId)
-    }
-    intervalId = setInterval(() => {
-      webSocket.send('-hb-')
-    }, 20 * 1000)
-    webSocket.onmessage = (event) => messageHandler(event)
-    webSocket.onerror = (e) => {
-      console.log('WebSocket error observed:', e)
-    }
-    webSocket.onclose = (e) => {
-      console.log('WebSocket close observed:', e)
-      if (!isIntentionalClose && e.code !== 1000 && e.code !== 1001) {
-        reconnect()
-      }
-    }
-    // store.commit('cleanMessage')
-    // getMoreEvent()
-  })
-}
+init()
 
 /**
  * WS的消息类型处理
@@ -127,14 +61,12 @@ function messageHandler(event) {
       if (port) {
         port.postMessage({ type: EVENT.online, data })
       }
-      // store.commit('setOnline', data)
       onlineEvent(data)
       break
     case MESSAGE_TYPE.revoke:
       if (port) {
         port.postMessage({ type: EVENT.revoke, data: data.oId })
       }
-      // store.commit('revoke', data.oId)
       break
     case MESSAGE_TYPE.redPacketStatus:
       if (options.hideRedPacketMessage) {
@@ -144,18 +76,15 @@ function messageHandler(event) {
       if (port) {
         port.postMessage({ type: EVENT.redPacketStatus, data })
       }
-      // store.commit('updateRedPacket', data)
       break
     case MESSAGE_TYPE.discussChanged:
       messageEvent(data, false)
       if (port) {
         port.postMessage({ type: EVENT.discussChanged, data: data.newDiscuss })
       }
-      // store.commit('setDiscuss', data.newDiscuss)
       break
     default:
       messageEvent(data, data.type === MESSAGE_TYPE.msg)
-      clearMessage()
   }
 }
 
@@ -165,15 +94,6 @@ function messageHandler(event) {
 chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
   port = p
-  // port.postMessage({ type: EVENT.userInfo, data: store.getters.userInfo })
-  // port.postMessage({
-  //   type: EVENT.loadMessage,
-  //   data: {
-  //     message: store.getters.message,
-  //     online: store.getters.online,
-  //     discuss: store.getters.discuss
-  //   }
-  // })
   port.onMessage.addListener((msg) => {
     switch (msg.type) {
       case EVENT.getMore:
@@ -194,7 +114,6 @@ chrome.runtime.onConnect.addListener((p) => {
   })
   port.onDisconnect.addListener(() => {
     port = null
-    clearMessage()
   })
 })
 
@@ -204,7 +123,7 @@ chrome.runtime.onConnect.addListener((p) => {
 chrome.runtime.onMessage.addListener((request) => {
   // 登录事件触发链接 WebSocket
   if (EVENT.LOGIN === request.type) {
-    openSocket()
+    openWebSocket()
   }
   if (TABS_EVENT.sendMessage === request.type) {
     sendMessage(request.data)
@@ -289,12 +208,12 @@ function reconnectEvent(message) {
   }
   let matchMsg = message.md.match(/您超过6小时未活跃/)
   if (matchMsg) {
-    initWebSocket()
+    openWebSocket()
     return true
   }
   matchMsg = message.md.match(/你的连接被管理员断开/)
   if (matchMsg) {
-    initWebSocket()
+    openWebSocket()
     return true
   }
 }
@@ -303,7 +222,7 @@ function reconnectEvent(message) {
  * @用户的消息时，浏览器提示
  * @param {*} message 消息内容
  */
-function atNotifications(message) {
+async function atNotifications(message) {
   if (options.showUnReadCount && message.type === MESSAGE_TYPE.msg) {
     chrome.browserAction.setBadgeText({ text: '' + ++count })
     chrome.browserAction.setBadgeBackgroundColor({ color: [64, 158, 255, 1] })
@@ -315,7 +234,7 @@ function atNotifications(message) {
   if (
     options.atNotification &&
     message.md &&
-    message.md.indexOf('@' + user().userName) !== -1
+    message.md.indexOf('@' + (await getUser()).userName) !== -1
   ) {
     notifications(
       `${message.userName}@了你`,
@@ -324,58 +243,14 @@ function atNotifications(message) {
   }
 }
 
-/**
- * 获取聊天记录
- */
-// async function getMoreEvent() {
-//   const lastId = store.getters.lastMessageId
-//   const res = lastId
-//     ? await getMessages({
-//         apiKey: key(),
-//         oId: lastId,
-//         mode: 1,
-//         size: MESSAGE_LIMIT
-//       })
-//     : await more({ apiKey: store.getters.key, page: 1 })
-//   if (res.code !== 0) {
-//     return
-//   }
-//   const data = lastId ? res.data.slice(1).reverse() : res.data.reverse()
-//   const arr = []
-//   for (let index = 0; index < data.length; index++) {
-//     if (index === 0) {
-//       markCareAndBlack(data[index])
-//       arr.unshift(data[index])
-//       continue
-//     }
-//     const e = data[index]
-//     const last = arr[0]
-//     if (last.content !== e.content) {
-//       markCareAndBlack(e)
-//       arr.unshift(e)
-//       continue
-//     }
-//     const { users = [], oIds = [] } = last
-//     users.push({
-//       userName: e.userName,
-//       userAvatarURL: e.userAvatarURL
+// function sendMessage(data) {
+//   key().then(apiKey => {
+//     send({
+//       content: data,
+//       apiKey
 //     })
-//     oIds.push(e.oId)
-//     arr[0].users = users
-//     arr[0].oIds = oIds
-//   }
-//   store.commit('concatMessage', arr)
-//   if (port) {
-//     port.postMessage({ type: EVENT.more, data: arr })
-//   }
+//   })
 // }
-
-function sendMessage(data) {
-  send({
-    content: data,
-    apiKey: key()
-  }).then()
-}
 
 /**
  * 标记特殊关心和黑名单
@@ -391,35 +266,4 @@ function markCareAndBlack(message) {
 function clearBadgeText() {
   count = 0
   chrome.action.setBadgeText({ text: '' })
-}
-
-function clearMessage() {
-  if (port || deleteMessage) {
-    return
-  }
-  deleteMessage = true
-  // while (store.getters.messageLength > MAX_PAGE * MESSAGE_LIMIT) {
-  //   store.commit('popMessage')
-  // }
-  deleteMessage = false
-}
-
-function isClosed() {
-  return (
-    !webSocket ||
-    webSocket.readyState === WebSocket.CLOSING ||
-    webSocket.readyState === WebSocket.CLOSED
-  )
-}
-
-async function reconnect() {
-  if (socketLock) {
-    return
-  }
-  socketLock = true
-  if (isClosed()) {
-    await initWebSocket()
-    console.log('重新连接了')
-  }
-  socketLock = false
 }

@@ -1,6 +1,6 @@
 import { setLocal, getLocal } from '@/common/utils/chromeUtil'
 import { STORAGE } from '@/common/constant/Constant'
-import { getUserInfo, getKey } from '@/background/api/login'
+import { getUserInfo, login } from '@/background/api/login'
 
 /**
  * 刷新Key
@@ -20,7 +20,7 @@ export function refreshKey() {
         resolve()
         return
       }
-      const r = await getKey(result[STORAGE.account])
+      const r = await login(result[STORAGE.account])
       if (r.code === 0) {
         setLocal({ [STORAGE.key]: r.Key })
         setLocal({ [STORAGE.user]: res.data })
@@ -32,10 +32,14 @@ export function refreshKey() {
   })
 }
 
-export async function key() {
-  return await getLocal([STORAGE.key])
+export async function getKey() {
+  // eslint-disable-next-line no-undef
+  const result = await chrome.storage.local.get([STORAGE.key])
+  return result[STORAGE.key]
 }
 
-export async function user() {
-  return await getLocal([STORAGE.user])
+export async function getUser() {
+  // eslint-disable-next-line no-undef
+  const result = await chrome.storage.local.get([STORAGE.user])
+  return result[STORAGE.user]
 }

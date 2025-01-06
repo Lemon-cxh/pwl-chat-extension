@@ -1,3 +1,11 @@
+/**
+ * 来源，用于区分是扩展的哪个页面
+ */
+export const SOURCE = {
+  POPUP: 'POPUP',
+  CONTENT_SCRIPTS: 'CONTENT_SCRIPTS',
+  BACKGROUND: 'BACKGROUND'
+}
 // 消息类型
 export const MESSAGE_TYPE = {
   /**
@@ -27,7 +35,7 @@ export const MESSAGE_TYPE = {
   /**
    * 弹幕消息
    */
-  barrager: 'barrager'
+  barrage: 'barrage'
 }
 
 // storage存储key

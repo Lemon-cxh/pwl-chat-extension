@@ -10,7 +10,6 @@ export default createStore({
     user
   },
   state: {
-    message: [],
     discuss: '',
     online: {
       onlineChatCnt: 0,
@@ -167,3 +166,14 @@ export default createStore({
     }
   }
 })
+
+/**
+ * 标记特殊关心和黑名单
+ * @param {*} message
+ */
+// function markCareAndBlack(message) {
+//   message.isCare =
+//     options.care && options.care.some((e) => e === message.userName)
+//   message.hidden =
+//     options.blacklist && options.blacklist.some((e) => e === message.userName)
+// }

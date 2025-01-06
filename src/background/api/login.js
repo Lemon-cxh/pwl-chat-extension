@@ -27,7 +27,7 @@ request.interceptors.response.use(
   }
 )
 
-export function getKey(data) {
+export function login(data) {
   return request({
     url: '/api/getKey',
     method: 'post',
@@ -43,5 +43,10 @@ export function getUserInfo(params) {
   })
 }
 
-// 导出 request 实例以便调试
-export default request
+export function getChannel(params) {
+  return request({
+    url: '/chat-room/node/get',
+    method: 'get',
+    params
+  })
+}

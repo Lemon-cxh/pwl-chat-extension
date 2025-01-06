@@ -41,17 +41,18 @@
           <!-- 提示类消息 -->
           <hint-message
             v-if="
-              type.redPacketStatus === item.type ||
-              type.discussChanged === item.type ||
-              type.customMessage === item.type ||
-              type.barrager === item.type
+              item.type &&
+              (type.redPacketStatus === item.type ||
+                type.discussChanged === item.type ||
+                type.customMessage === item.type ||
+                type.barrager === item.type)
             "
             :message="item"
             @show-user-card="showUserCard"
             @show-redpacket-info="showRedpacketInfo"
           />
           <!-- 聊天消息 -->
-          <div v-else-if="!item.type || type.msg === item.type">
+          <div v-else>
             <message
               v-if="!item.revoke && !item.hidden"
               class="list-complete-item"
@@ -100,13 +101,13 @@
 </template>
 
 <script>
-import { ref, defineAsyncComponent } from 'vue'
+import { ref, defineAsyncComponent, computed } from 'vue'
 import { EVENT, MESSAGE_TYPE } from '@/common/constant/Constant'
 import { getDate, isRedPacket } from '@/common/utils/util'
 import { clickEventListener } from '@/common/utils/commonUtil'
 import { getOptions } from '@/common/utils/chromeUtil'
 import { mapGetters, mapMutations } from 'vuex'
-import { revoke } from '@/popup/api/chatroom'
+import { revoke, getMessages, more } from '@/popup/api/chatroom'
 import { InfoFilled } from '@element-plus/icons-vue'
 
 let port
@@ -139,9 +140,6 @@ export default {
   inject: ['$message'],
   computed: {
     ...mapGetters(['userInfo', 'key']),
-    apiKey() {
-      return { apiKey: this.key }
-    },
     unlimitedRevoke() {
       return ['协警', 'OP', '管理员'].some((e) => e === this.userInfo.userRole)
     }
@@ -169,14 +167,20 @@ export default {
     const updateMessage = (index, property, value) => {
       messageArray.value[index][property] = value
     }
+    const lastMessageId = computed(() => {
+      const length = messageArray.value.length
+      return length > 0 ? messageArray.value[length - 1].oId : 0
+    })
     return {
       messageArray,
       unshiftMessage,
       pushMessage,
-      updateMessage
+      updateMessage,
+      lastMessageId
     }
   },
   async created() {
+    this.load()
     const that = this
     // 连接background.js
     /* global chrome */
@@ -231,18 +235,8 @@ export default {
           }
           this.setUserInfo(msg.data)
           break
-        case EVENT.loadMessage:
-          this.pushMessage(msg.data.message)
-          this.loading = false
-          this.online = msg.data.online
-          this.setDiscussContent(msg.data.discuss)
-          break
         case EVENT.message:
           this.messageEvent(msg.data)
-          break
-        case EVENT.more:
-          this.pushMessage(msg.data)
-          this.loading = false
           break
         case EVENT.redPacketStatus:
           this.updateRedPacket(msg.data)
@@ -312,8 +306,45 @@ export default {
       this.$refs.messageScrollbar.setScrollTop(0)
       this.hasNewMessage = false
     },
-    more() {
-      port.postMessage({ type: EVENT.getMore })
+    async more() {
+      const lastId = this.lastMessageId
+      const res = lastId
+        ? await getMessages({
+          apiKey: this.key,
+          oId: lastId,
+          mode: 1,
+          size: 25
+        })
+        : await more({ apiKey: this.key, page: 1 })
+      if (res.code !== 0) {
+        return
+      }
+      const data = lastId ? res.data.slice(1).reverse() : res.data.reverse()
+      const arr = []
+      for (let index = 0; index < data.length; index++) {
+        if (index === 0) {
+          // markCareAndBlack(data[index])
+          arr.unshift(data[index])
+          continue
+        }
+        const e = data[index]
+        const last = arr[0]
+        if (last.content !== e.content) {
+          // markCareAndBlack(e)
+          arr.unshift(e)
+          continue
+        }
+        const { users = [], oIds = [] } = last
+        users.push({
+          userName: e.userName,
+          userAvatarURL: e.userAvatarURL
+        })
+        oIds.push(e.oId)
+        arr[0].users = users
+        arr[0].oIds = oIds
+      }
+      this.pushMessage(arr)
+      this.loading = false
     },
     showMessageMenu(event) {
       let dom = event.target || event.srcElement
