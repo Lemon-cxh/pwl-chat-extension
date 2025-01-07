@@ -10,7 +10,11 @@ export default createStore({
     user
   },
   state: {
-    discuss: '',
+    message: [],
+    discuss: {
+      enable: false,
+      content: ''
+    },
     online: {
       onlineChatCnt: 0,
       users: []
@@ -102,8 +106,11 @@ export default createStore({
       }
       state.discuss = online.discussing
     },
-    setDiscuss(state, discuss) {
-      state.discuss = discuss
+    changeDiscuss(state) {
+      state.discuss.enable = !state.discuss.enable
+    },
+    setDiscussContent(state, content) {
+      state.discuss.content = content
     },
     updateRedPacket(state, message) {
       let msg

@@ -106,6 +106,7 @@ import { EVENT, MESSAGE_TYPE } from '@/common/constant/Constant'
 import { getDate, isRedPacket } from '@/common/utils/util'
 import { clickEventListener } from '@/common/utils/commonUtil'
 import { getOptions } from '@/common/utils/chromeUtil'
+import { getOnline, getDiscuss } from '@/common/manager/StorageManager'
 import { mapGetters, mapMutations } from 'vuex'
 import { revoke, getMessages, more } from '@/popup/api/chatroom'
 import { InfoFilled } from '@element-plus/icons-vue'
@@ -190,6 +191,8 @@ export default {
     // 是否展示圣诞头像挂件
     this.avatarPendant.isChristmas =
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
+    this.online = await getOnline()
+    this.setDiscussContent(await getDiscuss())
   },
   mounted() {
     document.getElementById('messageList').oncontextmenu = (event) => {

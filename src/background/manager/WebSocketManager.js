@@ -1,4 +1,4 @@
-import { getKey } from '@/background/manager/StorageManager'
+import { getKey } from '@/common/manager/StorageManager'
 import { getChannel } from '@/background/api/login'
 
 let webSocket = null

@@ -1,11 +1,3 @@
-/**
- * 来源，用于区分是扩展的哪个页面
- */
-export const SOURCE = {
-  POPUP: 'POPUP',
-  CONTENT_SCRIPTS: 'CONTENT_SCRIPTS',
-  BACKGROUND: 'BACKGROUND'
-}
 // 消息类型
 export const MESSAGE_TYPE = {
   /**
@@ -63,7 +55,15 @@ export const STORAGE = {
   /**
    * 用户信息
    */
-  user: 'user'
+  user: 'user',
+  /**
+   * 在线用户
+   */
+  online: 'online',
+  /**
+   * 话题
+   */
+  discuss: 'discuss'
 }
 
 // background和popup、devtools通信类型

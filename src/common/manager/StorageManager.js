@@ -32,14 +32,32 @@ export function refreshKey() {
   })
 }
 
-export async function getKey() {
-  // eslint-disable-next-line no-undef
-  const result = await chrome.storage.local.get([STORAGE.key])
-  return result[STORAGE.key]
+export function setOnline(data) {
+  setLocal({ [STORAGE.online]: data })
 }
 
-export async function getUser() {
+export function setDiscuss(data) {
+  setLocal({ [STORAGE.discuss]: data })
+}
+
+export function getOnline() {
+  return get(STORAGE.online)
+}
+
+export function getDiscuss() {
+  return get(STORAGE.discuss)
+}
+
+export function getKey() {
+  return get(STORAGE.key)
+}
+
+export function getUser() {
+  return get(STORAGE.user)
+}
+
+async function get(key) {
   // eslint-disable-next-line no-undef
-  const result = await chrome.storage.local.get([STORAGE.user])
-  return result[STORAGE.user]
+  const result = await chrome.storage.local.get([key])
+  return result[key]
 }

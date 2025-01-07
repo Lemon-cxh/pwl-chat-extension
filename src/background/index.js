@@ -1,4 +1,4 @@
-import { refreshKey, getUser } from '@/background/manager/StorageManager'
+import { refreshKey, getUser, setOnline, setDiscuss } from '@/common/manager/StorageManager'
 import {
   openWebSocket,
   closeWebSocket
@@ -61,8 +61,11 @@ function messageHandler(event) {
   const data = JSON.parse(event.data)
   switch (data.type) {
     case MESSAGE_TYPE.online:
+      setOnline(data)
+      setDiscuss(data.discussing)
       if (port) {
         port.postMessage({ type: EVENT.online, data })
+        console.log('在线：', data)
       }
       onlineEvent(data)
       break
@@ -82,6 +85,7 @@ function messageHandler(event) {
       break
     case MESSAGE_TYPE.discussChanged:
       messageEvent(data, false)
+      setDiscuss(data.newDiscuss)
       if (port) {
         port.postMessage({ type: EVENT.discussChanged, data: data.newDiscuss })
       }
@@ -234,7 +238,6 @@ async function atNotifications(message) {
     notifications(message.userName, message.md, message.userAvatarURL)
     return
   }
-  console.log(message)
   if (
     options.atNotification &&
     message.md &&
