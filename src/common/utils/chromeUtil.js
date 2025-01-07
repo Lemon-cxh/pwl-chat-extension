@@ -1,12 +1,13 @@
 import { STORAGE, defaultOptions } from '@/common/constant/Constant'
 
-export function notifications(title, message) {
+export function notifications(title, message, iconUrl) {
   /* global chrome */
   chrome.notifications.create({
     type: 'basic',
-    iconUrl: 'icons/128.png',
+    iconUrl,
     title,
-    message
+    message,
+    silent: true
   })
 }
 

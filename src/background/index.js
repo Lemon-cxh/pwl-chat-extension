@@ -1,5 +1,8 @@
 import { refreshKey, getUser } from '@/background/manager/StorageManager'
-import { openWebSocket, closeWebSocket } from '@/background/manager/WebSocketManager'
+import {
+  openWebSocket,
+  closeWebSocket
+} from '@/background/manager/WebSocketManager'
 import { sendMessage, openRedPacket } from '@/popup/api/chatroom'
 import {
   notifications,
@@ -224,22 +227,20 @@ function reconnectEvent(message) {
  */
 async function atNotifications(message) {
   if (options.showUnReadCount && message.type === MESSAGE_TYPE.msg) {
-    chrome.browserAction.setBadgeText({ text: '' + ++count })
-    chrome.browserAction.setBadgeBackgroundColor({ color: [64, 158, 255, 1] })
+    chrome.action.setBadgeText({ text: '' + ++count })
+    chrome.action.setBadgeBackgroundColor({ color: [64, 158, 255, 1] })
   }
   if (message.isCare) {
-    notifications(message.userName, message.md)
+    notifications(message.userName, message.md, message.userAvatarURL)
     return
   }
+  console.log(message)
   if (
     options.atNotification &&
     message.md &&
     message.md.indexOf('@' + (await getUser()).userName) !== -1
   ) {
-    notifications(
-      `${message.userName}@了你`,
-      message.md.substring(0, message.md.lastIndexOf('<span class='))
-    )
+    notifications(`${message.userName}@了你`, message.md, message.userAvatarURL)
   }
 }
 
