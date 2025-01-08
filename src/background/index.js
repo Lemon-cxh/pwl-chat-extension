@@ -90,8 +90,11 @@ function messageHandler(event) {
         port.postMessage({ type: EVENT.discussChanged, data: data.newDiscuss })
       }
       break
-    default:
+    case MESSAGE_TYPE.msg:
       messageEvent(data, data.type === MESSAGE_TYPE.msg)
+      break
+    default:
+      break
   }
 }
 
