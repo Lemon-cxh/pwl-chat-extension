@@ -26,7 +26,8 @@
       id="messageList"
       ref="messageScrollbar"
       class="message-box"
-      height="420px"
+      :height="scrollbarHeight"
+      noresize
       always
       @scroll="scroll"
     >
@@ -55,7 +56,6 @@
           <div v-else>
             <message
               v-if="!item.revoke && !item.hidden"
-              class="list-complete-item"
               :ref="'message_' + item.oId"
               :message="item"
               :date="date"
@@ -121,6 +121,7 @@ export default {
   },
   data() {
     return {
+      scrollbarHeight: '420',
       loading: true,
       date: getDate(),
       dialogVisible: false,
@@ -193,6 +194,7 @@ export default {
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
     this.online = await getOnline()
     this.setDiscussContent(await getDiscuss())
+    this.scrollbarHeight = window.innerHeight - 100
   },
   mounted() {
     document.getElementById('messageList').oncontextmenu = (event) => {
@@ -200,7 +202,7 @@ export default {
       event.preventDefault()
     }
     clickEventListener((dom) => {
-      if (dom.className === 'name-at') {
+      if (dom.href.search(`${process.env.VUE_APP_BASE_URL}/member/`) || dom.className === 'name-at') {
         this.userName = dom.innerText
         this.dialogVisible = true
         return
@@ -296,7 +298,7 @@ export default {
       this.showTop = scrollTop > 100
       // 判断是否需要加载更多消息
       const distance =
-        this.$refs.messageScrollbar.wrapRef.scrollHeight - scrollTop - 420
+        this.$refs.messageScrollbar.wrapRef.scrollHeight - scrollTop - window.innerHeight + 100
       if (!this.loading && distance < 10) {
         this.load()
       }
@@ -348,6 +350,7 @@ export default {
       }
       this.pushMessage(arr)
       this.loading = false
+      console.log(this.messageArray)
     },
     showMessageMenu(event) {
       let dom = event.target || event.srcElement

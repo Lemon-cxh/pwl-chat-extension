@@ -65,7 +65,6 @@ function messageHandler(event) {
       setDiscuss(data.discussing)
       if (port) {
         port.postMessage({ type: EVENT.online, data })
-        console.log('在线：', data)
       }
       onlineEvent(data)
       break

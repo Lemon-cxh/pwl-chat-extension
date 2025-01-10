@@ -11,8 +11,8 @@ export default {
 </script>
 <style>
 #app {
-  height: 500px;
-  width: 400px;
+  min-height: 500px;
+  width: 381px;
 }
 body {
   background: #333333;
