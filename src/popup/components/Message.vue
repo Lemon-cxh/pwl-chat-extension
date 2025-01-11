@@ -15,7 +15,7 @@
           src="@/../public/image/Christmas.png"
         />
       </el-row>
-      <el-row :class="[{ 'own-chat': isOwn }, 'flex-column']" type="flex">
+      <el-row :class="[{ 'own-chat': isOwn }, 'flex-column']" type="flex" style="max-width: calc(100% - 120px);">
         <el-row class="name">
           <span class="nick-name">{{ message.userNickname }}</span>
           <span :class="message.userNickname ? 'user-name' : 'nick-name'">{{
@@ -355,10 +355,10 @@ export default {
   min-width: 0px;
 }
 .message-content img[alt='图片表情'] {
-  max-height: 100px;
+  max-width: 100%;
 }
 .message-content * {
-  max-width: 265px;
+  max-width: 100%;
   overflow: auto;
   margin: 0px;
 }
@@ -371,7 +371,7 @@ export default {
   padding-left: 5px;
 }
 .message-content blockquote * {
-  max-width: 257px;
+  max-width: 100%;
 }
 .message-content iframe {
   border: none;

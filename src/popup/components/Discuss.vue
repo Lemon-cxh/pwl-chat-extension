@@ -17,13 +17,13 @@
         @blur="handleInputConfirm"
       >
       </el-input>
-      <el-button-group v-else>
+      <el-button-group class="input" v-else>
         <el-button
           :type="type"
+          class="button"
           plain
           size="small"
           @click="showInput()"
-          style="padding-right: 3px"
         >
           #{{ discuss.content }}
         </el-button>
@@ -98,6 +98,11 @@ export default {
 </script>
 <style scoped>
 .input {
-  max-width: 200px;
+  max-width: calc(100% - 140px);
+}
+.button {
+  padding-right: 3px;
+  max-width: calc(100% - 40px);
+  overflow: auto;
 }
 </style>

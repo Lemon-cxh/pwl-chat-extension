@@ -12,7 +12,7 @@ export default {
 <style>
 #app {
   min-height: 500px;
-  width: 381px;
+  min-width: 381px;
 }
 body {
   background: #333333;

@@ -202,7 +202,7 @@ export default {
       event.preventDefault()
     }
     clickEventListener((dom) => {
-      if (dom.href.search(`${process.env.VUE_APP_BASE_URL}/member/`) || dom.className === 'name-at') {
+      if (dom.href.search(`${process.env.VUE_APP_BASE_URL}/member/`) >= 0 || dom.className === 'name-at') {
         this.userName = dom.innerText
         this.dialogVisible = true
         return
@@ -350,7 +350,6 @@ export default {
       }
       this.pushMessage(arr)
       this.loading = false
-      console.log(this.messageArray)
     },
     showMessageMenu(event) {
       let dom = event.target || event.srcElement
