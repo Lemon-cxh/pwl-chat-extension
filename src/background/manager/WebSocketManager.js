@@ -1,5 +1,5 @@
 import { getKey } from '@/common/manager/StorageManager'
-import { getChannel } from '@/background/api/login'
+import { getChannel } from '@/background/api/index'
 
 let webSocket = null
 let wssUrl = 'wss://fishpi.cn/chat-room-channel'
@@ -45,7 +45,11 @@ function startHeartbeat() {
     clearInterval(heartbeatInterval)
   }
   heartbeatInterval = setInterval(() => {
-    webSocket.send('-hb-')
+    try {
+      webSocket.send('-hb-')
+    } catch (e) {
+      reconnect()
+    }
   }, 20 * 1000)
 }
 

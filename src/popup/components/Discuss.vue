@@ -102,7 +102,7 @@ export default {
 }
 .button {
   padding-right: 3px;
-  max-width: calc(100% - 40px);
+  max-width: calc(100% - 36px);
   overflow: auto;
 }
 </style>

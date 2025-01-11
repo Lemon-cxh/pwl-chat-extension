@@ -1,19 +1,23 @@
-import { refreshKey, getUser, setOnline, setDiscuss } from '@/common/manager/StorageManager'
+import {
+  refreshKey,
+  getKey,
+  getUser,
+  setOnline,
+  setDiscuss
+} from '@/common/manager/StorageManager'
 import {
   openWebSocket,
   closeWebSocket
 } from '@/background/manager/WebSocketManager'
-import { sendMessage, openRedPacket } from '@/popup/api/chatroom'
+import { send, openRedPacket } from '@/background/api/index'
 import {
   notifications,
-  getLocal,
   sendTabsMessage,
   getOptions,
   formatOptions
 } from '@/common/utils/chromeUtil'
 import {
   MESSAGE_TYPE,
-  STORAGE,
   EVENT,
   TABS_EVENT,
   defaultOptions
@@ -25,6 +29,11 @@ let port = null
 let count = 0
 let options = defaultOptions
 let careOnline = []
+
+chrome.runtime.onInstalled.addListener(() => {
+  // eslint-disable-next-line no-undef
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false })
+})
 
 /**
  * 获取设置
@@ -102,6 +111,7 @@ function messageHandler(event) {
  */
 chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
+  console.log(p)
   port = p
   port.onMessage.addListener((msg) => {
     switch (msg.type) {
@@ -111,9 +121,9 @@ chrome.runtime.onConnect.addListener((p) => {
       case EVENT.markRedPacket:
         // store.commit('updateRedPacket', msg.data)
         break
-      case EVENT.sendMessage:
-        sendMessage(msg.data)
-        break
+      // case EVENT.sendMessage:
+      //   sendMessage(msg.data)
+      //   break
       case EVENT.openRedPacket:
         // openRedPacket({ oId: msg.data, apiKey: store.getters.key })
         break
@@ -139,19 +149,17 @@ chrome.runtime.onMessage.addListener((request) => {
     return
   }
   if (TABS_EVENT.openRedPacket === request.type) {
-    getLocal([STORAGE.key], async (result) => {
-      openRedPacket({ oId: request.data, apiKey: result[STORAGE.key] }).then(
-        (res) => {
-          sendTabsMessage({
-            type: TABS_EVENT.markRedPacket,
-            data: {
-              data: res,
-              // userName: store.getters.userInfo.userName,
-              oId: request.data
-            }
-          })
-        }
-      )
+    getKey().then((apiKey) => {
+      openRedPacket({ oId: request.data, apiKey }).then(async (res) => {
+        sendTabsMessage({
+          type: TABS_EVENT.markRedPacket,
+          data: {
+            data: res,
+            userName: await getUser().userName,
+            oId: request.data
+          }
+        })
+      })
     })
   }
 })
@@ -169,10 +177,8 @@ function messageEvent(message, isMsg) {
     }
     markCareAndBlack(message)
   }
-  // store.commit('addMessage', { message, isMsg })
   if (port) {
     port.postMessage({ type: EVENT.message, data: message })
-    return
   }
   if (!isMsg || message.hidden) {
     return
@@ -249,14 +255,14 @@ async function atNotifications(message) {
   }
 }
 
-// function sendMessage(data) {
-//   key().then(apiKey => {
-//     send({
-//       content: data,
-//       apiKey
-//     })
-//   })
-// }
+function sendMessage(data) {
+  getKey().then((apiKey) => {
+    send({
+      content: data,
+      apiKey
+    })
+  })
+}
 
 /**
  * 标记特殊关心和黑名单

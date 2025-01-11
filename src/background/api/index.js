@@ -50,3 +50,23 @@ export function getChannel(params) {
     params
   })
 }
+
+export function send(data) {
+  data.client =
+    (navigator.userAgent.indexOf('Edg') > -1 ? 'Edge' : 'Chrome') +
+    '/v' +
+    process.env.VUE_APP_VERSION
+  return request({
+    url: '/chat-room/send',
+    method: 'post',
+    data
+  })
+}
+
+export function openRedPacket(data) {
+  return request({
+    url: '/chat-room/red-packet/open',
+    method: 'post',
+    data
+  })
+}
