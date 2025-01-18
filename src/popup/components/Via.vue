@@ -1,7 +1,7 @@
 <template>
   <el-tooltip v-if="via" placement="right" :hide-after="0">
     <template #content>
-      <div @click="handleClick">{{ via.content + ' ' + version }}</div>
+      <div class="tooltip-content" @click="handleClick">{{ via.content + ' ' + version }}</div>
     </template>
     <div><icon-svg class="via" :icon-class="via.icon" /></div>
   </el-tooltip>
@@ -170,5 +170,8 @@ export default {
 .via {
   font-size: 12px;
   margin-left: 6px;
+}
+.tooltip-content {
+  max-width: 200px;
 }
 </style>

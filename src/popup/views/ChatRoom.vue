@@ -121,7 +121,7 @@ export default {
   },
   data() {
     return {
-      scrollbarHeight: '420',
+      scrollbarHeight: window.innerHeight - 82,
       loading: true,
       date: getDate(),
       dialogVisible: false,
@@ -136,7 +136,9 @@ export default {
       showTop: false,
       isTop: true,
       hasNewMessage: false,
-      options: {}
+      options: {},
+      // 滚动至底部的时间
+      scrollTime: new Date().getTime()
     }
   },
   inject: ['$message'],
@@ -194,7 +196,14 @@ export default {
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
     this.online = await getOnline()
     this.setDiscussContent(await getDiscuss())
-    this.scrollbarHeight = window.innerHeight - 100
+    setInterval(() => {
+      // 如果30S内没滚动过消息，则删除多余消息
+      if ((new Date().getTime() - that.scrollTime) > 30000) {
+        while (that.messageArray.length > 100) {
+          that.messageArray.pop()
+        }
+      }
+    }, 30 * 1000)
   },
   mounted() {
     document.getElementById('messageList').oncontextmenu = (event) => {
@@ -296,9 +305,12 @@ export default {
         this.isTop = false
       }
       this.showTop = scrollTop > 100
+      if (this.showTop) {
+        this.scrollTime = new Date().getTime()
+      }
       // 判断是否需要加载更多消息
       const distance =
-        this.$refs.messageScrollbar.wrapRef.scrollHeight - scrollTop - window.innerHeight + 100
+        this.$refs.messageScrollbar.wrapRef.scrollHeight - scrollTop - window.innerHeight + 82
       if (!this.loading && distance < 10) {
         this.load()
       }

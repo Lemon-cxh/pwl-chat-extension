@@ -111,7 +111,6 @@ function messageHandler(event) {
  */
 chrome.runtime.onConnect.addListener((p) => {
   clearBadgeText()
-  console.log(p)
   port = p
   port.onMessage.addListener((msg) => {
     switch (msg.type) {
@@ -177,17 +176,21 @@ function messageEvent(message, isMsg) {
     }
     markCareAndBlack(message)
   }
+  // 如果Popup页面处于打开状态则推送消息
   if (port) {
     port.postMessage({ type: EVENT.message, data: message })
+    return
   }
   if (!isMsg || message.hidden) {
     return
   }
+  // 没有启用弹幕消息则直接通知
   if (!options.barrageOptions.enable) {
     atNotifications(message)
     return
   }
   sendTabsMessage({ type: TABS_EVENT.message, data: message }, (res) => {
+    // 推送消息给content-scripts时：如果标签页不存在 || 标签页隐藏时
     if (!res || res.hidden) {
       atNotifications(message)
     }

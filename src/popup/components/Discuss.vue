@@ -103,6 +103,14 @@ export default {
 .button {
   padding-right: 3px;
   max-width: calc(100% - 36px);
-  overflow: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.button:hover {
+    cursor: pointer;
+    text-overflow: inherit;
+    overflow: visible;
+    white-space: pre-line;
 }
 </style>
