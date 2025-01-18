@@ -72,6 +72,7 @@ export const EVENT = {
    * 登录事件，由 POPUP 页面触发，background 处理事件
    */
   LOGIN: 0,
+  LOGIN_OUT: -1,
   /**
    * 初始化页面加载消息
    */

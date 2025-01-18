@@ -184,12 +184,13 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 import { liveness, isCollectedLiveness, getLivenessReward } from '@/popup/api/user'
 import { unread } from '@/popup/api/chat'
 import { countNotifications, makeReadNotifications } from '@/popup/api/notification'
-import { STORAGE, defaultOptions } from '@/common/constant/Constant'
+import { STORAGE, defaultOptions, EVENT } from '@/common/constant/Constant'
 import { getDate } from '@/common/utils/util'
+import { clean } from '@/common/manager/StorageManager'
 import {
   setLocal,
   getLocal,
@@ -240,6 +241,7 @@ export default {
     }
   },
   async created() {
+    console.log(this.key, this.apiKey)
     // 获取活跃度
     getLocal([STORAGE.liveness], (res) => {
       const storage = res[STORAGE.liveness] ?? {}
@@ -265,7 +267,6 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['logout']),
     initLiveness(storage) {
       this.percentage = storage.percentage ?? 0
       if (
@@ -351,9 +352,8 @@ export default {
     },
     logout() {
       /* global chrome */
-      chrome.extension.getBackgroundPage().closeSocket()
-      this.logout()
-      setLocal({ [STORAGE.key]: '' })
+      chrome.runtime.sendMessage({ type: EVENT.LOGIN_OUT })
+      clean()
       this.$router.push({ name: 'Login' })
     },
     blacklistChange(val) {

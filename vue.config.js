@@ -101,17 +101,18 @@ module.exports = defineConfig({
     }
     // 如果是生产环境，添加 Terser 插件以压缩代码
     if (isProduction) {
-      config.optimization = {
-        minimize: true,
-        minimizer: [new TerserPlugin()]
-      }
-    }
-    if (!isProduction) {
+      // config.optimization = {
+      //   minimize: true,
+      //   minimizer: [new TerserPlugin()]
+      // }
       config.plugins.push(
         new ZipPlugin({
           path: path.resolve(rootPath, 'artifacts'),
-          filename: `{process.env.VUE_APP_NAME}-{process.env.VUE_APP_VERSION}-{process.env.NODE_ENV}.zip`
-        }),
+          filename: `${process.env.VUE_APP_NAME}-${process.env.VUE_APP_VERSION}-${process.env.NODE_ENV}.zip`
+        })
+      )
+    } else {
+      config.plugins.push(
         // 启用热模块替换
         new webpack.HotModuleReplacementPlugin()
       )
@@ -134,6 +135,24 @@ module.exports = defineConfig({
         runtimeCompat: true
       })
       .end()
+    if (isProduction) {
+      // 修改输出文件名
+      config.output.filename('js/[name].js')
+      config.output.chunkFilename('js/[name].js')
+
+      // 添加 TerserPlugin 压缩
+      config.optimization.minimize(true)
+      config.optimization.minimizer('terser').use(TerserPlugin, [
+        {
+          terserOptions: {
+            compress: {
+              // 移除 console.log
+              drop_console: true
+            }
+          }
+        }
+      ])
+    }
   },
   devServer: {
     before: (app, server) => {

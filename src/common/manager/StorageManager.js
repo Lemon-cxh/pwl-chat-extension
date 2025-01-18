@@ -32,6 +32,14 @@ export function refreshKey() {
   })
 }
 
+export function clean() {
+  setLocal({ [STORAGE.key]: '' })
+  setLocal({ [STORAGE.account]: {} })
+  setLocal({ [STORAGE.user]: {} })
+  setLocal({ [STORAGE.online]: {} })
+  setLocal({ [STORAGE.discuss]: {} })
+}
+
 export function setOnline(data) {
   setLocal({ [STORAGE.online]: data })
 }

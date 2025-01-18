@@ -196,14 +196,6 @@ export default {
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
     this.online = await getOnline()
     this.setDiscussContent(await getDiscuss())
-    setInterval(() => {
-      // 如果30S内没滚动过消息，则删除多余消息
-      if ((new Date().getTime() - that.scrollTime) > 30000) {
-        while (that.messageArray.length > 100) {
-          that.messageArray.pop()
-        }
-      }
-    }, 30 * 1000)
   },
   mounted() {
     document.getElementById('messageList').oncontextmenu = (event) => {
@@ -294,6 +286,11 @@ export default {
         !isRedPacket(message)
       ) {
         this.hasNewMessage = true
+      }
+      if ((new Date().getTime() - this.scrollTime) > 30000) {
+        while (this.messageArray.length > 100) {
+          this.messageArray.pop()
+        }
       }
     },
     scroll({ scrollTop }) {

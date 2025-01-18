@@ -23,7 +23,7 @@ const req = require.context('@/popup/svg', true, /\.svg$/)
 requireAll(req)
 
 store
-  .dispatch('getUser')
+  .dispatch('init')
   .then(() => {
     router.push({ name: 'ChatRoom' })
   })

@@ -66,7 +66,7 @@ init()
  * 如果port连接存在，需要同步信息
  * @param {*} event
  */
-function messageHandler(event) {
+const messageHandler = function messageHandler(event) {
   const data = JSON.parse(event.data)
   switch (data.type) {
     case MESSAGE_TYPE.online:
@@ -141,7 +141,10 @@ chrome.runtime.onConnect.addListener((p) => {
 chrome.runtime.onMessage.addListener((request) => {
   // 登录事件触发链接 WebSocket
   if (EVENT.LOGIN === request.type) {
-    openWebSocket()
+    openWebSocket(messageHandler)
+  }
+  if (EVENT.LOGIN_OUT === request.type) {
+    closeWebSocket()
   }
   if (TABS_EVENT.sendMessage === request.type) {
     sendMessage(request.data)
@@ -226,12 +229,12 @@ function reconnectEvent(message) {
   }
   let matchMsg = message.md.match(/您超过6小时未活跃/)
   if (matchMsg) {
-    openWebSocket()
+    openWebSocket(messageHandler)
     return true
   }
   matchMsg = message.md.match(/你的连接被管理员断开/)
   if (matchMsg) {
-    openWebSocket()
+    openWebSocket(messageHandler)
     return true
   }
 }

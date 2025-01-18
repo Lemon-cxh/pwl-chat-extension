@@ -141,7 +141,7 @@ export default createStore({
     }
   },
   actions: {
-    getUser(context) {
+    init(context) {
       return new Promise((resolve, reject) => {
         getLocal([STORAGE.key, STORAGE.account], async (result) => {
           if (!result || !result[STORAGE.key]) {
