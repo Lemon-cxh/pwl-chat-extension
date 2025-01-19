@@ -154,14 +154,14 @@ export default createStore({
             const r = await getKey(result[STORAGE.account])
             if (r.code !== 0) {
               setLocal({ [STORAGE.key]: '' })
-              reject(new Error('获取key请求失败'))
+              reject(new Error(res.msg ? res.msg : '获取key请求失败'))
               return
             }
             key = r.Key
             setLocal({ [STORAGE.key]: key })
             res = await getUserInfo({ apiKey: key })
             if (r.code !== 0) {
-              reject(new Error('获取用户信息失败'))
+              reject(new Error(res.msg ? res.msg : '获取用户信息失败'))
               return
             }
           }

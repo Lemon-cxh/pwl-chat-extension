@@ -1,4 +1,4 @@
-import { setLocal, getLocal } from '@/common/utils/chromeUtil'
+import { setLocal, getLocal, removeLocal } from '@/common/utils/chromeUtil'
 import { STORAGE } from '@/common/constant/Constant'
 import { getUserInfo, login } from '@/background/api/index'
 
@@ -32,12 +32,12 @@ export function refreshKey() {
   })
 }
 
+/**
+ * 清空本地数据
+ */
 export function clean() {
-  setLocal({ [STORAGE.key]: '' })
-  setLocal({ [STORAGE.account]: {} })
-  setLocal({ [STORAGE.user]: {} })
-  setLocal({ [STORAGE.online]: {} })
-  setLocal({ [STORAGE.discuss]: {} })
+  removeLocal([STORAGE.key, STORAGE.user, STORAGE.liveness,
+    STORAGE.discussEnable, STORAGE.online, STORAGE.discuss])
 }
 
 export function setOnline(data) {

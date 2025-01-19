@@ -41,8 +41,7 @@
 </template>
 
 <script>
-import { getKey } from '@/popup/api/login'
-import { mapMutations } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 import md5 from 'js-md5'
 import { setLocal, getLocal } from '@/common/utils/chromeUtil'
 import { STORAGE, EVENT } from '@/common/constant/Constant'
@@ -87,23 +86,20 @@ export default {
   },
   methods: {
     ...mapMutations(['setUserInfo', 'setKey']),
+    ...mapActions(['init']),
     onSubmit() {
       const data = { ...this.form }
       data.userPassword = md5(data.userPassword)
-      getKey(data).then((response) => {
-        if (response.code !== 0) {
-          this.$message.error(response.msg ? response.msg : response)
-          return
-        }
-        this.setKey(response.Key)
-        setLocal({
-          [STORAGE.key]: response.Key,
-          [STORAGE.account]: data
+      setLocal({ [STORAGE.account]: data })
+      this.init()
+        .then(() => {
+          /* global chrome */
+          chrome.runtime.sendMessage({ type: EVENT.LOGIN })
+          this.$router.push({ name: 'ChatRoom' })
         })
-        /* global chrome */
-        chrome.runtime.sendMessage({ type: EVENT.LOGIN })
-        this.$router.push({ name: 'ChatRoom' })
-      })
+        .catch((e) => {
+          this.$message.error(e)
+        })
     },
     register() {
       this.$router.push({ name: 'Register' })

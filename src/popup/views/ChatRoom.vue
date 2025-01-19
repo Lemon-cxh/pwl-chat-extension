@@ -196,6 +196,13 @@ export default {
       this.date.endsWith('12-24') || this.date.endsWith('12-25')
     this.online = await getOnline()
     this.setDiscussContent(await getDiscuss())
+    window.setInterval(() => {
+      if ((new Date().getTime() - that.scrollTime) > 30000) {
+        while (that.messageArray.length > 100) {
+          that.messageArray.pop()
+        }
+      }
+    }, 30000)
   },
   mounted() {
     document.getElementById('messageList').oncontextmenu = (event) => {
@@ -286,11 +293,6 @@ export default {
         !isRedPacket(message)
       ) {
         this.hasNewMessage = true
-      }
-      if ((new Date().getTime() - this.scrollTime) > 30000) {
-        while (this.messageArray.length > 100) {
-          this.messageArray.pop()
-        }
       }
     },
     scroll({ scrollTop }) {

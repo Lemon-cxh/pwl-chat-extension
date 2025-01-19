@@ -27,6 +27,10 @@ export function setSync(obj) {
   chrome.storage.sync.set(obj)
 }
 
+export function removeLocal(obj) {
+  chrome.storage.local.remove(obj)
+}
+
 export function sendTabsMessage(message, callback) {
   chrome.tabs.query(
     { active: true, currentWindow: true, status: 'complete' },

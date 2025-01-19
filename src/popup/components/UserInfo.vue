@@ -241,7 +241,6 @@ export default {
     }
   },
   async created() {
-    console.log(this.key, this.apiKey)
     // 获取活跃度
     getLocal([STORAGE.liveness], (res) => {
       const storage = res[STORAGE.liveness] ?? {}
