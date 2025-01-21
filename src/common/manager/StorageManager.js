@@ -10,7 +10,6 @@ export function refreshKey() {
     getLocal([STORAGE.key, STORAGE.account], async (result) => {
       // 没有则退出
       if (!result || !result[STORAGE.key]) {
-        console.log('还未登录')
         reject(new Error('还未登录'))
         return
       }

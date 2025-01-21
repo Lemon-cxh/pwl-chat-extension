@@ -87,10 +87,10 @@ export default {
   methods: {
     ...mapMutations(['setUserInfo', 'setKey']),
     ...mapActions(['init']),
-    onSubmit() {
+    async onSubmit() {
       const data = { ...this.form }
       data.userPassword = md5(data.userPassword)
-      setLocal({ [STORAGE.account]: data })
+      await setLocal({ [STORAGE.account]: data })
       this.init()
         .then(() => {
           /* global chrome */

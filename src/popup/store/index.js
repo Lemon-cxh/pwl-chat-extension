@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 import { user } from './module/user'
 import { getUserInfo, getKey } from '@/popup/api/login'
 import { STORAGE, MESSAGE_TYPE } from '@/common/constant/Constant'
-import { setLocal, getLocal } from '@/common/utils/chromeUtil'
+import { setLocal, getLocal, removeLocal } from '@/common/utils/chromeUtil'
 import { isRedPacket } from '@/common/utils/util'
 
 export default createStore({
@@ -144,29 +144,25 @@ export default createStore({
     init(context) {
       return new Promise((resolve, reject) => {
         getLocal([STORAGE.key, STORAGE.account], async (result) => {
-          if (!result || !result[STORAGE.key]) {
-            reject(new Error('未登录'))
-            return
-          }
           let key = result[STORAGE.key]
-          let res = await getUserInfo({ apiKey: key })
-          if (res.code !== 0) {
+          // 没有key先登录
+          if (!key) {
             const r = await getKey(result[STORAGE.account])
             if (r.code !== 0) {
-              setLocal({ [STORAGE.key]: '' })
-              reject(new Error(res.msg ? res.msg : '获取key请求失败'))
+              removeLocal([STORAGE.key])
+              reject(new Error(r.msg ? r.msg : '获取key请求失败'))
               return
             }
             key = r.Key
             setLocal({ [STORAGE.key]: key })
-            res = await getUserInfo({ apiKey: key })
-            if (r.code !== 0) {
-              reject(new Error(res.msg ? res.msg : '获取用户信息失败'))
-              return
-            }
+            context.commit('setKey', key)
+          }
+          const res = await getUserInfo({ apiKey: key })
+          if (res.code !== 0) {
+            reject(new Error(res.msg ? res.msg : '获取用户信息失败'))
+            return
           }
           context.commit('setUserInfo', res.data)
-          context.commit('setKey', key)
           resolve()
         })
       })
