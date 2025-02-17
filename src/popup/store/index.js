@@ -154,9 +154,9 @@ export default createStore({
               return
             }
             key = r.Key
-            setLocal({ [STORAGE.key]: key })
-            context.commit('setKey', key)
           }
+          setLocal({ [STORAGE.key]: key })
+          context.commit('setKey', key)
           const res = await getUserInfo({ apiKey: key })
           if (res.code !== 0) {
             reject(new Error(res.msg ? res.msg : '获取用户信息失败'))
