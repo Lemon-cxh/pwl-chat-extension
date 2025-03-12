@@ -37,29 +37,33 @@
 
 ```
 .
-├── public/
-│   ├── _locales/
-│   │   └── zh_CN/              - 目录名对应 manifest.json 的 default_locale
-│   ├── css/                    - 需要向网页注入的css
-│   ├── icons/                  - 扩展所需的Icon
-│   ├── image/                  - 图片资源
-│   └── browser-extension.html  - 默认html模板
-├── src/
-│   ├── api/                    - 所有请求
-│   ├── components/             - 各个组件
-│   ├── constant/               - 常量
-│   ├── content-scripts/
-│   │   └── content-script.js   - 需要向网页注入的js
-│   ├── popup/                  - 点击扩展图标展示的入口页面
+├── public
+│   ├── _locales
+│   │   └── zh_CN                 - 目录名对应 manifest.json 的 default_locale
+│   ├── css                       - 需要向网页注入的css
+│   ├── icons                     - 扩展所需的Icon
+│   ├── image                     - 图片资源
+│   └── browser-extension.html    - 默认html模板
+├── src
+│   ├── background                - 服务工作进程
+│   │   ├── api                   - 请求
+│   │   ├── manager               - WebSocket
+│   │   ├── index.js              - 服务工作进程
+│   ├── common                    - 公共
+│   │   ├── constant              - 常量
+│   ├── content-scripts           - 需要向网页注入的js
+│   ├── devtools                  - Devtools页面
+│   ├── popup                     - 扩展弹出页面
+│   │   ├── api                   - 所有请求
+│   │   ├── components            - 各个组件
+│   │   ├── router                - 路由
+│   │   ├── store                 - 全局 store 管理
+│   │   ├── svg                   - svg 文件
+│   │   ├── utils                 - 工具方法
+│   │   ├── views                 - 所有view
 │   │   ├── App.vue
 │   │   └── main.js
-│   ├── router/                 - 路由
-│   ├── store/                  - 全局 store 管理
-│   ├── svg/                    - svg 文件
-│   ├── utils/                  - 工具方法
-│   ├── views/                  - 所有view
-│   ├── background.js           - 在后台运行的js
-│   └── manifest.json           - 扩展配置文件
+│   └── manifest.json              - 扩展配置文件
 ```
 
 #### 热加载以进行调试

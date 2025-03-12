@@ -1,4 +1,5 @@
 import request from '@/popup/utils/request'
+import store from '@/popup/store/index'
 
 export function more(params) {
   return request({
@@ -43,9 +44,10 @@ export function openRedPacket(data) {
   })
 }
 
-export function upload(file) {
+export function upload(file, apiKey) {
   const formData = new FormData()
   formData.append('file[]', file)
+  formData.append('apiKey', store.getters.key)
   return request({
     url: '/upload',
     method: 'post',
@@ -57,7 +59,10 @@ export function revoke(oId, data) {
   return request({
     url: `/chat-room/revoke/${oId}`,
     method: 'delete',
-    data
+    data: {
+      ...data,
+      apiKey: store.getters.key
+    }
   })
 }
 
