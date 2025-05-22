@@ -36,7 +36,7 @@
           ref="inner"
           v-for="item in messageArray"
           v-bind:key="
-            type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
+            item.oId ? (item.whoGot ? item.oId + '_' + item.whoGot : item.oId) : new Date().getTime()
           "
         >
           <!-- 提示类消息 -->
@@ -189,7 +189,10 @@ export default {
     // 连接background.js
     /* global chrome */
     port = chrome.runtime.connect()
-    port.onMessage.addListener((msg) => that.messageListener(msg))
+    port.onMessage.addListener((msg) => {
+      console.log(msg.data)
+      that.messageListener(msg)
+    })
     this.options = await getOptions()
     // 是否展示圣诞头像挂件
     this.avatarPendant.isChristmas =
