@@ -15,7 +15,11 @@
           src="@/../public/image/Christmas.png"
         />
       </el-row>
-      <el-row :class="[{ 'own-chat': isOwn }, 'flex-column']" type="flex" style="max-width: calc(100% - 120px);">
+      <el-row
+        :class="[{ 'own-chat': isOwn }, 'flex-column']"
+        type="flex"
+        style="max-width: calc(100% - 120px)"
+      >
         <el-row class="name">
           <span class="nick-name">{{ message.userNickname }}</span>
           <span :class="message.userNickname ? 'user-name' : 'nick-name'">{{
@@ -35,7 +39,7 @@
           v-else
           :class="[
             isOwn ? 'own-content-background' : 'content-background',
-            'message-content'
+            'message-content',
           ]"
         >
           <el-popover
@@ -74,7 +78,7 @@
         </div>
         <el-row class="footer">
           <span>{{ getTime(message.time) }}</span>
-          <via v-if="!isOwn" :client="message.client"/>
+          <via v-if="!isOwn" :client="message.client" />
         </el-row>
       </el-row>
       <icon-svg
@@ -199,11 +203,80 @@ export default {
       })
     },
     modifyContent(content) {
+      // 处理音乐消息
+      if (content.includes('"msgType":"music"')) {
+        try {
+          const musicData = JSON.parse(content)
+          return `
+            <div class='music-card'>
+              <img src='${musicData.coverURL}' class='music-cover' />
+              <div class='music-info'>
+                <div class='music-title'>${musicData.title}</div>
+                <a href='${musicData.source}' target='_blank' class='music-link'>播放音乐</a>
+              </div>
+            </div>
+          `
+        } catch (e) {
+          console.error('音乐消息解析失败:', e)
+        }
+      }
+
+      // 处理天气消息
+      if (content.includes('"msgType":"weather"')) {
+        try {
+          const weatherData = JSON.parse(content)
+          const dates = weatherData.date.split(',')
+          const weatherCodes = weatherData.weatherCode.split(',')
+          const mins = weatherData.min.split(',').map(Number)
+          const maxs = weatherData.max.split(',').map(Number)
+          // 天气图标映射
+          const codeMap = {
+            CLEAR_DAY: '☀️',
+            PARTLY_CLOUDY_DAY: '⛅',
+            CLOUDY: '☁️',
+            LIGHT_RAIN: '🌧️',
+            MODERATE_RAIN: '🌦️',
+            HEAVY_RAIN: '⛈️',
+            SNOW: '❄️',
+            FOG: '🌫️',
+            WIND: '💨',
+            HAZE: '🌁',
+            SLEET: '🌨️',
+            THUNDER: '⛈️',
+            SUNNY: '☀️',
+            OVERCAST: '☁️',
+            RAIN: '🌧️',
+            '': '❓'
+          }
+          let weatherHtml = `
+            <div class='weather-card-2'>
+              <div class='weather-city-2'>${weatherData.t}</div>
+              <div class='weather-status-2'>${weatherData.st}</div>
+              <div class='weather-forecast-2'>
+          `
+          for (let i = 0; i < dates.length; i++) {
+            weatherHtml += `
+              <div class='weather-day-2'>
+                <div class='weather-date-2'>${dates[i]}</div>
+                <div class='weather-icon-2'>${
+                  codeMap[weatherCodes[i]] || '❓'
+                }</div>
+                <div class='weather-temp-max-2'>${maxs[i]}°C</div>
+                <div class='weather-temp-min-2'>${mins[i]}°C</div>
+              </div>
+            `
+          }
+          return weatherHtml
+        } catch (e) {
+          console.error('天气消息解析失败:', e)
+        }
+      }
+
       // 美化话题格式
       // <em><code># Yui女装呢 #</code></em>
       const result = content.replaceAll(
         /(<em><code>#\s)(.{1,16})(\s#<\/code><\/em>)/g,
-        '<span class="el-tag" style="margin: 1px 0;">$2</span>'
+        "<span class='el-tag' style='margin: 1px 0;'>$2</span>"
       )
       // 隐藏小尾巴信息
       if (!this.hideBlockquote) {
@@ -283,7 +356,7 @@ export default {
   background-color: #a3db92;
 }
 .content-background::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 4px;
   left: -14px;
@@ -296,7 +369,7 @@ export default {
   background-color: #fffbe6;
 }
 .own-content-background::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 4px;
   right: -14px;
@@ -354,7 +427,7 @@ export default {
 .el-popover.el-popper {
   min-width: 0px;
 }
-.message-content img[alt='图片表情'] {
+.message-content img[alt="图片表情"] {
   max-width: 100%;
 }
 .message-content * {
@@ -375,5 +448,137 @@ export default {
 }
 .message-content iframe {
   border: none;
+}
+
+/* 音乐卡片样式 */
+.music-card {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 8px 0;
+  max-width: 300px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.music-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.music-cover {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  margin-right: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.music-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.music-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  line-height: 1.4;
+}
+
+.music-link {
+  color: #409eff;
+  text-decoration: none;
+  font-size: 13px;
+  padding: 4px 8px;
+  background: rgba(64, 158, 255, 0.1);
+  border-radius: 4px;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.music-link:hover {
+  background: rgba(64, 158, 255, 0.2);
+  color: #66b1ff;
+}
+
+/* 新天气卡片样式 */
+.weather-card-2 {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 18px 12px 12px 12px;
+  margin: 10px auto;
+  max-width: 340px;
+  text-align: center;
+  font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+}
+.weather-city-2 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 4px;
+}
+.weather-status-2 {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
+.weather-forecast-2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 8px;
+}
+.weather-day-2 {
+  flex: 1;
+  margin: 0 2px;
+  background: none;
+  border-radius: 8px;
+  padding: 0 2px;
+}
+.weather-date-2 {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 2px;
+}
+.weather-icon-2 {
+  font-size: 28px;
+  margin-bottom: 2px;
+  line-height: 1;
+}
+.weather-desc-2 {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 2px;
+}
+.weather-temp-max-2 {
+  font-size: 15px;
+  color: #f56c6c;
+  font-weight: 600;
+  line-height: 1;
+}
+.weather-temp-min-2 {
+  font-size: 13px;
+  color: #409eff;
+  line-height: 1;
+}
+.weather-svg-2 {
+  margin: 0 auto;
+  width: 180px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.weather-svg-2 svg {
+  width: 180px;
+  height: 40px;
+  display: block;
 }
 </style>
