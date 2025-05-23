@@ -26,7 +26,7 @@
         <div
           :class="[
             'message-content',
-            message.senderUserName === userInfo.userName ? 'self' : '',
+            message.senderUserName === userInfo.userName ? 'self' : ''
           ]"
         >
           <el-avatar :size="40" :src="message.senderAvatar" />
@@ -56,7 +56,7 @@
         type="textarea"
         :rows="3"
         placeholder="输入消息..."
-        @keyup.enter.native.exact="sendMessage"
+        @keyup.enter.exact="sendMessage"
       />
       <div class="input-tools">
         <div class="left-tools">
@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import { getChatMessage } from '@/popup/api/privatechat'
+import { getChatMessage, markAsRead } from '@/popup/api/privatechat'
 import { mapGetters } from 'vuex'
 import {
   openPrivateChatWebSocket,
@@ -287,7 +287,12 @@ export default {
     addContent(content) {
       this.inputMessage += content
     },
-    goBack() {
+    async goBack() {
+      const params = {
+        ...this.apiKey,
+        fromUser: this.currentUser
+      }
+      await markAsRead(params)
       this.$router.push({ name: 'PrivateChatList' })
     },
     handleWebSocketMessage(event) {
