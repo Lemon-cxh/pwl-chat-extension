@@ -189,10 +189,7 @@ export default {
     // 连接background.js
     /* global chrome */
     port = chrome.runtime.connect()
-    port.onMessage.addListener((msg) => {
-      console.log(msg.data)
-      that.messageListener(msg)
-    })
+    port.onMessage.addListener((msg) => that.messageListener(msg))
     this.options = await getOptions()
     // 是否展示圣诞头像挂件
     this.avatarPendant.isChristmas =
@@ -265,7 +262,7 @@ export default {
           this.setDiscussContent(msg.data.discussing)
           break
         case EVENT.discussChanged:
-          this.setDiscussContent(msg.data)
+          this.setDiscussContent(msg.data.newDiscuss)
           break
         default:
           break
