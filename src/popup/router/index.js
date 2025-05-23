@@ -25,6 +25,21 @@ const routes = [
     path: '/notification',
     name: 'Notification',
     component: () => import('@/popup/views/Notification.vue')
+  },
+  {
+    path: '/private-chat-list',
+    name: 'PrivateChatList',
+    component: () => import('@/popup/views/PrivateChatList.vue')
+  },
+  {
+    path: '/private-chat/:username',
+    name: 'PrivateChat',
+    component: () => import('@/popup/components/PrivateChat.vue')
+  },
+  {
+    path: '/article-list',
+    name: 'ArticleList',
+    component: () => import('@/popup/views/ArticleList.vue')
   }
 ]
 

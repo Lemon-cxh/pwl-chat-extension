@@ -9,6 +9,10 @@ import {
   openWebSocket,
   closeWebSocket
 } from '@/background/manager/WebSocketManager'
+import {
+  openPrivateChatWebSocket,
+  closePrivateChatWebSocket
+} from './manager/PrivateChatWebSocketManager'
 import { send, openRedPacket } from '@/background/api/index'
 import {
   notifications,
@@ -162,6 +166,21 @@ chrome.runtime.onMessage.addListener((request) => {
       })
     })
   }
+  // 私聊相关事件
+  if (TABS_EVENT.openPrivateChat === request.type) {
+    openPrivateChatWebSocket(request.data.toUser, (event) => {
+      const data = JSON.parse(event.data)
+      if (data.type === 'msg') {
+        sendTabsMessage({
+          type: TABS_EVENT.privateMessage,
+          data
+        })
+      }
+    })
+  }
+  if (TABS_EVENT.closePrivateChat === request.type) {
+    closePrivateChatWebSocket()
+  }
 })
 
 /**
@@ -255,7 +274,11 @@ async function atNotifications(message) {
     message.md &&
     message.md.indexOf('@' + (await getUser()).userName) !== -1
   ) {
-    notifications(`${message.userName}@了你`, message.md, message.userAvatarURL)
+    notifications(
+      `${message.userName}@了你`,
+      message.md,
+      message.userAvatarURL
+    )
   }
 }
 
