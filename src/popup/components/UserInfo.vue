@@ -28,6 +28,11 @@
             <el-badge :value="unreadChat" :hidden="unreadChat === 0">
             </el-badge>
           </el-dropdown-item>
+          <el-dropdown-item command="openArticle">
+            <house class="svg-icon" />
+            看 贴
+            <el-badge> </el-badge>
+          </el-dropdown-item>
           <el-dropdown-item command="openNotifications">
             <bell class="svg-icon" />
             通 知
@@ -185,9 +190,16 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { liveness, isCollectedLiveness, getLivenessReward } from '@/popup/api/user'
+import {
+  liveness,
+  isCollectedLiveness,
+  getLivenessReward
+} from '@/popup/api/user'
 import { unread } from '@/popup/api/chat'
-import { countNotifications, makeReadNotifications } from '@/popup/api/notification'
+import {
+  countNotifications,
+  makeReadNotifications
+} from '@/popup/api/notification'
 import { STORAGE, defaultOptions, EVENT } from '@/common/constant/Constant'
 import { getDate } from '@/common/utils/util'
 import { clean } from '@/common/manager/StorageManager'
@@ -341,7 +353,10 @@ export default {
       window.open(process.env.VUE_APP_BASE_URL)
     },
     openChat() {
-      window.open(process.env.VUE_APP_BASE_URL + '/chat')
+      this.$router.push({ name: 'PrivateChatList' })
+    },
+    openArticle() {
+      this.$router.push({ name: 'ArticleList' })
     },
     openNotifications() {
       this.$router.push({ name: 'Notification' })
