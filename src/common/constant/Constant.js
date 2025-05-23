@@ -138,7 +138,7 @@ export const TABS_EVENT = {
   /**
    * 网页发送消息
    */
-  sendMessage: 3,
+  sendMessage: 'sendMessage',
   /**
    * 同步配置
    */
@@ -146,11 +146,23 @@ export const TABS_EVENT = {
   /**
    * 网页打开红包
    */
-  openRedPacket: 5,
+  openRedPacket: 'openRedPacket',
   /**
    * 标记红包领取状态
    */
-  markRedPacket: 6
+  markRedPacket: 'markRedPacket',
+  /**
+   * 打开私聊
+   */
+  openPrivateChat: 'openPrivateChat',
+  /**
+   * 关闭私聊
+   */
+  closePrivateChat: 'closePrivateChat',
+  /**
+   * 私聊消息
+   */
+  privateMessage: 'privateMessage'
 }
 
 /**
