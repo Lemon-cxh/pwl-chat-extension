@@ -5,9 +5,11 @@ import router from '@/popup/router'
 import IconSvg from '@/popup/components/Icon-svg'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
+// main.ts/main.js
+import 'element-plus/theme-chalk/el-message-box.css';
 
 // 设置ElMessage显示时间
-;['success', 'warning', 'info', 'error'].forEach((type) => {
+['success', 'warning', 'info', 'error'].forEach((type) => {
   ElMessage[type] = (msg) => {
     return ElMessage({
       message: msg,
@@ -18,7 +20,8 @@ import 'element-plus/es/components/message/style/css'
 })
 
 // 自定义的SVG组件配置：导入svg
-const requireAll = (requireContext) => requireContext.keys().map(requireContext)
+const requireAll = (requireContext) =>
+  requireContext.keys().map(requireContext)
 const req = require.context('@/popup/svg', true, /\.svg$/)
 requireAll(req)
 

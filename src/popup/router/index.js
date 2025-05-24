@@ -40,6 +40,21 @@ const routes = [
     path: '/article-list',
     name: 'ArticleList',
     component: () => import('@/popup/views/ArticleList.vue')
+  },
+  {
+    path: '/breezemoon',
+    name: 'BreezemoonList',
+    component: () => import('@/popup/views/BreezemoonList.vue')
+  },
+  {
+    path: '/breezemoon/post',
+    name: 'BreezemoonPost',
+    component: () => import('@/popup/views/BreezemoonPost.vue')
+  },
+  {
+    path: '/article/:id',
+    name: 'ArticleDetail',
+    component: () => import('@/popup/views/ArticleDetail.vue')
   }
 ]
 

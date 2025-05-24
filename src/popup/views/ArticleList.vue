@@ -175,10 +175,10 @@ export default {
       this.loadArticles(true)
     },
     selectArticle(article) {
-      window.open(
-        `${process.env.VUE_APP_BASE_URL}${article.articlePermalink}`,
-        '_blank'
-      )
+      this.$router.push({
+        name: 'ArticleDetail',
+        params: { id: article.oId }
+      })
     },
     goBack() {
       this.$router.push({ name: 'ChatRoom' })
@@ -228,6 +228,7 @@ export default {
 }
 .article-scrollbar {
   margin-top: 80px;
+  height: 86vh;
 }
 /* 新增和修改的样式 */
 .avatar-author-container {
