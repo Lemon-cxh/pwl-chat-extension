@@ -14,55 +14,68 @@
       </el-tabs>
     </div>
     <el-scrollbar
-      ref="scrollbar"
+      ref="articleScrollbar"
       class="article-scrollbar"
-      @scroll="handleScroll"
+      :height="scrollbarHeight"
+      noresize
+      always
+      @scroll="scroll"
     >
-      <div v-if="loading && articles.length === 0" class="simple-loading">
-        加载中...
-      </div>
-      <template v-else>
-        <div
-          v-for="article in articles"
-          :key="article.oId"
-          class="article-item"
-          @click="selectArticle(article)"
-        >
+      <div
+        v-for="article in articles"
+        :key="article.oId"
+        class="article-item"
+        @click="selectArticle(article)"
+      >
+        <div class="avatar-author-container">
           <el-avatar :size="32" :src="article.articleAuthorThumbnailURL48" />
-          <div class="article-content">
-            <div class="article-title-row">
-              <span class="article-title">{{ article.articleTitle }}</span>
-              <span class="article-time">{{ article.timeAgo }}</span>
-            </div>
-            <div class="article-meta-row">
-              <span class="author">{{ article.articleAuthorName }}</span>
-              <span class="stats">
-                <i class="el-icon-view"></i
-                >{{ article.articleViewCntDisplayFormat }}
-                <i class="el-icon-chat-dot-round"></i
-                >{{ article.articleCommentCount }}
-              </span>
-            </div>
-            <div class="article-preview">
-              {{ article.articlePreviewContent }}
-            </div>
-            <div class="article-tags">
+          <div class="author-name">{{ article.articleAuthorName }}</div>
+        </div>
+        <div class="article-content">
+          <div class="article-title-row">
+            <span class="article-title">{{ article.articleTitle }}</span>
+          </div>
+          <div class="article-meta-row">
+            <span class="stats">
+              <el-icon><view-icon /></el-icon>{{ article.articleViewCount }}
+              <el-icon><ChatDotRound /></el-icon>{{ article.articleCommentCount }}
+              <el-icon><Star /></el-icon>{{ article.articleThankCnt }}
+            </span>
+          </div>
+          <div class="article-preview">
+            {{ article.articlePreviewContent }}
+          </div>
+          <!-- 添加文章缩略图 -->
+          <div v-if="article.articleThumbnailURL" class="article-thumbnail">
+            <img :src="article.articleThumbnailURL" alt="缩略图" />
+          </div>
+          <div class="tags-time-row">
+            <div class="tags-container">
               <el-tag
                 v-for="tag in article.articleTagObjs"
                 :key="tag.oId"
-                size="mini"
+                size="small"
                 class="tag"
               >
                 {{ tag.tagTitle }}
               </el-tag>
             </div>
+            <span class="article-time">{{ article.timeAgo }}</span>
+          </div>
+          <!-- 添加最佳评论 -->
+          <div v-if="article.articleNiceComments && article.articleNiceComments.length > 0" class="best-comment">
+            <div class="best-comment-header">
+              <el-icon><Trophy /></el-icon> 最佳评论
+            </div>
+            <div class="best-comment-content">
+              <span class="best-comment-author">{{ article.articleNiceComments[0].commentAuthorName }}:</span>
+              {{ article.articleNiceComments[0].commentContent }}
+            </div>
           </div>
         </div>
-        <div v-if="loadingMore" class="simple-loading">加载中...</div>
-        <div v-if="noMore && articles.length > 0" class="simple-loading">
-          没有更多了
-        </div>
-      </template>
+      </div>
+      <div v-if="loading" class="loading-more">加载中...</div>
+      <div v-if="!hasMore && !loading" class="no-more">没有更多内容了</div>
     </el-scrollbar>
   </div>
 </template>
@@ -75,96 +88,91 @@ import {
   getReplyArticles
 } from '@/popup/api/article'
 import { mapGetters } from 'vuex'
+import { View as ViewIcon, ChatDotRound, Star, Trophy } from '@element-plus/icons-vue'
 
 export default {
   name: 'ArticleList',
+  components: {
+    ViewIcon,
+    ChatDotRound,
+    Star,
+    Trophy
+  },
   data() {
     return {
+      scrollbarHeight: window.innerHeight - 80,
       activeTab: 'recent',
       articles: [],
       loading: false,
-      loadingMore: false,
-      page: 1,
-      size: 20,
-      noMore: false
+      currentPage: 0,
+      hasMore: true
     }
   },
   computed: {
     ...mapGetters(['key']),
     apiKey() {
       return { apiKey: this.key }
+    },
+    pageParams() {
+      return {
+        p: this.currentPage,
+        apiKey: this.apiKey
+      }
     }
   },
   methods: {
-    async loadArticles(isLoadMore = false) {
-      if (isLoadMore) {
-        this.loadingMore = true
-      } else {
-        this.loading = true
+    async loadArticles(isTabChange = false) {
+      if (this.loading) {
+        return
       }
+      // 如果是切换标签页，重置数据
+      if (isTabChange) {
+        this.articles = []
+        this.currentPage = 0
+        this.hasMore = true
+      }
+      // 如果没有更多数据，直接返回
+      if (!this.hasMore) {
+        return
+      }
+      this.loading = true
+      this.currentPage++
       try {
         let response
-        const params = { ...this.apiKey, p: this.page, size: this.size }
         switch (this.activeTab) {
           case 'recent':
-            response = await getRecentArticles(params)
+            response = await getRecentArticles(this.pageParams)
             break
           case 'hot':
-            response = await getHotArticles(params)
+            response = await getHotArticles(this.pageParams)
             break
           case 'good':
-            response = await getGoodArticles(params)
+            response = await getGoodArticles(this.pageParams)
             break
           case 'reply':
-            response = await getReplyArticles(params)
+            response = await getReplyArticles(this.pageParams)
             break
         }
         if (response.code === 0) {
-          const list = response.data.articles || []
-          if (isLoadMore) {
-            this.articles = this.articles.concat(list)
+          const newArticles = response.data.articles
+          // 如果返回的数据为空，说明没有更多数据了
+          if (!newArticles || newArticles.length === 0) {
+            this.hasMore = false
           } else {
-            this.articles = list
+            this.articles = [...this.articles, ...newArticles]
           }
-          if (list.length === 0) {
-            this.noMore = true
-          } else {
-            this.noMore = false
-          }
+        } else {
+          this.currentPage--
         }
       } catch (error) {
         console.error('Failed to load articles:', error)
+        this.currentPage--
       } finally {
         this.loading = false
-        this.loadingMore = false
       }
     },
     handleTabClick() {
-      this.page = 1
-      this.noMore = false
-      this.articles = []
-      this.loadArticles()
-    },
-    handleScroll(args) {
-      // 兼容 el-scrollbar 只传 { scrollTop } 的情况
-      let scrollTop
-      if (typeof args === 'object' && args !== null && 'scrollTop' in args) {
-        scrollTop = args.scrollTop
-      } else {
-        scrollTop = 0
-      }
-      const wrap = this.$refs.scrollbar && this.$refs.scrollbar.wrapRef
-      if (!wrap) return
-      const scrollHeight = wrap.scrollHeight
-      const clientHeight = wrap.clientHeight
-      if (
-        scrollTop + clientHeight >= scrollHeight - 10 &&
-        !this.loadingMore &&
-        !this.noMore
-      ) {
-        this.page++
-        this.loadArticles(true)
-      }
+      this.loadArticles(true)
     },
     selectArticle(article) {
       this.$router.push({
@@ -174,10 +182,23 @@ export default {
     },
     goBack() {
       this.$router.push({ name: 'ChatRoom' })
+    },
+    scroll({ scrollTop }) {
+      // 获取滚动容器的高度信息
+      const scrollbar = this.$refs.articleScrollbar
+      if (!scrollbar) {
+        return
+      }
+      const { scrollHeight, clientHeight } = scrollbar.wrapRef
+      // 当滚动到距离底部 50px 时加载更多
+      const distanceToBottom = scrollHeight - scrollTop - clientHeight
+      if (!this.loading && distanceToBottom < 50 && this.hasMore) {
+        this.loadArticles()
+      }
     }
   },
   mounted() {
-    this.loadArticles()
+    this.loadArticles(true)
   }
 }
 </script>
@@ -209,13 +230,71 @@ export default {
   margin-top: 80px;
   height: 86vh;
 }
+/* 新增和修改的样式 */
+.avatar-author-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 10px;
+  width: 40px;
+}
+
+.author-name {
+  color: #999;
+  margin-top: 4px;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .article-item {
   display: flex;
   align-items: flex-start;
-  padding: 10px 8px;
+  padding: 5px 8px;
   border-bottom: 1px solid #232323;
   cursor: pointer;
   transition: background 0.2s;
+}
+
+.article-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.tags-time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.tags-container {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tag {
+  background: #232323;
+  border-color: #333;
+  color: #bbb;
+  font-size: 11px;
+  padding: 0 4px;
+  margin-right: 3px;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.article-time {
+  font-size: 11px;
+  color: #888;
+  margin-left: 8px;
+  flex-shrink: 0;
 }
 .article-item:hover {
   background: #232323;
@@ -240,10 +319,9 @@ export default {
   color: #e0e0e0;
   flex: 1;
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .article-time {
   font-size: 11px;
   color: #888;
@@ -252,7 +330,7 @@ export default {
 }
 .article-meta-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   font-size: 12px;
   color: #999;
@@ -270,44 +348,60 @@ export default {
   align-items: center;
   font-size: 11px;
 }
-.stats i {
-  margin-right: 2px;
-}
+
 .article-preview {
   font-size: 12px;
   color: #bbb;
   line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  max-width: 180px;
   margin-bottom: 2px;
 }
-.article-tags {
+
+/* 文章缩略图样式 */
+.article-thumbnail {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+  max-height: 120px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.article-thumbnail img {
+  width: 100%;
+  object-fit: cover;
+}
+
+/* 最佳评论样式 */
+.best-comment {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #2a2a2a;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.best-comment-header {
   display: flex;
-  gap: 4px;
-  margin-top: 2px;
+  align-items: center;
+  color: #f0c14b;
+  margin-bottom: 4px;
+  font-weight: 600;
 }
-.tag {
-  background: #232323;
-  border-color: #333;
+
+.best-comment-header .el-icon {
+  margin-right: 4px;
+}
+
+.best-comment-content {
   color: #bbb;
-  font-size: 11px;
-  padding: 0 4px;
+  line-height: 1.4;
 }
-.article-scrollbar :deep(.el-scrollbar__bar.is-vertical) {
-  width: 4px;
-}
-.article-scrollbar :deep(.el-scrollbar__thumb) {
-  background: #333;
-  border-radius: 2px;
-}
-.article-scrollbar :deep(.el-scrollbar__thumb:hover) {
-  background: #444;
-}
-.article-scrollbar :deep(.el-scrollbar__wrap) {
-  margin-right: 0 !important;
+
+.best-comment-author {
+  color: #ddd;
+  font-weight: 600;
+  margin-right: 4px;
 }
 :deep(.el-page-header__left),
 :deep(.el-page-header__content) {
@@ -332,5 +426,18 @@ export default {
   text-align: center;
   padding: 32px 0;
   font-size: 15px;
+}
+.loading-more {
+  color: #aaa;
+  text-align: center;
+  padding: 12px 0;
+  font-size: 13px;
+}
+
+.no-more {
+  color: #666;
+  text-align: center;
+  padding: 12px 0;
+  font-size: 12px;
 }
 </style>
