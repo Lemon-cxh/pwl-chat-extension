@@ -13,8 +13,14 @@
         <el-tab-pane label="最近回复" name="reply"></el-tab-pane>
       </el-tabs>
     </div>
-    <el-scrollbar class="article-scrollbar">
-      <div v-if="loading" class="simple-loading">加载中...</div>
+    <el-scrollbar
+      ref="scrollbar"
+      class="article-scrollbar"
+      @scroll="handleScroll"
+    >
+      <div v-if="loading && articles.length === 0" class="simple-loading">
+        加载中...
+      </div>
       <template v-else>
         <div
           v-for="article in articles"
@@ -52,6 +58,10 @@
             </div>
           </div>
         </div>
+        <div v-if="loadingMore" class="simple-loading">加载中...</div>
+        <div v-if="noMore && articles.length > 0" class="simple-loading">
+          没有更多了
+        </div>
       </template>
     </el-scrollbar>
   </div>
@@ -62,67 +72,114 @@ import {
   getRecentArticles,
   getHotArticles,
   getGoodArticles,
-  getReplyArticles,
-} from "@/popup/api/article";
-import { mapGetters } from "vuex";
+  getReplyArticles
+} from '@/popup/api/article'
+import { mapGetters } from 'vuex'
 
 export default {
-  name: "ArticleList",
+  name: 'ArticleList',
   data() {
     return {
-      activeTab: "recent",
+      activeTab: 'recent',
       articles: [],
       loading: false,
-    };
+      loadingMore: false,
+      page: 1,
+      size: 20,
+      noMore: false
+    }
   },
   computed: {
-    ...mapGetters(["key"]),
+    ...mapGetters(['key']),
     apiKey() {
-      return { apiKey: this.key };
-    },
+      return { apiKey: this.key }
+    }
   },
   methods: {
-    async loadArticles() {
-      this.loading = true;
+    async loadArticles(isLoadMore = false) {
+      if (isLoadMore) {
+        this.loadingMore = true
+      } else {
+        this.loading = true
+      }
       try {
-        let response;
+        let response
+        const params = { ...this.apiKey, p: this.page, size: this.size }
         switch (this.activeTab) {
-          case "recent":
-            response = await getRecentArticles(this.apiKey);
-            break;
-          case "hot":
-            response = await getHotArticles(this.apiKey);
-            break;
-          case "good":
-            response = await getGoodArticles(this.apiKey);
-            break;
-          case "reply":
-            response = await getReplyArticles(this.apiKey);
-            break;
+          case 'recent':
+            response = await getRecentArticles(params)
+            break
+          case 'hot':
+            response = await getHotArticles(params)
+            break
+          case 'good':
+            response = await getGoodArticles(params)
+            break
+          case 'reply':
+            response = await getReplyArticles(params)
+            break
         }
         if (response.code === 0) {
-          this.articles = response.data.articles;
+          const list = response.data.articles || []
+          if (isLoadMore) {
+            this.articles = this.articles.concat(list)
+          } else {
+            this.articles = list
+          }
+          if (list.length === 0) {
+            this.noMore = true
+          } else {
+            this.noMore = false
+          }
         }
       } catch (error) {
-        console.error("Failed to load articles:", error);
+        console.error('Failed to load articles:', error)
       } finally {
-        this.loading = false;
+        this.loading = false
+        this.loadingMore = false
       }
     },
     handleTabClick() {
-      this.loadArticles();
+      this.page = 1
+      this.noMore = false
+      this.articles = []
+      this.loadArticles()
+    },
+    handleScroll(args) {
+      // 兼容 el-scrollbar 只传 { scrollTop } 的情况
+      let scrollTop
+      if (typeof args === 'object' && args !== null && 'scrollTop' in args) {
+        scrollTop = args.scrollTop
+      } else {
+        scrollTop = 0
+      }
+      const wrap = this.$refs.scrollbar && this.$refs.scrollbar.wrapRef
+      if (!wrap) return
+      const scrollHeight = wrap.scrollHeight
+      const clientHeight = wrap.clientHeight
+      if (
+        scrollTop + clientHeight >= scrollHeight - 10 &&
+        !this.loadingMore &&
+        !this.noMore
+      ) {
+        this.page++
+        this.loadArticles(true)
+      }
     },
     selectArticle(article) {
-      window.open(`https://fishpi.cn${article.articlePermalink}`, "_blank");
+      this.$router.push({
+        name: 'ArticleDetail',
+        params: { id: article.oId }
+      })
     },
     goBack() {
-      this.$router.push({ name: "ChatRoom" });
-    },
+      this.$router.push({ name: 'ChatRoom' })
+    }
   },
   mounted() {
-    this.loadArticles();
-  },
-};
+    this.loadArticles()
+  }
+}
 </script>
 
 <style scoped>
@@ -150,6 +207,7 @@ export default {
 }
 .article-scrollbar {
   margin-top: 80px;
+  height: 86vh;
 }
 .article-item {
   display: flex;
