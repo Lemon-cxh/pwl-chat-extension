@@ -33,6 +33,10 @@
             看 贴
             <el-badge> </el-badge>
           </el-dropdown-item>
+          <el-dropdown-item command="openBreezemoon">
+            <moon class="svg-icon" />
+            清风明月
+          </el-dropdown-item>
           <el-dropdown-item command="openNotifications">
             <bell class="svg-icon" />
             通 知
@@ -215,7 +219,8 @@ import {
   Bell,
   ChatRound,
   Setting,
-  SwitchButton
+  SwitchButton,
+  Moon
 } from '@element-plus/icons-vue'
 
 const REQUEST_INTERVAL = 40000
@@ -230,7 +235,8 @@ export default {
     Bell,
     ChatRound,
     Setting,
-    SwitchButton
+    SwitchButton,
+    Moon
   },
   data() {
     return {
@@ -357,6 +363,9 @@ export default {
     },
     openArticle() {
       this.$router.push({ name: 'ArticleList' })
+    },
+    openBreezemoon() {
+      this.$router.push({ name: 'BreezemoonList' })
     },
     openNotifications() {
       this.$router.push({ name: 'Notification' })
