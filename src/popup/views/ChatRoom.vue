@@ -36,7 +36,7 @@
           ref="inner"
           v-for="item in messageArray"
           v-bind:key="
-            type.msg === item.type ? item.oId : item.oId + '_' + item.whoGot
+            item.oId ? (item.whoGot ? item.oId + '_' + item.whoGot : item.oId) : new Date().getTime()
           "
         >
           <!-- 提示类消息 -->
@@ -262,7 +262,7 @@ export default {
           this.setDiscussContent(msg.data.discussing)
           break
         case EVENT.discussChanged:
-          this.setDiscussContent(msg.data)
+          this.setDiscussContent(msg.data.newDiscuss)
           break
         default:
           break

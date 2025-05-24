@@ -99,13 +99,11 @@ const messageHandler = function messageHandler(event) {
       messageEvent(data, false)
       setDiscuss(data.newDiscuss)
       if (port) {
-        port.postMessage({ type: EVENT.discussChanged, data: data.newDiscuss })
+        port.postMessage({ type: EVENT.discussChanged, data })
       }
       break
-    case MESSAGE_TYPE.msg:
-      messageEvent(data, data.type === MESSAGE_TYPE.msg)
-      break
     default:
+      messageEvent(data, data.type === MESSAGE_TYPE.msg)
       break
   }
 }

@@ -13,7 +13,7 @@
         <span class="number" @click="openRedPacket"> 红包 </span>
         <span>({{ message.got }}/{{ message.count }})</span>
       </div>
-      <div v-else-if="type.discussStatus === message.type" class="message-box">
+      <div v-else-if="type.discussChanged === message.type" class="message-box">
         <span class="text" @click="showUserCard(message.whoChanged)">
           {{ message.whoChanged }}
         </span>
@@ -90,8 +90,6 @@ export default {
 }
 .message-box {
   max-width: 300px;
-  display: flex;
-  align-items: center;
 }
 .text {
   color: #4183c4;

@@ -209,11 +209,14 @@ export default {
           const musicData = JSON.parse(content)
           return `
             <div class='music-card'>
-              <img src='${musicData.coverURL}' class='music-cover' />
-              <div class='music-info'>
+              <div class='music-header'>
+                <img src='${musicData.coverURL}' class='music-cover' />
                 <div class='music-title'>${musicData.title}</div>
-                <a href='${musicData.source}' target='_blank' class='music-link'>播放音乐</a>
               </div>
+              <audio controls>
+                <source src="${musicData.source}" type="audio/mpeg">
+                您的浏览器不支持 audio 元素。
+              </audio>
             </div>
           `
         } catch (e) {
@@ -233,6 +236,7 @@ export default {
           const codeMap = {
             CLEAR_DAY: '☀️',
             PARTLY_CLOUDY_DAY: '⛅',
+            PARTLY_CLOUDY_NIGHT: '🌙',
             CLOUDY: '☁️',
             LIGHT_RAIN: '🌧️',
             MODERATE_RAIN: '🌦️',
@@ -453,12 +457,12 @@ export default {
 /* 音乐卡片样式 */
 .music-card {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
   border-radius: 12px;
   padding: 12px;
   margin: 8px 0;
-  max-width: 300px;
+  width: 240px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
@@ -468,9 +472,15 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.music-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
 .music-cover {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 8px;
   margin-right: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -486,25 +496,13 @@ export default {
 .music-title {
   font-size: 15px;
   font-weight: 600;
-  margin-bottom: 8px;
   color: #2c3e50;
   line-height: 1.4;
+  flex: 1;
 }
 
-.music-link {
-  color: #409eff;
-  text-decoration: none;
-  font-size: 13px;
-  padding: 4px 8px;
-  background: rgba(64, 158, 255, 0.1);
-  border-radius: 4px;
-  display: inline-block;
-  transition: all 0.3s ease;
-}
-
-.music-link:hover {
-  background: rgba(64, 158, 255, 0.2);
-  color: #66b1ff;
+.music-card audio {
+  width: 100%;
 }
 
 /* 新天气卡片样式 */
@@ -550,7 +548,6 @@ export default {
 .weather-icon-2 {
   font-size: 28px;
   margin-bottom: 2px;
-  line-height: 1;
 }
 .weather-desc-2 {
   font-size: 13px;
@@ -561,13 +558,13 @@ export default {
   font-size: 15px;
   color: #f56c6c;
   font-weight: 600;
-  line-height: 1;
 }
+
 .weather-temp-min-2 {
   font-size: 13px;
   color: #409eff;
-  line-height: 1;
 }
+
 .weather-svg-2 {
   margin: 0 auto;
   width: 180px;
