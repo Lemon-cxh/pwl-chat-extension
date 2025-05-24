@@ -62,16 +62,6 @@
             </div>
             <span class="article-time">{{ article.timeAgo }}</span>
           </div>
-          <!-- 添加最佳评论 -->
-          <div v-if="article.articleNiceComments && article.articleNiceComments.length > 0" class="best-comment">
-            <div class="best-comment-header">
-              <el-icon><Trophy /></el-icon> 最佳评论
-            </div>
-            <div class="best-comment-content">
-              <span class="best-comment-author">{{ article.articleNiceComments[0].commentAuthorName }}:</span>
-              {{ article.articleNiceComments[0].commentContent }}
-            </div>
-          </div>
         </div>
       </div>
       <div v-if="loading" class="loading-more">加载中...</div>
@@ -88,19 +78,18 @@ import {
   getReplyArticles
 } from '@/popup/api/article'
 import { mapGetters } from 'vuex'
-import { View as ViewIcon, ChatDotRound, Star, Trophy } from '@element-plus/icons-vue'
+import { View as ViewIcon, ChatDotRound, Star } from '@element-plus/icons-vue'
 
 export default {
   name: 'ArticleList',
   components: {
     ViewIcon,
     ChatDotRound,
-    Star,
-    Trophy
+    Star
   },
   data() {
     return {
-      scrollbarHeight: window.innerHeight - 80,
+      scrollbarHeight: window.innerHeight - 85,
       activeTab: 'recent',
       articles: [],
       loading: false,
@@ -214,11 +203,6 @@ export default {
 .header {
   padding: 6px 8px 0 8px;
   background: #232323;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
 }
 .title {
   margin-left: 8px;
@@ -226,10 +210,7 @@ export default {
   font-weight: 600;
   color: #fff;
 }
-.article-scrollbar {
-  margin-top: 80px;
-  height: 86vh;
-}
+
 /* 新增和修改的样式 */
 .avatar-author-container {
   display: flex;
@@ -372,37 +353,6 @@ export default {
   object-fit: cover;
 }
 
-/* 最佳评论样式 */
-.best-comment {
-  margin-top: 8px;
-  padding: 8px;
-  background-color: #2a2a2a;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-.best-comment-header {
-  display: flex;
-  align-items: center;
-  color: #f0c14b;
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.best-comment-header .el-icon {
-  margin-right: 4px;
-}
-
-.best-comment-content {
-  color: #bbb;
-  line-height: 1.4;
-}
-
-.best-comment-author {
-  color: #ddd;
-  font-weight: 600;
-  margin-right: 4px;
-}
 :deep(.el-page-header__left),
 :deep(.el-page-header__content) {
   color: white;

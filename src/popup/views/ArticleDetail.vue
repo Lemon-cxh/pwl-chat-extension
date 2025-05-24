@@ -17,14 +17,21 @@
       <div v-else class="article-content">
         <!-- 文章头部信息 -->
         <div class="article-header">
-          <h1 class="article-title">{{ article.articleTitle }}</h1>
+          <h1 class="article-title">
+            <a :href="articlePermalink" target="_blank">{{
+              article.articleTitle
+            }}</a>
+          </h1>
           <div class="article-meta">
             <span class="author">
               <img :src="article.articleAuthorThumbnailURL48" class="avatar" />
               {{ article.articleAuthorName }}
             </span>
-            <span class="time">{{ article.timeAgo }}</span>
-            <span class="views">{{ article.articleViewCount }} 阅读</span>
+            <span class="time">{{ article.articleCreateTimeStr }}</span>
+            <span class="time"
+              ><el-icon><view-icon /></el-icon
+              >{{ article.articleViewCount }}</span
+            >
           </div>
           <div class="article-tags" v-if="article.articleTags">
             <el-tag
@@ -49,7 +56,7 @@
             </el-button>
             <el-button type="text" @click="handleThank">
               <i class="el-icon-star-on"></i>
-              感谢
+              {{ article.articleThankCnt }}感谢
             </el-button>
             <el-button type="text" @click="handleComment">
               <i class="el-icon-chat-dot-round"></i>
@@ -167,10 +174,11 @@
     <el-dialog
       v-model="commentDialogVisible"
       title="发表评论"
-      width="100%"
-      custom-class="bottom-dialog"
+      width="90%"
+      header-class="header-dialog"
+      body-class="bottom-dialog"
+      footer-class="dialog-footer"
       :close-on-click-modal="false"
-      append-to-body
     >
       <div v-if="replyTo" class="reply-to">
         回复 @{{ replyTo.commentAuthorName }}：
@@ -184,16 +192,15 @@
         @keyup.enter.ctrl="submitComment"
       />
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="handleCommentCancel">取消</el-button>
-          <el-button
-            type="primary"
-            @click="submitComment"
-            :loading="commentLoading"
-          >
-            发表评论
-          </el-button>
-        </span>
+        <el-button size="small" @click="handleCommentCancel">取消</el-button>
+        <el-button
+          type="primary"
+          size="small"
+          @click="submitComment"
+          :loading="commentLoading"
+        >
+          发表评论
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -210,10 +217,14 @@ import {
   thankComment
 } from '@/popup/api/article'
 import { mapGetters } from 'vuex'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { View as ViewIcon } from '@element-plus/icons-vue'
 
 export default {
   name: 'ArticleDetail',
+  components: {
+    ViewIcon
+  },
   data() {
     return {
       article: null,
@@ -232,6 +243,9 @@ export default {
     ...mapGetters(['key']),
     apiKey() {
       return { apiKey: this.key }
+    },
+    articlePermalink() {
+      return `${process.env.VUE_APP_BASE_URL}${this.article?.articlePermalink}`
     }
   },
   created() {
@@ -265,16 +279,16 @@ export default {
         if (response.code === 0) {
           if (response.type === -1) {
             this.article.articleGoodCnt++
-            ElMessage.success('点赞成功')
+            this.$message.success('点赞成功')
           } else {
             this.article.articleGoodCnt--
-            ElMessage.success('已取消点赞')
+            this.$message.success('已取消点赞')
           }
         } else {
-          ElMessage.error(response.msg || '操作失败')
+          this.$message.error(response.msg || '操作失败')
         }
       } catch (error) {
-        ElMessage.error('操作失败')
+        this.$message.error('操作失败')
         console.error(error)
       }
     },
@@ -291,13 +305,13 @@ export default {
         )
         const response = await thankArticle(this.article.oId, this.apiKey)
         if (response.code === 0) {
-          ElMessage.success('感谢成功')
+          this.$message.success('感谢成功')
         } else {
-          ElMessage.error(response.msg || '操作失败')
+          this.$message.error(response.msg || '操作失败')
         }
       } catch (error) {
         if (error !== 'cancel') {
-          ElMessage.error('操作失败')
+          this.$message.error('操作失败')
           console.error(error)
         }
       }
@@ -360,9 +374,7 @@ export default {
 
           // 按时间倒序排序
           this.comments = rootComments.sort((a, b) => {
-            return (
-              new Date(b.commentCreateTime) - new Date(a.commentCreateTime)
-            )
+            return new Date(b.commentCreateTime) - new Date(a.commentCreateTime)
           })
 
           // 更新评论总数
@@ -382,7 +394,7 @@ export default {
     },
     async submitComment() {
       if (!this.commentContent.trim()) {
-        ElMessage.warning('请输入评论内容')
+        this.$message.warning('请输入评论内容')
         return
       }
       try {
@@ -396,16 +408,16 @@ export default {
           commentOriginalCommentId: this.replyTo?.oId
         })
         if (response.code === 0) {
-          ElMessage.success('评论成功')
+          this.$message.success('评论成功')
           this.commentContent = ''
           this.commentDialogVisible = false
           this.replyTo = null
           this.fetchComments()
         } else {
-          ElMessage.error(response.msg || '评论失败')
+          this.$message.error(response.msg || '评论失败')
         }
       } catch (error) {
-        ElMessage.error('评论失败')
+        this.$message.error('评论失败')
         console.error(error)
       } finally {
         this.commentLoading = false
@@ -420,22 +432,22 @@ export default {
         if (response.code === 0) {
           if (response.type === -1) {
             comment.commentGoodCnt++
-            ElMessage.success('点赞成功')
+            this.$message.success('点赞成功')
           } else {
             comment.commentGoodCnt--
-            ElMessage.success('已取消点赞')
+            this.$message.success('已取消点赞')
           }
         } else {
-          ElMessage.error(response.msg || '操作失败')
+          this.$message.error(response.msg || '操作失败')
         }
       } catch (error) {
-        ElMessage.error('操作失败')
+        this.$message.error('操作失败')
         console.error(error)
       }
     },
     async handleCommentThank(comment) {
       if (comment.commentAuthorId === this.article.articleAuthorId) {
-        ElMessage.warning('不能感谢自己的评论')
+        this.$message.warning('不能感谢自己的评论')
         return
       }
       try {
@@ -453,13 +465,13 @@ export default {
           commentId: comment.oId
         })
         if (response.code === 0) {
-          ElMessage.success('感谢成功')
+          this.$message.success('感谢成功')
         } else {
-          ElMessage.error(response.msg || '操作失败')
+          this.$message.error(response.msg || '操作失败')
         }
       } catch (error) {
         if (error !== 'cancel') {
-          ElMessage.error('操作失败')
+          this.$message.error('操作失败')
           console.error(error)
         }
       }
@@ -543,8 +555,8 @@ export default {
 }
 
 .avatar {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -576,8 +588,6 @@ export default {
 
 .article-footer {
   border-top: 1px solid #232323;
-  padding-top: 16px;
-  margin-bottom: 24px;
 }
 
 .article-actions {
@@ -586,15 +596,12 @@ export default {
 }
 
 .article-comments {
-  margin-top: 24px;
   border-top: 1px solid #232323;
-  padding-top: 16px;
 }
 
 .article-comments h3 {
   font-size: 15px;
   font-weight: 600;
-  margin-bottom: 16px;
   color: #fff;
 }
 
@@ -653,23 +660,6 @@ export default {
   border-color: #333;
   color: #bbb;
   margin-right: 4px;
-}
-
-:deep(.el-scrollbar__bar.is-vertical) {
-  width: 4px;
-}
-
-:deep(.el-scrollbar__thumb) {
-  background: #333;
-  border-radius: 2px;
-}
-
-:deep(.el-scrollbar__thumb:hover) {
-  background: #444;
-}
-
-:deep(.el-scrollbar__wrap) {
-  margin-right: 0 !important;
 }
 
 .loading {
@@ -750,14 +740,6 @@ export default {
   border-radius: 8px;
 }
 
-:deep(.el-dialog__title) {
-  color: #fff;
-}
-
-:deep(.el-dialog__body) {
-  color: #e0e0e0;
-}
-
 :deep(.el-textarea__inner) {
   background: #232323;
   border-radius: 10px;
@@ -766,15 +748,12 @@ export default {
   font-size: 15px;
   padding: 12px;
   min-height: 80px;
+  width: calc(100% - 20px);
+  margin: auto;
 }
 
 :deep(.el-textarea__inner:focus) {
   border-color: #409eff;
-}
-
-:deep(.el-dialog__footer) {
-  border-top: 1px solid #232323;
-  padding-top: 16px;
 }
 
 .nice-comment {
@@ -855,44 +834,6 @@ export default {
   margin-left: 4px;
 }
 
-:deep(.el-message-box) {
-  background: #2c2c2c;
-  border: 1px solid #333;
-}
-
-:deep(.el-message-box__title) {
-  color: #fff;
-}
-
-:deep(.el-message-box__content) {
-  color: #e0e0e0;
-}
-
-:deep(.el-message-box__btns) {
-  border-top: 1px solid #333;
-}
-
-:deep(.el-message-box__btns button) {
-  background: #232323;
-  border-color: #333;
-  color: #e0e0e0;
-}
-
-:deep(.el-message-box__btns button:hover) {
-  background: #2c2c2c;
-}
-
-:deep(.el-message-box__btns .el-button--primary) {
-  background: #409eff;
-  border-color: #409eff;
-  color: #fff;
-}
-
-:deep(.el-message-box__btns .el-button--primary:hover) {
-  background: #66b1ff;
-  border-color: #66b1ff;
-}
-
 .comment-input-wrapper {
   position: fixed;
   bottom: 0;
@@ -916,29 +857,6 @@ export default {
   font-size: 12px;
 }
 
-:deep(.el-message) {
-  background: #2c2c2c;
-  border-color: #333;
-}
-
-:deep(.el-message__content) {
-  color: #e0e0e0;
-}
-
-:deep(.el-message--success) {
-  background: #2c2c2c;
-  border-color: #67c23a;
-}
-
-:deep(.el-message--warning) {
-  background: #2c2c2c;
-  border-color: #e6a23c;
-}
-
-:deep(.el-message--error) {
-  background: #2c2c2c;
-  border-color: #f56c6c;
-}
 .simple-loading {
   color: #aaa;
   text-align: center;
@@ -946,79 +864,26 @@ export default {
   font-size: 15px;
 }
 
+:deep(a) {
+  color: #409eff;
+}
+
 /* 评论弹窗底部弹出样式 */
+:deep(.header-dialog) {
+  padding: 10px;
+}
+
+:deep(.el-dialog__title) {
+  color: #fff;
+}
+
 :deep(.bottom-dialog) {
-  position: fixed !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  margin: 0 !important;
-  width: 100vw !important;
-  max-width: 100vw !important;
-  border-radius: 18px 18px 0 0 !important;
-  background: #232323 !important;
+  border-radius: 18px 18px 0 0;
+  background: #232323;
   box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.18);
 }
-:deep(.bottom-dialog .el-dialog__body) {
-  padding: 18px 18px 0 18px;
-}
-:deep(.bottom-dialog .el-dialog__footer) {
-  border-top: 1px solid #333;
-  padding: 14px 18px 14px 18px;
-}
 
-/* ElMessage 居中和深色主题 */
-:deep(.el-message) {
-  left: 50% !important;
-  top: 30% !important;
-  transform: translate(-50%, 0) !important;
-  background: #232323 !important;
-  color: #fff !important;
-  border-color: #333 !important;
-}
-:deep(.el-message__content) {
-  color: #fff !important;
-}
-:deep(.el-message--success) {
-  background: #232323 !important;
-  border-color: #67c23a !important;
-}
-:deep(.el-message--warning) {
-  background: #232323 !important;
-  border-color: #e6a23c !important;
-}
-:deep(.el-message--error) {
-  background: #232323 !important;
-  border-color: #f56c6c !important;
-}
-
-/* ElMessageBox 居中和深色主题 */
-:deep(.el-message-box) {
-  background: #232323 !important;
-  color: #fff !important;
-  border: 1px solid #333 !important;
-}
-:deep(.el-message-box__title),
-:deep(.el-message-box__content) {
-  color: #fff !important;
-}
-:deep(.el-message-box__btns) {
-  border-top: 1px solid #333 !important;
-}
-:deep(.el-message-box__btns button) {
-  background: #232323 !important;
-  border-color: #333 !important;
-  color: #e0e0e0 !important;
-}
-:deep(.el-message-box__btns button:hover) {
-  background: #2c2c2c !important;
-}
-:deep(.el-message-box__btns .el-button--primary) {
-  background: #409eff !important;
-  border-color: #409eff !important;
-  color: #fff !important;
-}
-:deep(.el-message-box__btns .el-button--primary:hover) {
-  background: #66b1ff !important;
-  border-color: #66b1ff !important;
+:deep(.el-dialog__footer) {
+  padding: 10px 20px;
 }
 </style>

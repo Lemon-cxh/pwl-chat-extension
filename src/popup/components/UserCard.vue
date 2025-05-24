@@ -192,9 +192,5 @@ export default {
 .el-dialog {
   background-color: #333;
 }
-.el-dialog__header,
-.el-dialog__body,
-.el-dialog--center .el-dialog__body {
-  padding: 0;
-}
+
 </style>
