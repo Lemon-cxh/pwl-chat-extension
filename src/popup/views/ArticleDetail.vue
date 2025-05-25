@@ -224,6 +224,7 @@ import { View as ViewIcon } from '@element-plus/icons-vue'
 
 export default {
   name: 'ArticleDetail',
+  inject: ['$message'],
   components: {
     ViewIcon
   },
