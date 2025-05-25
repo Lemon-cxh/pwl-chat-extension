@@ -422,7 +422,7 @@ export default {
       this.redPacketInfo = info
       const data = { oId: info.oId, got: info.info.count }
       this.updateRedPacket(data)
-      port.postMessage({ type: EVENT.markRedPacket, data })
+      // port.postMessage({ type: EVENT.markRedPacket, data })
     },
     sendMessage(content, includeExtra) {
       this.$refs.messageInput.sendMessage(content, includeExtra)

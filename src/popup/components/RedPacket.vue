@@ -68,27 +68,13 @@
         v-if="'specify' === redPacketForm.type"
         prop="recivers"
       >
-        <el-select
-          v-model="redPacketForm.recivers"
+        <user-select
+          :user="redPacketForm.recivers"
+          :multiple="false"
           class="option"
-          filterable
-          remote
           placeholder="请输入关键词"
-          :remote-method="remoteMethod"
-          :loading="userListLoading"
-        >
-          <el-option
-            v-for="item in userList"
-            :key="item.userName"
-            :label="item.userName"
-            :value="item.userName"
-          >
-            <el-row class="option" type="flex">
-              <img class="option-image" :src="item.userAvatarURL" />
-              <span class="option-text">{{ item.userName }}</span>
-            </el-row>
-          </el-option>
-        </el-select>
+          @change="(val) => (redPacketForm.recivers = val)"
+        />
       </el-form-item>
       <el-form-item label="内容" prop="msg">
         <el-input
@@ -107,19 +93,24 @@
 
 <script>
 import { send } from '@/popup/api/chatroom'
-import { getUserName } from '@/popup/api/user'
 import { mapGetters } from 'vuex'
 import {
   RED_PACKET_TYPE,
   RED_PACKET_MAP,
   defaultType
 } from '@/common/constant/RedPacketConstant'
-import { inputRule, selectRule, numberRule } from '@/common/constant/RuleConstant'
-/**
- * 发送红包组件
- */
+import {
+  inputRule,
+  selectRule,
+  numberRule
+} from '@/common/constant/RuleConstant'
+import UserSelect from '@/popup/components/UserSelect.vue'
+
 export default {
   name: 'redPacket',
+  components: {
+    UserSelect
+  },
   inject: ['$message'],
   data() {
     return {
@@ -134,8 +125,6 @@ export default {
       redPacketDialogVisible: false,
       redPacketTypeMap: RED_PACKET_MAP,
       redPacketTypeArray: RED_PACKET_TYPE,
-      userList: [],
-      userListLoading: false,
       rules: {
         money: numberRule('积分'),
         count: numberRule('个数'),
@@ -188,22 +177,10 @@ export default {
         this.$message.info(res.msg)
       })
     },
-    remoteMethod(query) {
-      if (query === '') {
-        return
-      }
-      this.userListLoading = true
-      getUserName({ name: query }).then((res) => {
-        this.userList = res.data
-        this.userListLoading = false
-      })
-    },
-    redPacketTypeChange(value) {
-      const map = RED_PACKET_MAP.get(value)
-      this.redPacketForm.count = map.count
-      this.redPacketForm.msg = map.msg
-      this.redPacketForm.recivers = undefined
-      this.redPacketForm.gesture = value === 'rockPaperScissors' ? 0 : undefined
+    handleUserChange(users) {
+      // 由于UserSelect是多选的，我们只取第一个值
+      this.redPacketForm.recivers =
+        users && users.length > 0 ? users[0] : undefined
     }
   }
 }

@@ -51,15 +51,15 @@
         <div class="article-footer">
           <div class="article-actions">
             <el-button type="text" @click="handleLike">
-              <i class="el-icon-thumb"></i>
+              <icon-svg class="icon-svg" icon-class="like"/>
               {{ article.articleGoodCnt }} 赞同
             </el-button>
             <el-button type="text" @click="handleThank">
-              <i class="el-icon-star-on"></i>
+              <icon-svg class="icon-svg" icon-class="coin"/>
               {{ article.articleThankCnt }}感谢
             </el-button>
             <el-button type="text" @click="handleComment">
-              <i class="el-icon-chat-dot-round"></i>
+              <icon-svg class="icon-svg" icon-class="reply"/>
               {{ article.articleCommentCount }} 评论
             </el-button>
           </div>
@@ -73,7 +73,6 @@
               v-for="comment in comments"
               :key="comment.oId"
               class="comment-item"
-              :class="{ 'nice-comment': comment.isNice }"
             >
               <div class="comment-header">
                 <img :src="comment.commentAuthorThumbnailURL" class="avatar" />
@@ -99,15 +98,15 @@
               ></div>
               <div class="comment-actions">
                 <el-button type="text" @click="handleCommentLike(comment)">
-                  <i class="el-icon-thumb"></i>
+                  <icon-svg class="icon-svg" icon-class="like"/>
                   {{ comment.commentGoodCnt }} 赞同
                 </el-button>
                 <el-button type="text" @click="handleCommentThank(comment)">
-                  <i class="el-icon-star-on"></i>
+                  <icon-svg class="icon-svg" icon-class="coin"/>
                   {{ comment.commentThankCnt }} 感谢
                 </el-button>
                 <el-button type="text" @click="replyToComment(comment)">
-                  <i class="el-icon-chat-dot-round"></i>
+                  <icon-svg class="icon-svg" icon-class="reply"/>
                   {{ comment.commentReplyCnt }} 回复
                 </el-button>
               </div>
@@ -149,15 +148,15 @@
                   ></div>
                   <div class="reply-actions">
                     <el-button type="text" @click="handleCommentLike(reply)">
-                      <i class="el-icon-thumb"></i>
+                      <icon-svg class="icon-svg" icon-class="like"/>
                       {{ reply.commentGoodCnt }} 赞同
                     </el-button>
                     <el-button type="text" @click="handleCommentThank(reply)">
-                      <i class="el-icon-star-on"></i>
+                      <icon-svg class="icon-svg" icon-class="coin"/>
                       {{ reply.commentThankCnt }} 感谢
                     </el-button>
                     <el-button type="text" @click="replyToComment(reply)">
-                      <i class="el-icon-chat-dot-round"></i>
+                      <icon-svg class="icon-svg" icon-class="reply"/>
                       回复
                     </el-button>
                   </div>
@@ -184,11 +183,13 @@
         回复 @{{ replyTo.commentAuthorName }}：
       </div>
       <el-input
+        ref="commentInput"
         v-model="commentContent"
         type="textarea"
         :rows="4"
         placeholder="请输入评论内容"
         resize="none"
+        @paste.capture.prevent="pasteHandler"
         @keyup.enter.ctrl="submitComment"
       />
       <template #footer>
@@ -216,6 +217,7 @@ import {
   voteUpComment,
   thankComment
 } from '@/popup/api/article'
+import { upload } from '@/popup/api/chatroom'
 import { mapGetters } from 'vuex'
 import { ElMessageBox } from 'element-plus'
 import { View as ViewIcon } from '@element-plus/icons-vue'
@@ -392,6 +394,28 @@ export default {
       this.replyTo = null
       this.commentContent = ''
     },
+    pasteHandler(e) {
+      if (e.clipboardData.types.some((e) => e === 'Files')) {
+        const type = e.clipboardData.files[0].type
+        upload(e.clipboardData.files[0]).then((res) => {
+          const succMap = res.data.succMap
+          for (const key in succMap) {
+            this.commentContent += `${
+              type.startsWith('image') ? '!' : ''
+            }[${key}](${succMap[key]})`
+          }
+        })
+      } else {
+        this.$nextTick(() => {
+          const index =
+            this.$refs.commentInput.$el.firstElementChild.selectionStart
+          this.commentContent =
+            this.commentContent.substring(0, index) +
+            e.clipboardData.getData('Text') +
+            this.commentContent.substring(index)
+        })
+      }
+    },
     async submitComment() {
       if (!this.commentContent.trim()) {
         this.$message.warning('请输入评论内容')
@@ -493,7 +517,7 @@ export default {
   height: 100%;
   overflow: hidden;
   font-size: 13px;
-  max-width: 380px;
+  max-width: 381px;
   display: flex;
   flex-direction: column;
 }
@@ -756,13 +780,6 @@ export default {
   border-color: #409eff;
 }
 
-.nice-comment {
-  background: rgba(103, 194, 58, 0.1);
-  border-radius: 4px;
-  padding: 12px;
-  margin-bottom: 12px;
-}
-
 .comment-header {
   display: flex;
   align-items: center;
@@ -820,6 +837,11 @@ export default {
   margin-top: 4px;
   display: flex;
   gap: 12px;
+}
+
+.icon-svg {
+  font-size: 14px;
+  margin-right: 6px;
 }
 
 .reply-actions .el-button {

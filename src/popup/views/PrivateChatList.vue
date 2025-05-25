@@ -1,11 +1,24 @@
 <template>
   <div class="private-chat-list">
     <div class="header">
-      <el-page-header @back="goBack">
-        <template #content>
-          <span class="title">私聊列表</span>
-        </template>
-      </el-page-header>
+      <div class="header-content">
+        <el-page-header @back="goBack">
+          <template #content>
+            <span class="title">私聊列表</span>
+          </template>
+        </el-page-header>
+
+        <div class="user-select-wrapper">
+          <user-select
+            v-model="selectedUser"
+            :multiple="false"
+            placeholder="请输入用户名"
+            width="120px"
+            custom-class="user-select"
+            @change="handleSelectUser"
+          />
+        </div>
+      </div>
     </div>
     <el-scrollbar class="chat-list">
       <div
@@ -38,13 +51,18 @@
 <script>
 import { getChatList, hasUnread, markAsRead } from '@/popup/api/privatechat'
 import { mapGetters } from 'vuex'
+import UserSelect from '@/popup/components/UserSelect.vue' // 导入UserSelect组件
 
 export default {
   name: 'PrivateChatList',
+  components: {
+    UserSelect // 注册UserSelect组件
+  },
   data() {
     return {
       chatList: [],
-      unreadList: []
+      unreadList: [],
+      selectedUser: '' // 添加selectedUser数据项
     }
   },
   computed: {
@@ -95,6 +113,14 @@ export default {
     hasUnread(chat) {
       return this.getUnreadCount(chat) > 0
     },
+    // 修改处理用户选择的方法
+    handleSelectUser(val) {
+      if (val) {
+        this.selectChat({
+          receiverUserName: val
+        })
+      }
+    },
     selectChat(chat) {
       if (this.hasUnread(chat)) {
         this.markAsRead(chat.receiverUserName)
@@ -138,10 +164,33 @@ export default {
   z-index: 1;
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.user-select-wrapper {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
 .title {
   margin-left: 12px;
   font-size: 16px;
   font-weight: 600;
+  color: #fff;
+}
+
+/* 添加用户选择器的自定义样式 */
+:deep(.user-select .el-input__wrapper) {
+  background-color: #333;
+  border-color: #444;
+}
+
+:deep(.user-select .el-input__inner) {
   color: #fff;
 }
 
@@ -225,26 +274,9 @@ export default {
   transform-origin: right center;
 }
 
-/* 自定义滚动条样式 */
-.chat-list :deep(.el-scrollbar__bar.is-vertical) {
-  width: 6px;
-}
-
-.chat-list :deep(.el-scrollbar__thumb) {
-  background-color: #444;
-  border-radius: 3px;
-}
-
-.chat-list :deep(.el-scrollbar__thumb:hover) {
-  background-color: #555;
-}
-
-.chat-list :deep(.el-scrollbar__wrap) {
-  margin-right: 0 !important;
-}
-
 /* 修改 el-page-header 样式 */
 :deep(.el-page-header__left) {
+  margin-right: 0px;
   color: white;
 }
 
