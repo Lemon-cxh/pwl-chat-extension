@@ -8,11 +8,12 @@
   >
     <div class="user-card">
       <div
+        v-if="userInfo.cardBg"
         class="card-header"
         :style="getBackgroundImage(userInfo.cardBg)"
       ></div>
 
-      <div class="card-body">
+      <div class="card-body" :class="{ 'no-header': !userInfo.cardBg }">
         <div class="user-info-overview">
           <el-avatar
             :size="60"
@@ -40,6 +41,17 @@
                 <el-icon><Coin /></el-icon>
                 {{ userInfo.userPoint }}
               </span>
+              <span class="separator">•</span>
+              <span
+                class="online-status"
+                :class="{ 'is-online': userInfo.userOnlineFlag }"
+              >
+                <el-icon
+                  ><CircleCheck v-if="userInfo.userOnlineFlag" /><CircleClose
+                    v-else
+                /></el-icon>
+                {{ userInfo.userOnlineFlag ? "在线" : "离线" }}
+              </span>
             </div>
           </div>
           <div class="right-icons">
@@ -56,6 +68,11 @@
             <el-icon><Location /></el-icon>
             {{ userInfo.userCity || "未知" }}
           </span>
+          <span class="separator">•</span>
+          <span class="online-time" v-if="userInfo.onlineMinute">
+            <el-icon><Timer /></el-icon>
+            {{ userInfo.onlineMinute }}分钟
+          </span>
           <div class="badges" v-if="userInfo.sysMetal">
             <img
               v-for="(item, index) in userInfo.sysMetal.list"
@@ -67,6 +84,30 @@
                 item.attr
               "
             />
+          </div>
+        </div>
+
+        <div
+          class="user-stats"
+          v-if="
+            userInfo.followingUserCount !== undefined ||
+            userInfo.followerCount !== undefined
+          "
+        >
+          <div
+            class="stat-item"
+            v-if="userInfo.followingUserCount !== undefined"
+          >
+            <span class="stat-value">{{ userInfo.followingUserCount }}</span>
+            <span class="stat-label">关注</span>
+          </div>
+          <div class="stat-item" v-if="userInfo.followerCount !== undefined">
+            <span class="stat-value">{{ userInfo.followerCount }}</span>
+            <span class="stat-label">粉丝</span>
+          </div>
+          <div class="stat-item" v-if="userInfo.mbti">
+            <span class="stat-value">{{ userInfo.mbti }}</span>
+            <span class="stat-label">MBTI</span>
           </div>
         </div>
 
@@ -89,15 +130,40 @@
             <el-icon><HomeFilled /></el-icon>
             主页
           </el-button>
+          <el-button
+            v-if="userInfo.canFollow === 'yes'"
+            :type="isFollowing ? 'danger' : 'success'"
+            size="small"
+            :loading="followLoading"
+            @click="handleFollow"
+          >
+            <el-icon><Plus v-if="!isFollowing" /><Minus v-else /></el-icon>
+            {{ isFollowing ? "取关" : "关注" }}
+          </el-button>
+          <el-button
+            type="warning"
+            size="small"
+            @click="transferDialogVisible = true"
+          >
+            <el-icon><Money /></el-icon>
+            转账
+          </el-button>
         </div>
       </div>
     </div>
+
+    <TransferDialog
+      v-model="transferDialogVisible"
+      :user-name="userInfo.userName"
+      :api-key="key"
+      @success="handleTransferSuccess"
+    />
   </el-dialog>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { getUserInfo } from '@/popup/api/user'
+import { getUserInfo, followUser, unfollowUser } from '@/popup/api/user'
 import {
   Coin,
   LocationFilled as Location,
@@ -105,8 +171,15 @@ import {
   ChatLineRound,
   User,
   ChatDotRound,
-  HomeFilled
+  HomeFilled,
+  CircleCheck,
+  CircleClose,
+  Timer,
+  Plus,
+  Minus,
+  Money
 } from '@element-plus/icons-vue'
+import TransferDialog from './TransferDialog.vue'
 
 /**
  * 用户信息卡片
@@ -120,7 +193,14 @@ export default {
     ChatLineRound,
     User,
     ChatDotRound,
-    HomeFilled
+    HomeFilled,
+    CircleCheck,
+    CircleClose,
+    Timer,
+    Plus,
+    Minus,
+    Money,
+    TransferDialog
   },
   props: {
     dialogVisible: Boolean,
@@ -129,7 +209,10 @@ export default {
   emits: ['closeDialog'],
   data() {
     return {
-      userInfo: {}
+      userInfo: {},
+      isFollowing: false,
+      followLoading: false,
+      transferDialogVisible: false
     }
   },
   computed: {
@@ -153,6 +236,8 @@ export default {
           res.sysMetal = JSON.parse(res.sysMetal)
         }
         this.userInfo = res
+        // 检查是否已关注
+        this.isFollowing = res.followingUserCount > 0
       } catch (error) {
         console.error('Failed to load user info:', error)
       }
@@ -186,6 +271,37 @@ export default {
     },
     closeHandler() {
       this.$emit('closeDialog')
+    },
+    async handleFollow() {
+      if (this.followLoading) return
+
+      this.followLoading = true
+      try {
+        const params = {
+          apiKey: this.key,
+          followingId: this.userInfo.oId
+        }
+
+        if (this.isFollowing) {
+          await unfollowUser(params)
+          this.userInfo.followingUserCount--
+        } else {
+          await followUser(params)
+          this.userInfo.followingUserCount++
+        }
+
+        this.isFollowing = !this.isFollowing
+        this.$message.success(this.isFollowing ? '关注成功' : '取关成功')
+      } catch (error) {
+        console.error('Follow/Unfollow failed:', error)
+        this.$message.error('操作失败，请重试')
+      } finally {
+        this.followLoading = false
+      }
+    },
+    async handleTransferSuccess() {
+      // 刷新用户信息
+      await this.loadUserInfo(this.userInfo.userName)
     }
   }
 }
@@ -213,6 +329,10 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.card-body.no-header {
+  padding-top: 12px;
 }
 
 .user-info-overview {
@@ -371,6 +491,55 @@ export default {
 
 .el-popup-parent--hidden {
   padding-right: 0 !important;
+}
+
+.online-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.online-status.is-online {
+  color: #67c23a;
+}
+
+.online-status:not(.is-online) {
+  color: #909399;
+}
+
+.user-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.online-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
 }
 </style>
 <style>
