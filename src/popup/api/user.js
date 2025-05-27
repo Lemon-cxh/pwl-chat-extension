@@ -39,3 +39,27 @@ export function getUserName(data) {
     data
   })
 }
+
+export function followUser(params) {
+  return request({
+    url: '/follow/user',
+    method: 'post',
+    params
+  })
+}
+
+export function unfollowUser(params) {
+  return request({
+    url: '/unfollow/user',
+    method: 'post',
+    params
+  })
+}
+
+export function transferPoint(data) {
+  return request({
+    url: '/point/transfer',
+    method: 'post',
+    data
+  })
+}
