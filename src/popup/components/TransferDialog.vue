@@ -58,6 +58,7 @@ import { transferPoint } from '@/popup/api/user'
 
 export default {
   name: 'TransferDialog',
+  inject: ['$message'],
   props: {
     modelValue: {
       type: Boolean,
@@ -117,7 +118,11 @@ export default {
         await transferPoint(data)
         this.$message.success('转账成功')
         this.$emit('update:modelValue', false)
-        this.$emit('success')
+        this.$emit('success', {
+          amount: this.form.amount,
+          memo: this.form.memo
+        })
+        this.resetForm()
       } catch (error) {
         console.error('Transfer failed:', error)
         this.$message.error('转账失败，请重试')
