@@ -26,7 +26,7 @@
         <div
           :class="[
             'message-content',
-            message.senderUserName === userInfo.userName ? 'self' : ''
+            message.senderUserName === userInfo.userName ? 'self' : '',
           ]"
         >
           <el-avatar :size="40" :src="message.senderAvatar" />
@@ -68,10 +68,20 @@
           <div class="tool-item">
             <emoji @add-content="addContent" />
           </div>
+          <div class="tool-item" @click="showTransferDialog">
+            <el-icon><money /></el-icon>
+          </div>
         </div>
         <el-button type="primary" @click="sendMessage">发送</el-button>
       </div>
     </div>
+    <!-- 转账对话框 -->
+    <transfer-dialog
+      v-model="transferDialogVisible"
+      :user-name="currentUser"
+      :api-key="key"
+      @success="handleTransferSuccess"
+    />
   </div>
 </template>
 
@@ -83,16 +93,20 @@ import {
   closePrivateChatWebSocket,
   sendPrivateChatMessage
 } from '@/background/manager/PrivateChatWebSocketManager'
-import { InfoFilled } from '@element-plus/icons-vue'
+import { InfoFilled, Money } from '@element-plus/icons-vue'
 import Emoji from '@/popup/components/Emoji.vue'
 import Images from '@/popup/components/Images.vue'
+import TransferDialog from '@/popup/components/TransferDialog.vue'
 
 export default {
   name: 'PrivateChat',
+  inject: ['$message'],
   components: {
     InfoFilled,
+    Money,
     Emoji,
-    Images
+    Images,
+    TransferDialog
   },
   emits: ['back'],
   data() {
@@ -104,7 +118,8 @@ export default {
       hasNewMessage: false,
       isTop: true,
       loading: false,
-      scrollbarHeight: window.innerHeight - 200 // 增加底部空间
+      scrollbarHeight: window.innerHeight - 200, // 增加底部空间
+      transferDialogVisible: false
     }
   },
   computed: {
@@ -335,6 +350,26 @@ export default {
       } catch (error) {
         console.error('Failed to handle WebSocket message:', error)
       }
+    },
+    showTransferDialog() {
+      this.transferDialogVisible = true
+    },
+    handleTransferSuccess({ amount, memo }) {
+      // 发送转账成功消息
+      const message = {
+        type: 'msg',
+        toUser: this.currentUser,
+        content: `<p>转账 ${amount} 积分成功${
+          memo ? `，备注：${memo}` : ''
+        }</p>`,
+        time: new Date().toLocaleString(),
+        senderUserName: this.userInfo.userName,
+        senderAvatar: this.userInfo.userAvatarURL
+      }
+      this.messages.push(message)
+      this.$nextTick(() => {
+        this.scrollToBottom()
+      })
     }
   },
   watch: {

@@ -6,58 +6,62 @@
     :show-close="false"
     :before-close="close"
     center
+    class="red-packet-dialog"
   >
-    <el-row class="flex-column">
-      <el-avatar :src="info.info.userAvatarURL"></el-avatar>
-      <el-row class="item">{{ info.info.msg }}</el-row>
-      <el-row class="count">{{
-        (info.info.got >= info.info.count ? '总计: ' : '已抢: ') + count
-      }}</el-row>
-      <el-row v-if="info.info.gesture != undefined">
-        {{ info.info.userName }} 出了:
-        {{
-          info.info.gesture === 0
-            ? '石头'
-            : info.info.gesture === 1
-            ? '剪刀'
-            : '布'
-        }}
-      </el-row>
-      <el-row v-if="message">
-        {{ message }}
-      </el-row>
-      <div class="who-box">
-        <el-row
-          v-for="(item, index) in info.who"
-          :key="index"
-          class="item"
-          type="flex"
-        >
-          <el-row type="flex">
-            <el-avatar
-              class="item-avatar"
-              :size="35"
-              :src="item.avatar"
-            ></el-avatar>
-            <el-row class="flex-column user">
-              <el-row class="text">{{ item.userName }}</el-row>
-              <el-row class="time">{{ item.time }}</el-row>
-            </el-row>
-            <el-row class="flex-column money-column">
-              <el-row
-                :class="['money', item.userMoney > 0 ? 'red' : 'green']"
-                >{{ item.userMoney }}</el-row
-              >
-              <el-row
-                v-if="item.showMessage || item.userMoney === max"
-                class="text"
-                >{{ item.showMessage ? item.showMessage : '手气最佳' }}</el-row
-              >
-            </el-row>
-          </el-row>
-        </el-row>
+    <div class="red-packet-container">
+      <div class="header">
+        <el-avatar
+          :src="info.info.userAvatarURL"
+          :size="56"
+          class="avatar"
+        ></el-avatar>
+        <div class="info">
+          <div class="message">{{ info.info.msg }}</div>
+          <div class="count">
+            {{
+              (info.info.got >= info.info.count ? "总计: " : "已抢: ") + count
+            }}
+          </div>
+        </div>
       </div>
-    </el-row>
+
+      <div v-if="info.info.gesture != undefined" class="gesture">
+        <span>{{ info.info.userName }} 出了: </span>
+        <span class="gesture-value">{{
+          info.info.gesture === 0
+            ? "石头"
+            : info.info.gesture === 1
+            ? "剪刀"
+            : "布"
+        }}</span>
+      </div>
+
+      <div v-if="message" class="result">
+        {{ message }}
+      </div>
+
+      <div class="list">
+        <div v-for="(item, index) in info.who" :key="index" class="list-item">
+          <el-avatar
+            class="item-avatar"
+            :size="36"
+            :src="item.avatar"
+          ></el-avatar>
+          <div class="item-info">
+            <div class="name">{{ item.userName }}</div>
+            <div class="time">{{ item.time }}</div>
+          </div>
+          <div class="item-money">
+            <div :class="['amount', item.userMoney > 0 ? 'red' : 'green']">
+              {{ item.userMoney }}
+            </div>
+            <div v-if="item.showMessage || item.userMoney === max" class="tag">
+              {{ item.showMessage ? item.showMessage : "手气最佳" }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </el-dialog>
 </template>
 
@@ -129,49 +133,136 @@ export default {
 </script>
 
 <style scoped>
-.flex-column {
+.red-packet-dialog :deep(.el-dialog) {
+  background: #1a1a1a;
+  border-radius: 8px;
+}
+
+.red-packet-dialog :deep(.el-dialog__title) {
+  color: #fff;
+}
+
+.red-packet-container {
+  padding: 16px;
+  color: #e0e0e0;
+}
+
+.header {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  color: white;
+  margin-bottom: 20px;
 }
-.item {
-  margin: 5px 0;
+
+.avatar {
+  margin-bottom: 12px;
+  border: 2px solid #333;
+}
+
+.info {
   text-align: center;
 }
-.count {
+
+.message {
   font-size: 16px;
-  margin-bottom: 3px;
+  color: #fff;
+  margin-bottom: 6px;
 }
-.who-box {
-  max-height: 285px;
-  overflow: auto;
-  border-top: 1px solid;
-  margin-top: 3px;
+
+.count {
+  font-size: 14px;
+  color: #999;
 }
-.user {
-  width: 150px;
+
+.gesture {
+  text-align: center;
+  margin: 12px 0;
+  padding: 8px;
+  background: #2a2a2a;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #999;
 }
-.item-avatar {
-  align-self: center;
+
+.gesture-value {
+  color: #fff;
+  font-weight: 500;
 }
-.text {
+
+.result {
+  text-align: center;
+  margin: 12px 0;
+  padding: 8px;
+  background: #2a2a2a;
+  border-radius: 4px;
+  color: #fff;
   font-size: 14px;
 }
+
+.list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 16px;
+}
+
+.list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 2px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin-bottom: 8px;
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.item-avatar {
+  margin-right: 12px;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.name {
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
 .time {
   font-size: 12px;
+  color: #666;
 }
+
+.item-money {
+  text-align: right;
+  min-width: 70px;
+}
+
+.amount {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.tag {
+  font-size: 12px;
+  color: #999;
+}
+
 .red {
-  color: rgb(236, 55, 55);
+  color: #ff4d4f;
 }
+
 .green {
-  color: rgb(11, 219, 11);
-}
-.money-column {
-  width: 80px;
-}
-.money {
-  font-size: 18px;
-  font-weight: bolder;
+  color: #52c41a;
 }
 </style>
