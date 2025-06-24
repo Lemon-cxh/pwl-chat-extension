@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    width="380px"
+    width="370px"
     center
     :modal="false"
     :before-close="closeHandler"
@@ -53,6 +53,13 @@
                 {{ userInfo.userOnlineFlag ? "在线" : "离线" }}
               </span>
             </div>
+            <div class="user-meta">
+              <span>{{ userInfo.followingUserCount }}关注</span>
+              <span class="separator">•</span>
+              <span>{{ userInfo.followerCount }}粉丝</span>
+              <span class="separator">•</span>
+              <span>{{ userInfo.mbti ? userInfo.mbti : 'MBTI' }}</span>
+            </div>
           </div>
           <div class="right-icons">
             <!-- TODO: 添加爱心或其他右侧图标 -->
@@ -84,30 +91,6 @@
                 item.attr
               "
             />
-          </div>
-        </div>
-
-        <div
-          class="user-stats"
-          v-if="
-            userInfo.followingUserCount !== undefined ||
-            userInfo.followerCount !== undefined
-          "
-        >
-          <div
-            class="stat-item"
-            v-if="userInfo.followingUserCount !== undefined"
-          >
-            <span class="stat-value">{{ userInfo.followingUserCount }}</span>
-            <span class="stat-label">关注</span>
-          </div>
-          <div class="stat-item" v-if="userInfo.followerCount !== undefined">
-            <span class="stat-value">{{ userInfo.followerCount }}</span>
-            <span class="stat-label">粉丝</span>
-          </div>
-          <div class="stat-item" v-if="userInfo.mbti">
-            <span class="stat-value">{{ userInfo.mbti }}</span>
-            <span class="stat-label">MBTI</span>
           </div>
         </div>
 
@@ -237,7 +220,7 @@ export default {
         }
         this.userInfo = res
         // 检查是否已关注
-        this.isFollowing = res.followingUserCount > 0
+        this.isFollowing = res.canFollow === 'no'
       } catch (error) {
         console.error('Failed to load user info:', error)
       }
@@ -277,17 +260,17 @@ export default {
 
       this.followLoading = true
       try {
-        const params = {
+        const data = {
           apiKey: this.key,
           followingId: this.userInfo.oId
         }
 
         if (this.isFollowing) {
-          await unfollowUser(params)
-          this.userInfo.followingUserCount--
+          await unfollowUser(data)
+          this.userInfo.followerCount--
         } else {
-          await followUser(params)
-          this.userInfo.followingUserCount++
+          await followUser(data)
+          this.userInfo.followerCount++
         }
 
         this.isFollowing = !this.isFollowing

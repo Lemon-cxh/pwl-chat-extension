@@ -40,19 +40,19 @@ export function getUserName(data) {
   })
 }
 
-export function followUser(params) {
+export function followUser(data) {
   return request({
     url: '/follow/user',
     method: 'post',
-    params
+    data
   })
 }
 
-export function unfollowUser(params) {
+export function unfollowUser(data) {
   return request({
     url: '/unfollow/user',
     method: 'post',
-    params
+    data
   })
 }
 
