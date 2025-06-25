@@ -2,7 +2,10 @@ import { getKey } from '@/common/manager/StorageManager'
 import { getChannel } from '@/background/api/index'
 
 let webSocket = null
+let userWebSocket = null
 let wssUrl = 'wss://fishpi.cn/chat-room-channel'
+// 用于累计用户在线时间
+const userChannelWssUrl = 'wss://fishpi.cn/user-channel?apiKey='
 let socketLock = false
 let heartbeatInterval = null
 let defaultMessageHandler = null
@@ -13,7 +16,8 @@ export async function openWebSocket(messageHandler) {
     closeWebSocket()
   }
   console.log('openWebSocket')
-  const nodeData = await getChannel({ apiKey: await getKey() })
+  const apiKey = await getKey()
+  const nodeData = await getChannel({ apiKey })
   if (nodeData.code === 0) {
     wssUrl = nodeData.data
   }
@@ -31,10 +35,13 @@ export async function openWebSocket(messageHandler) {
       reconnect()
     }
   }
+
+  userWebSocket = new WebSocket(userChannelWssUrl + apiKey)
 }
 
 export function closeWebSocket() {
   webSocket && webSocket.close()
+  userWebSocket && userWebSocket.close()
   if (heartbeatInterval !== undefined) {
     clearInterval(heartbeatInterval)
   }
@@ -59,7 +66,7 @@ async function reconnect() {
   }
   socketLock = true
   if (isClosed()) {
-    await open()
+    await openWebSocket(defaultMessageHandler)
     console.log('重新连接了')
   }
   socketLock = false
