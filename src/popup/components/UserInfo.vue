@@ -223,7 +223,7 @@ import {
   Moon
 } from '@element-plus/icons-vue'
 
-const REQUEST_INTERVAL = 40000
+const REFRESH_INTERVAL = 360000 // 6分钟刷新一次
 /**
  * 左上角用户信息(活跃度进度条，下拉菜单)
  */
@@ -286,21 +286,18 @@ export default {
   methods: {
     initLiveness(storage) {
       this.percentage = storage.percentage ?? 0
+      const currentTime = new Date().getTime()
+      // 检查是否已达到100%或者距离上次刷新时间不足6分钟
       if (
         storage.percentage >= 100 ||
-        (storage.time && new Date().getTime() - storage.time < REQUEST_INTERVAL)
+        (storage.time && currentTime - storage.time < REFRESH_INTERVAL)
       ) {
         return
       }
+      // 获取活跃度并设置定时器
       this.getLiveness(storage)
-      this.intervalId = window.setInterval(() => {
-        if (storage.percentage >= 100) {
-          window.clearInterval(this.intervalId)
-          return
-        }
-        this.getLiveness(storage)
-      }, REQUEST_INTERVAL)
     },
+
     getLiveness(storage) {
       liveness(this.apiKey).then((res) => {
         storage.percentage = res.liveness
