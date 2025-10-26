@@ -111,6 +111,5 @@ export default {
     cursor: pointer;
     text-overflow: inherit;
     overflow: visible;
-    white-space: pre-line;
 }
 </style>
