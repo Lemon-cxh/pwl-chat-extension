@@ -98,7 +98,7 @@ export default {
 </script>
 <style scoped>
 .input {
-  max-width: calc(100% - 140px);
+  max-width: 230px;
 }
 .button {
   padding-right: 3px;
