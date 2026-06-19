@@ -114,6 +114,7 @@
 import { mapGetters } from 'vuex'
 import { isRedPacket } from '@/common/utils/util'
 import { getMd } from '@/common/api/chatroom'
+import { formatContent } from '@/common/utils/contentUtil'
 /**
  * 消息组件
  */
@@ -203,93 +204,7 @@ export default {
       })
     },
     modifyContent(content) {
-      // 处理音乐消息
-      if (content.includes('"msgType":"music"')) {
-        try {
-          const musicData = JSON.parse(content)
-          return `
-            <div class='music-card'>
-              <div class='music-header'>
-                <img src='${musicData.coverURL}' class='music-cover' />
-                <div class='music-title'>${musicData.title}</div>
-              </div>
-              <audio controls>
-                <source src="${musicData.source}" type="audio/mpeg">
-                您的浏览器不支持 audio 元素。
-              </audio>
-            </div>
-          `
-        } catch (e) {
-          console.error('音乐消息解析失败:', e)
-        }
-      }
-
-      // 处理天气消息
-      if (content.includes('"msgType":"weather"')) {
-        try {
-          const weatherData = JSON.parse(content)
-          const dates = weatherData.date.split(',')
-          const weatherCodes = weatherData.weatherCode.split(',')
-          const mins = weatherData.min.split(',').map(Number)
-          const maxs = weatherData.max.split(',').map(Number)
-          // 天气图标映射
-          const codeMap = {
-            CLEAR_DAY: '☀️',
-            PARTLY_CLOUDY_DAY: '⛅',
-            PARTLY_CLOUDY_NIGHT: '🌙',
-            CLOUDY: '☁️',
-            LIGHT_RAIN: '🌧️',
-            MODERATE_RAIN: '🌦️',
-            HEAVY_RAIN: '⛈️',
-            SNOW: '❄️',
-            FOG: '🌫️',
-            WIND: '💨',
-            HAZE: '🌁',
-            SLEET: '🌨️',
-            THUNDER: '⛈️',
-            SUNNY: '☀️',
-            OVERCAST: '☁️',
-            RAIN: '🌧️',
-            '': '❓'
-          }
-          let weatherHtml = `
-            <div class='weather-card-2'>
-              <div class='weather-city-2'>${weatherData.t}</div>
-              <div class='weather-status-2'>${weatherData.st}</div>
-              <div class='weather-forecast-2'>
-          `
-          for (let i = 0; i < dates.length; i++) {
-            weatherHtml += `
-              <div class='weather-day-2'>
-                <div class='weather-date-2'>${dates[i]}</div>
-                <div class='weather-icon-2'>${
-                  codeMap[weatherCodes[i]] || '❓'
-                }</div>
-                <div class='weather-temp-max-2'>${maxs[i]}°C</div>
-                <div class='weather-temp-min-2'>${mins[i]}°C</div>
-              </div>
-            `
-          }
-          return weatherHtml
-        } catch (e) {
-          console.error('天气消息解析失败:', e)
-        }
-      }
-
-      // 美化话题格式
-      // <em><code># Yui女装呢 #</code></em>
-      const result = content.replaceAll(
-        /(<em><code>#\s)(.{1,16})(\s#<\/code><\/em>)/g,
-        "<span class='el-tag' style='margin: 1px 0;'>$2</span>"
-      )
-      // 隐藏小尾巴信息
-      if (!this.hideBlockquote) {
-        return result
-      }
-      return result.replaceAll(
-        /((?<!引用(.|\n)+)<blockquote>)((.|\n)+)(<\/blockquote>)/g,
-        '<details><summary></summary><blockquote>$3</blockquote></details>'
-      )
+      return formatContent(content, this.hideBlockquote)
     },
     talkToHe() {
       this.$emit('addContent', this.userName)

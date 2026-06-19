@@ -40,6 +40,7 @@ import { clickEventListener } from '@/common/utils/commonUtil'
 import { isRedPacket } from '@/common/utils/util'
 import { getOptions } from '@/common/utils/chromeUtil'
 import { concatWithFold, updateRedPacketStatus } from '@/common/utils/messageUtil'
+import { foldBlockquote } from '@/common/utils/contentUtil'
 
 let port
 
@@ -129,14 +130,7 @@ export default {
       updateRedPacketStatus(this.messageArray, data)
     },
     modifyContent(content) {
-      // 隐藏小尾巴信息
-      if (!this.options.hideBlockquote) {
-        return content
-      }
-      return content.replaceAll(
-        /((?<!引用(.|\n)+)<blockquote>)((.|\n)+)(<\/blockquote>)/g,
-        '<details><summary></summary><blockquote>$3</blockquote></details>'
-      )
+      return foldBlockquote(content, this.options.hideBlockquote)
     }
   }
 }

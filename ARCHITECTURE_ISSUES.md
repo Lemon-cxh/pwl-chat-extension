@@ -39,15 +39,16 @@
 - 应提取为公共 composable 或工具函数
 - **已修复**：提取到 `src/common/utils/messageUtil.js`（foldNewMessage / concatWithFold / unshiftWithFold / updateRedPacketStatus / revokeMessage），三处统一调用
 
-### 5. `modifyContent` 内容转换逻辑分叉
+### 5. ✅ `modifyContent` 内容转换逻辑分叉
 
 - **涉及文件**: [src/popup/components/Message.vue](src/popup/components/Message.vue)（150+ 行）、[src/devtools/App.vue](src/devtools/App.vue)
 - `Message.vue` 处理音乐卡片、天气卡片、话题标签、blockquote 折叠
 - `devtools/App.vue` 只处理 blockquote，且实现不同
 - 应提取为公共内容格式化工具函数，按消息类型拆分
+- **已修复**：提取到 `src/common/utils/contentUtil.js`（formatMusicContent / formatWeatherContent / beautifyTopicTag / foldBlockquote / formatContent），两处统一调用
 
 ### 6. `TABS_EVENT` 值类型不一致
-
+scm-history-item:e%3A%5CProject%5Cpwl-chat-extension?%7B%22repositoryId%22%3A%22scm0%22%2C%22historyItemId%22%3A%2246f3e3fd8c7c6dd3bcf42b76db50d592c022be95%22%2C%22historyItemParentId%22%3A%22cc66a76653715e0875c347161d4c7104e54f80a4%22%2C%22historyItemDisplayId%22%3A%2246f3e3f%22%7D
 - **涉及文件**: [src/common/constant/Constant.js](src/common/constant/Constant.js)
 - 一部分值是数字（`showImage: 1`、`message: 2`、`syncOptions: 4`），另一部分是字符串（`sendMessage: 'sendMessage'`、`openRedPacket: 'openRedPacket'`）
 - 容易在比较时埋 bug，应统一为一种类型
