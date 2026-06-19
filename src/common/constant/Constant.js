@@ -146,11 +146,11 @@ export const TABS_EVENT = {
   /**
    * 显示图片
    */
-  showImage: 1,
+  showImage: 'showImage',
   /**
    * 网页接收消息
    */
-  message: 2,
+  message: 'message',
   /**
    * 网页发送消息
    */
@@ -158,7 +158,7 @@ export const TABS_EVENT = {
   /**
    * 同步配置
    */
-  syncOptions: 4,
+  syncOptions: 'syncOptions',
   /**
    * 网页打开红包
    */

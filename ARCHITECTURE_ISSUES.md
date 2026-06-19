@@ -47,11 +47,11 @@
 - 应提取为公共内容格式化工具函数，按消息类型拆分
 - **已修复**：提取到 `src/common/utils/contentUtil.js`（formatMusicContent / formatWeatherContent / beautifyTopicTag / foldBlockquote / formatContent），两处统一调用
 
-### 6. `TABS_EVENT` 值类型不一致
-scm-history-item:e%3A%5CProject%5Cpwl-chat-extension?%7B%22repositoryId%22%3A%22scm0%22%2C%22historyItemId%22%3A%2246f3e3fd8c7c6dd3bcf42b76db50d592c022be95%22%2C%22historyItemParentId%22%3A%22cc66a76653715e0875c347161d4c7104e54f80a4%22%2C%22historyItemDisplayId%22%3A%2246f3e3f%22%7D
+### 6. ✅ `TABS_EVENT` 值类型不一致
 - **涉及文件**: [src/common/constant/Constant.js](src/common/constant/Constant.js)
 - 一部分值是数字（`showImage: 1`、`message: 2`、`syncOptions: 4`），另一部分是字符串（`sendMessage: 'sendMessage'`、`openRedPacket: 'openRedPacket'`）
 - 容易在比较时埋 bug，应统一为一种类型
+- **已修复**：统一为全部字符串类型，所有使用处通过常量引用无需额外修改
 
 ### 7. PrivateChat.vue 自成体系、API 响应约定不一致
 
