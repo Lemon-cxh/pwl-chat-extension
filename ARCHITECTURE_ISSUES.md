@@ -53,12 +53,13 @@
 - 容易在比较时埋 bug，应统一为一种类型
 - **已修复**：统一为全部字符串类型，所有使用处通过常量引用无需额外修改
 
-### 7. PrivateChat.vue 自成体系、API 响应约定不一致
+### 7. ✅ PrivateChat.vue 自成体系、API 响应约定不一致
 
 - **涉及文件**: [src/popup/components/PrivateChat.vue](src/popup/components/PrivateChat.vue)（616 行）
 - 独立管理自己的 WebSocket、消息分页、时间格式化，与 ChatRoom 模式完全不同
 - 使用 `response.result === 0` 检查 API 返回，而其他所有 API 使用 `res.code === 0`
 - 应统一 API 响应字段约定，并将 WS 通信改为走 background 消息通道
+- **已修复**：WS 通信已在 #2 中改为 background 端口通道；API 响应字段在 `privatechat.js` 层做兼容映射（`result` → `code`），PrivateChat.vue 和 PrivateChatList.vue 统一使用 `code === 0` 判断
 
 ### 8. Vuex store 和 ChatRoom.vue 消息状态不统一
 

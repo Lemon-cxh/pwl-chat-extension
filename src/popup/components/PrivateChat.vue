@@ -137,7 +137,7 @@ export default {
           pageSize: this.pageSize
         }
         const response = await getChatMessage(params)
-        if (response.result === 0) {
+        if (response.code === 0) {
           const newMessages = response.data.reverse()
           this.messages = [...newMessages, ...this.messages]
           if (this.page === 1) {
@@ -161,7 +161,7 @@ export default {
           pageSize: this.pageSize
         }
         const response = await getChatMessage(params)
-        if (response.result === 0) {
+        if (response.code === 0) {
           const newMessages = response.data.reverse()
           // 记录当前滚动位置
           const messageList = this.$refs.messageScrollbar

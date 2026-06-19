@@ -72,7 +72,7 @@ export default {
     async loadChatList() {
       try {
         const response = await getChatList()
-        if (response.result === 0) {
+        if (response.code === 0) {
           this.chatList = response.data
         }
       } catch (error) {
