@@ -148,6 +148,13 @@ export default {
     }
   },
   methods: {
+    redPacketTypeChange(type) {
+      const config = this.redPacketTypeMap.get(type)
+      if (config) {
+        this.redPacketForm.count = config.count
+        this.redPacketForm.msg = config.msg
+      }
+    },
     redPacketHandler() {
       if (this.$refs.form) {
         this.$refs.form.resetFields()
