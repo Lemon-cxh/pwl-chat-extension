@@ -6,7 +6,8 @@ import {
 } from '@/common/manager/StorageManager'
 import {
   openWebSocket,
-  closeWebSocket
+  closeWebSocket,
+  isClosed
 } from '@/background/manager/WebSocketManager'
 import {
   openPrivateChatWebSocket,
@@ -55,6 +56,16 @@ chrome.storage.onChanged.addListener((changes) => {
   if (changes.options) {
     options = formatOptions(changes.options.newValue)
     sendTabsMessage({ type: TABS_EVENT.syncOptions, data: options })
+  }
+  // 监听 key 变化：新 key 写入说明已登录或 key 已刷新，尝试建立 WS 连接
+  if (changes.keyStorage && changes.keyStorage.newValue) {
+    if (isClosed()) {
+      openWebSocket(messageHandler)
+    }
+  }
+  // 监听 key 被清除：说明已登出，关闭 WS
+  if (changes.keyStorage && !changes.keyStorage.newValue) {
+    closeWebSocket()
   }
 })
 

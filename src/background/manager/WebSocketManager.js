@@ -40,10 +40,19 @@ export async function openWebSocket(messageHandler) {
 }
 
 export function closeWebSocket() {
-  webSocket && webSocket.close()
-  userWebSocket && userWebSocket.close()
-  if (heartbeatInterval !== undefined) {
+  if (webSocket) {
+    webSocket.onclose = null
+    webSocket.close(1000, 'normal close')
+    webSocket = null
+  }
+  if (userWebSocket) {
+    userWebSocket.onclose = null
+    userWebSocket.close(1000, 'normal close')
+    userWebSocket = null
+  }
+  if (heartbeatInterval != null) {
     clearInterval(heartbeatInterval)
+    heartbeatInterval = null
   }
 }
 
@@ -72,7 +81,7 @@ async function reconnect() {
   socketLock = false
 }
 
-function isClosed() {
+export function isClosed() {
   return (
     !webSocket ||
     webSocket.readyState === WebSocket.CLOSING ||
