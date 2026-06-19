@@ -88,11 +88,7 @@
 <script>
 import { getChatMessage, markAsRead } from '@/common/api/privatechat'
 import { mapGetters } from 'vuex'
-import {
-  openPrivateChatWebSocket,
-  closePrivateChatWebSocket,
-  sendPrivateChatMessage
-} from '@/background/manager/PrivateChatWebSocketManager'
+import { EVENT } from '@/common/constant/Constant'
 import { InfoFilled, Money } from '@element-plus/icons-vue'
 import Emoji from '@/popup/components/Emoji.vue'
 import Images from '@/popup/components/Images.vue'
@@ -118,6 +114,7 @@ export default {
       hasNewMessage: false,
       isTop: true,
       loading: false,
+      pcPort: null,
       scrollbarHeight: window.innerHeight - 200, // 增加底部空间
       transferDialogVisible: false
     }
@@ -187,26 +184,25 @@ export default {
       }
     },
     async sendMessage() {
-      if (!this.inputMessage.trim()) return
+      if (!this.inputMessage.trim() || !this.pcPort) return
 
-      try {
-        const message = {
-          type: 'msg',
-          toUser: this.currentUser,
-          content: `<p>${this.inputMessage}</p>`,
-          time: new Date().toLocaleString(),
-          senderUserName: this.userInfo.userName,
-          senderAvatar: this.userInfo.userAvatarURL
-        }
-        await sendPrivateChatMessage(this.currentUser, this.inputMessage)
-        this.messages.push(message)
-        this.inputMessage = ''
-        this.$nextTick(() => {
-          this.scrollToBottom()
-        })
-      } catch (error) {
-        console.error('Failed to send message:', error)
+      const message = {
+        type: 'msg',
+        toUser: this.currentUser,
+        content: `<p>${this.inputMessage}</p>`,
+        time: new Date().toLocaleString(),
+        senderUserName: this.userInfo.userName,
+        senderAvatar: this.userInfo.userAvatarURL
       }
+      this.pcPort.postMessage({
+        type: EVENT.sendPrivateMessage,
+        data: { toUser: this.currentUser, content: this.inputMessage }
+      })
+      this.messages.push(message)
+      this.inputMessage = ''
+      this.$nextTick(() => {
+        this.scrollToBottom()
+      })
     },
     formatTime(timestamp) {
       const date = new Date(timestamp)
@@ -304,45 +300,42 @@ export default {
       await markAsRead(params)
       this.$router.push({ name: 'PrivateChatList' })
     },
-    handleWebSocketMessage(event) {
+    handleIncomingMessage(msg) {
+      if (msg.type !== EVENT.privateMessage) return
       try {
-        const data = JSON.parse(event.data)
-        console.log('Received WebSocket message:', data)
-        // 检查是否是私聊消息
-        if (data.user_session) {
-          // 判断是否是自己的消息
-          if (data.senderUserName === this.userInfo.userName) {
-            return
-          }
+        const data = msg.data
+        // 判断是否是自己的消息
+        if (data.senderUserName === this.userInfo.userName) {
+          return
+        }
 
-          const message = {
-            oId: data.oId,
-            time: data.time,
-            senderUserName: data.senderUserName,
-            senderAvatar: data.senderAvatar,
-            content: data.content,
-            type: 'msg'
-          }
-          this.messages.push(message)
+        const message = {
+          oId: data.oId,
+          time: data.time,
+          senderUserName: data.senderUserName,
+          senderAvatar: data.senderAvatar,
+          content: data.content,
+          type: 'msg'
+        }
+        this.messages.push(message)
 
-          // 获取滚动条位置
-          const messageList = this.$refs.messageScrollbar
-          if (messageList) {
-            const { scrollTop, clientHeight, scrollHeight } =
-              messageList.wrapRef
-            // 如果距离底部超过 100px，显示新消息提示
-            if (scrollHeight - scrollTop - clientHeight > 100) {
-              this.hasNewMessage = true
-            } else {
-              // 否则直接滚动到底部
-              this.$nextTick(() => {
-                this.scrollToBottom()
-              })
-            }
+        // 获取滚动条位置
+        const messageList = this.$refs.messageScrollbar
+        if (messageList) {
+          const { scrollTop, clientHeight, scrollHeight } =
+            messageList.wrapRef
+          // 如果距离底部超过 100px，显示新消息提示
+          if (scrollHeight - scrollTop - clientHeight > 100) {
+            this.hasNewMessage = true
+          } else {
+            // 否则直接滚动到底部
+            this.$nextTick(() => {
+              this.scrollToBottom()
+            })
           }
         }
       } catch (error) {
-        console.error('Failed to handle WebSocket message:', error)
+        console.error('Failed to handle incoming message:', error)
       }
     },
     showTransferDialog() {
@@ -373,13 +366,27 @@ export default {
         this.messages = []
         this.page = 1
         await this.loadMessages()
-        await openPrivateChatWebSocket(newUser, this.handleWebSocketMessage)
+        // 通过 port 通知 background 打开私聊 WS
+        /* global chrome */
+        if (this.pcPort) {
+          this.pcPort.disconnect()
+        }
+        this.pcPort = chrome.runtime.connect({ name: 'privateChat' })
+        this.pcPort.onMessage.addListener(this.handleIncomingMessage)
+        this.pcPort.postMessage({
+          type: EVENT.openPrivateChat,
+          data: { toUser: newUser }
+        })
       },
       immediate: true
     }
   },
   beforeUnmount() {
-    closePrivateChatWebSocket()
+    if (this.pcPort) {
+      this.pcPort.postMessage({ type: EVENT.closePrivateChat })
+      this.pcPort.disconnect()
+      this.pcPort = null
+    }
   }
 }
 </script>

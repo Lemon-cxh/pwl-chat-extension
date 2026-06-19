@@ -120,7 +120,23 @@ export const EVENT = {
   /**
    * 领取红包
    */
-  openRedPacket: 14
+  openRedPacket: 14,
+  /**
+   * 打开私聊
+   */
+  openPrivateChat: 15,
+  /**
+   * 关闭私聊
+   */
+  closePrivateChat: 16,
+  /**
+   * 发送私聊消息
+   */
+  sendPrivateMessage: 17,
+  /**
+   * 接收私聊消息
+   */
+  privateMessage: 18
 }
 
 /**

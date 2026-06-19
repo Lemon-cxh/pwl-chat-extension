@@ -10,7 +10,8 @@ import {
 } from '@/background/manager/WebSocketManager'
 import {
   openPrivateChatWebSocket,
-  closePrivateChatWebSocket
+  closePrivateChatWebSocket,
+  sendPrivateChatMessage
 } from './manager/PrivateChatWebSocketManager'
 import { send, openRedPacket } from '@/common/api/chatroom'
 import {
@@ -28,6 +29,7 @@ import {
 
 // 与popup页面的通信
 let port = null
+let privateChatPort = null
 // 未读消息数
 let count = 0
 let options = defaultOptions
@@ -111,6 +113,39 @@ const messageHandler = function messageHandler(event) {
  * 监听扩展页面、Devtools与background的长连接
  */
 chrome.runtime.onConnect.addListener((p) => {
+  // 私聊端口
+  if (p.name === 'privateChat') {
+    privateChatPort = p
+    privateChatPort.onMessage.addListener((msg) => {
+      switch (msg.type) {
+        case EVENT.openPrivateChat:
+          openPrivateChatWebSocket(msg.data.toUser, (event) => {
+            const data = JSON.parse(event.data)
+            if (data.type === 'msg') {
+              privateChatPort.postMessage({
+                type: EVENT.privateMessage,
+                data
+              })
+            }
+          })
+          break
+        case EVENT.closePrivateChat:
+          closePrivateChatWebSocket()
+          break
+        case EVENT.sendPrivateMessage:
+          sendPrivateChatMessage(msg.data.toUser, msg.data.content)
+          break
+        default:
+          break
+      }
+    })
+    privateChatPort.onDisconnect.addListener(() => {
+      closePrivateChatWebSocket()
+      privateChatPort = null
+    })
+    return
+  }
+  // 公聊端口（ChatRoom）
   clearBadgeText()
   port = p
   port.onMessage.addListener((msg) => {
