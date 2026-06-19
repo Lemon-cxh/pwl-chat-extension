@@ -184,7 +184,12 @@ export default {
       }
     },
     async sendMessage() {
-      if (!this.inputMessage.trim() || !this.pcPort) return
+      if (!this.inputMessage.trim()) return
+      if (!this.pcPort) {
+        console.error('pcPort 未初始化，无法发送私聊消息')
+        this.$message.error('连接未就绪，请稍后重试')
+        return
+      }
 
       const message = {
         type: 'msg',
@@ -194,15 +199,20 @@ export default {
         senderUserName: this.userInfo.userName,
         senderAvatar: this.userInfo.userAvatarURL
       }
-      this.pcPort.postMessage({
-        type: EVENT.sendPrivateMessage,
-        data: { toUser: this.currentUser, content: this.inputMessage }
-      })
-      this.messages.push(message)
-      this.inputMessage = ''
-      this.$nextTick(() => {
-        this.scrollToBottom()
-      })
+      try {
+        this.pcPort.postMessage({
+          type: EVENT.sendPrivateMessage,
+          data: { toUser: this.currentUser, content: this.inputMessage }
+        })
+        this.messages.push(message)
+        this.inputMessage = ''
+        this.$nextTick(() => {
+          this.scrollToBottom()
+        })
+      } catch (error) {
+        console.error('发送私聊消息失败:', error)
+        this.$message.error('发送失败，请重试')
+      }
     },
     formatTime(timestamp) {
       const date = new Date(timestamp)
@@ -365,8 +375,8 @@ export default {
         if (!newUser) return
         this.messages = []
         this.page = 1
-        await this.loadMessages()
-        // 通过 port 通知 background 打开私聊 WS
+
+        // 先建立端口连接，确保发送按钮立即可用
         /* global chrome */
         if (this.pcPort) {
           this.pcPort.disconnect()
@@ -377,6 +387,9 @@ export default {
           type: EVENT.openPrivateChat,
           data: { toUser: newUser }
         })
+
+        // 再异步加载历史消息
+        await this.loadMessages()
       },
       immediate: true
     }

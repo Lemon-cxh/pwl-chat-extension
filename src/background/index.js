@@ -128,27 +128,9 @@ chrome.runtime.onConnect.addListener((p) => {
   if (p.name === 'privateChat') {
     privateChatPort = p
     privateChatPort.onMessage.addListener((msg) => {
-      switch (msg.type) {
-        case EVENT.openPrivateChat:
-          openPrivateChatWebSocket(msg.data.toUser, (event) => {
-            const data = JSON.parse(event.data)
-            if (data.type === 'msg') {
-              privateChatPort.postMessage({
-                type: EVENT.privateMessage,
-                data
-              })
-            }
-          })
-          break
-        case EVENT.closePrivateChat:
-          closePrivateChatWebSocket()
-          break
-        case EVENT.sendPrivateMessage:
-          sendPrivateChatMessage(msg.data.toUser, msg.data.content)
-          break
-        default:
-          break
-      }
+      handlePrivateChatMessage(msg).catch((e) =>
+        console.error('处理私聊消息失败:', e)
+      )
     })
     privateChatPort.onDisconnect.addListener(() => {
       closePrivateChatWebSocket()
@@ -343,4 +325,32 @@ function markCareAndBlack(message) {
 function clearBadgeText() {
   count = 0
   chrome.action.setBadgeText({ text: '' })
+}
+
+/**
+ * 处理私聊端口消息（异步，确保 WS 操作完成）
+ * @param {*} msg 从 popup 端口接收的消息
+ */
+async function handlePrivateChatMessage(msg) {
+  switch (msg.type) {
+    case EVENT.openPrivateChat:
+      await openPrivateChatWebSocket(msg.data.toUser, (event) => {
+        const data = JSON.parse(event.data)
+        if (data.type === 'msg') {
+          privateChatPort.postMessage({
+            type: EVENT.privateMessage,
+            data
+          })
+        }
+      })
+      break
+    case EVENT.closePrivateChat:
+      closePrivateChatWebSocket()
+      break
+    case EVENT.sendPrivateMessage:
+      await sendPrivateChatMessage(msg.data.toUser, msg.data.content)
+      break
+    default:
+      break
+  }
 }
