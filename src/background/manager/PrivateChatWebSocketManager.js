@@ -1,7 +1,6 @@
 import { getKey } from '@/common/manager/StorageManager'
 
 let webSocket = null
-let webSocketReady = null // Promise，WebSocket OPEN 时 resolve
 const wssUrl = 'wss://fishpi.cn/chat-channel'
 let socketLock = false
 let defaultMessageHandler = null
@@ -15,49 +14,36 @@ export async function openPrivateChatWebSocket(toUser, messageHandler) {
   }
   console.log('openPrivateChatWebSocket', { toUser })
   const apiKey = await getKey()
+  webSocket = new WebSocket(`${wssUrl}?apiKey=${apiKey}&toUser=${toUser}`)
 
-  // 等待 WebSocket 连接就绪
-  webSocketReady = new Promise((resolve, reject) => {
-    webSocket = new WebSocket(`${wssUrl}?apiKey=${apiKey}&toUser=${toUser}`)
-
-    webSocket.onopen = () => {
-      console.log('Private Chat WebSocket connected')
-      resolve()
+  webSocket.onopen = () => {
+    console.log('Private Chat WebSocket connected')
+  }
+  webSocket.onmessage = (event) => {
+    console.log('Received WebSocket message:', event.data)
+    defaultMessageHandler && defaultMessageHandler(event)
+  }
+  webSocket.onerror = (e) => {
+    console.error('Private Chat WebSocket error observed:', e)
+  }
+  webSocket.onclose = (e) => {
+    console.log('Private Chat WebSocket close observed:', e)
+    if (e.code !== 1000 && e.code !== 1001) {
+      reconnect()
     }
-    webSocket.onmessage = (event) => {
-      console.log('Received WebSocket message:', event.data)
-      defaultMessageHandler && defaultMessageHandler(event)
-    }
-    webSocket.onerror = (e) => {
-      console.error('Private Chat WebSocket error observed:', e)
-      reject(e)
-    }
-    webSocket.onclose = (e) => {
-      console.log('Private Chat WebSocket close observed:', e)
-      if (e.code !== 1000 && e.code !== 1001) {
-        reconnect()
-      }
-    }
-  })
-
-  await webSocketReady
+  }
 }
 
 export function closePrivateChatWebSocket() {
   if (webSocket) {
     webSocket.close()
     webSocket = null
-    webSocketReady = null
   }
 }
 
 export async function sendPrivateChatMessage(toUser, content) {
   if (isClosed()) {
     await openPrivateChatWebSocket(toUser, defaultMessageHandler)
-  }
-  // 等待 WebSocket 就绪后发送
-  if (webSocketReady) {
-    await webSocketReady
   }
   try {
     webSocket.send(content)

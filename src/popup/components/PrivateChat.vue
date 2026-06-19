@@ -186,7 +186,6 @@ export default {
     async sendMessage() {
       if (!this.inputMessage.trim()) return
       if (!this.pcPort) {
-        console.error('pcPort 未初始化，无法发送私聊消息')
         this.$message.error('连接未就绪，请稍后重试')
         return
       }
@@ -199,20 +198,16 @@ export default {
         senderUserName: this.userInfo.userName,
         senderAvatar: this.userInfo.userAvatarURL
       }
-      try {
-        this.pcPort.postMessage({
-          type: EVENT.sendPrivateMessage,
-          data: { toUser: this.currentUser, content: this.inputMessage }
-        })
-        this.messages.push(message)
-        this.inputMessage = ''
-        this.$nextTick(() => {
-          this.scrollToBottom()
-        })
-      } catch (error) {
-        console.error('发送私聊消息失败:', error)
-        this.$message.error('发送失败，请重试')
-      }
+      this.pcPort.postMessage({
+        type: EVENT.sendPrivateMessage,
+        data: { toUser: this.currentUser, content: this.inputMessage }
+      })
+      // 乐观更新：先在前端显示消息
+      this.messages.push(message)
+      this.inputMessage = ''
+      this.$nextTick(() => {
+        this.scrollToBottom()
+      })
     },
     formatTime(timestamp) {
       const date = new Date(timestamp)

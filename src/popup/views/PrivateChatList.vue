@@ -82,7 +82,7 @@ export default {
     async loadUnreadList() {
       try {
         const response = await hasUnread()
-        if (response.result > 0) {
+        if (response.code === 0 && response.data?.length > 0) {
           this.unreadList = response.data
         }
       } catch (error) {
