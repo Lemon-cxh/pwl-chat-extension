@@ -1,6 +1,5 @@
 import {
   refreshKey,
-  getKey,
   getUser,
   setOnline,
   setDiscuss
@@ -13,7 +12,7 @@ import {
   openPrivateChatWebSocket,
   closePrivateChatWebSocket
 } from './manager/PrivateChatWebSocketManager'
-import { send, openRedPacket } from '@/background/api/index'
+import { send, openRedPacket } from '@/common/api/chatroom'
 import {
   notifications,
   sendTabsMessage,
@@ -153,16 +152,14 @@ chrome.runtime.onMessage.addListener((request) => {
     return
   }
   if (TABS_EVENT.openRedPacket === request.type) {
-    getKey().then((apiKey) => {
-      openRedPacket({ oId: request.data, apiKey }).then(async (res) => {
-        sendTabsMessage({
-          type: TABS_EVENT.markRedPacket,
-          data: {
-            data: res,
-            userName: await getUser().userName,
-            oId: request.data
-          }
-        })
+    openRedPacket({ oId: request.data }).then(async (res) => {
+      sendTabsMessage({
+        type: TABS_EVENT.markRedPacket,
+        data: {
+          data: res,
+          userName: await getUser().userName,
+          oId: request.data
+        }
       })
     })
   }
@@ -283,12 +280,7 @@ async function atNotifications(message) {
 }
 
 function sendMessage(data) {
-  getKey().then((apiKey) => {
-    send({
-      content: data,
-      apiKey
-    })
-  })
+  send({ content: data })
 }
 
 /**

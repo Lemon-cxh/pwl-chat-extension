@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { openRedPacket } from '@/popup/api/chatroom'
+import { openRedPacket } from '@/common/api/chatroom'
 import { mapGetters } from 'vuex'
 import {
   RED_PACKET_MAP,
@@ -56,7 +56,7 @@ export default {
       return JSON.parse(this.content)
     },
     form() {
-      return { oId: this.oId, apiKey: this.key }
+      return { oId: this.oId }
     },
     showGesture() {
       return this.redPacket.type === rockPaperScissors &&

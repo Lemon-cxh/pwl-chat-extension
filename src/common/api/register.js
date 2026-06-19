@@ -1,4 +1,4 @@
-import request from '@/popup/utils/request'
+import request from './request'
 
 export function register(data) {
   return request({

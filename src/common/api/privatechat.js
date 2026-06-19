@@ -1,4 +1,4 @@
-import request from '@/popup/utils/request'
+import request from './request'
 
 export function getChatList(params) {
   return request({
@@ -15,6 +15,7 @@ export function getChatMessage(params) {
     params
   })
 }
+
 export function markAsRead(params) {
   return request({
     url: '/chat/mark-as-read',
@@ -22,6 +23,7 @@ export function markAsRead(params) {
     params
   })
 }
+
 export function hasUnread(params) {
   return request({
     url: '/chat/has-unread',

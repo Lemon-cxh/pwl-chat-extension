@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { transferPoint } from '@/popup/api/user'
+import { transferPoint } from '@/common/api/user'
 
 export default {
   name: 'TransferDialog',
@@ -65,10 +65,6 @@ export default {
       default: false
     },
     userName: {
-      type: String,
-      required: true
-    },
-    apiKey: {
       type: String,
       required: true
     }
@@ -109,7 +105,6 @@ export default {
       this.loading = true
       try {
         const data = {
-          apiKey: this.apiKey,
           userName: this.userName,
           amount: Number(this.form.amount),
           memo: this.form.memo || ''

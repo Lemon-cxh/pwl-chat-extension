@@ -1,5 +1,5 @@
 import { getKey } from '@/common/manager/StorageManager'
-import { getChannel } from '@/background/api/index'
+import { getChannel } from '@/common/api/channel'
 
 let webSocket = null
 let userWebSocket = null
@@ -17,7 +17,7 @@ export async function openWebSocket(messageHandler) {
   }
   console.log('openWebSocket')
   const apiKey = await getKey()
-  const nodeData = await getChannel({ apiKey })
+  const nodeData = await getChannel()
   if (nodeData.code === 0) {
     wssUrl = nodeData.data
   }

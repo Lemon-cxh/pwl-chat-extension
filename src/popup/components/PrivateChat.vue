@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { getChatMessage, markAsRead } from '@/popup/api/privatechat'
+import { getChatMessage, markAsRead } from '@/common/api/privatechat'
 import { mapGetters } from 'vuex'
 import {
   openPrivateChatWebSocket,
@@ -124,9 +124,6 @@ export default {
   },
   computed: {
     ...mapGetters(['userInfo', 'key']),
-    apiKey() {
-      return { apiKey: this.key }
-    },
     currentUser() {
       return this.$route.params.username
     },
@@ -138,7 +135,6 @@ export default {
     async loadMessages() {
       try {
         const params = {
-          ...this.apiKey,
           toUser: this.currentUser,
           page: this.page,
           pageSize: this.pageSize
@@ -163,7 +159,6 @@ export default {
       this.page += 1
       try {
         const params = {
-          ...this.apiKey,
           toUser: this.currentUser,
           page: this.page,
           pageSize: this.pageSize
@@ -304,7 +299,6 @@ export default {
     },
     async goBack() {
       const params = {
-        ...this.apiKey,
         fromUser: this.currentUser
       }
       await markAsRead(params)

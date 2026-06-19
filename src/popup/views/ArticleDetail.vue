@@ -216,8 +216,8 @@ import {
   addComment,
   voteUpComment,
   thankComment
-} from '@/popup/api/article'
-import { upload } from '@/popup/api/chatroom'
+} from '@/common/api/article'
+import { upload } from '@/common/api/chatroom'
 import { mapGetters } from 'vuex'
 import { ElMessageBox } from 'element-plus'
 import { View as ViewIcon } from '@element-plus/icons-vue'
@@ -244,9 +244,6 @@ export default {
   },
   computed: {
     ...mapGetters(['key']),
-    apiKey() {
-      return { apiKey: this.key }
-    },
     articlePermalink() {
       return `${process.env.VUE_APP_BASE_URL}${this.article?.articlePermalink}`
     }
@@ -260,7 +257,7 @@ export default {
       try {
         this.loading = true
         const articleId = this.$route.params.id
-        const response = await getArticleDetail(articleId, this.apiKey)
+        const response = await getArticleDetail(articleId)
         if (response.code === 0) {
           this.article = response.data.article
         } else {
@@ -276,7 +273,6 @@ export default {
     async handleLike() {
       try {
         const response = await voteUpArticle({
-          ...this.apiKey,
           dataId: this.article.oId
         })
         if (response.code === 0) {
@@ -306,7 +302,7 @@ export default {
             type: 'warning'
           }
         )
-        const response = await thankArticle(this.article.oId, this.apiKey)
+        const response = await thankArticle(this.article.oId)
         if (response.code === 0) {
           this.$message.success('感谢成功')
         } else {
@@ -322,7 +318,6 @@ export default {
     async fetchComments() {
       try {
         const response = await getArticleComments(this.$route.params.id, {
-          ...this.apiKey,
           p: this.commentPage
         })
         if (response.code === 0) {
@@ -425,7 +420,6 @@ export default {
       try {
         this.commentLoading = true
         const response = await addComment({
-          ...this.apiKey,
           articleId: this.article.oId,
           commentContent: this.commentContent,
           commentAnonymous: false,
@@ -451,7 +445,6 @@ export default {
     async handleCommentLike(comment) {
       try {
         const response = await voteUpComment({
-          ...this.apiKey,
           dataId: comment.oId
         })
         if (response.code === 0) {
@@ -486,7 +479,6 @@ export default {
           }
         )
         const response = await thankComment({
-          ...this.apiKey,
           commentId: comment.oId
         })
         if (response.code === 0) {

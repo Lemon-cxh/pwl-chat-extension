@@ -1,6 +1,7 @@
 import { setLocal, getLocal, removeLocal } from '@/common/utils/chromeUtil'
 import { STORAGE } from '@/common/constant/Constant'
-import { getUserInfo, login } from '@/background/api/index'
+import { getUserInfo, getKey as login } from '@/common/api/auth'
+import { setApiKey } from '@/common/api/request'
 
 /**
  * 刷新Key
@@ -13,15 +14,19 @@ export function refreshKey() {
         reject(new Error('还未登录'))
         return
       }
-      const res = await getUserInfo({ apiKey: result[STORAGE.key] })
+      // 先缓存 key，后续请求由拦截器自动注入
+      setApiKey(result[STORAGE.key])
+      const res = await getUserInfo()
       if (res.code === 0) {
         setLocal({ [STORAGE.user]: res.data })
         resolve()
         return
       }
+      // key 过期，重新登录获取新 key
       const r = await login(result[STORAGE.account])
       if (r.code === 0) {
         setLocal({ [STORAGE.key]: r.Key })
+        setApiKey(r.Key)
         setLocal({ [STORAGE.user]: res.data })
         resolve()
         return

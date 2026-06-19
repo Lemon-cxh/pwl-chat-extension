@@ -198,12 +198,12 @@ import {
   liveness,
   isCollectedLiveness,
   getLivenessReward
-} from '@/popup/api/user'
-import { unread } from '@/popup/api/chat'
+} from '@/common/api/user'
+import { unread } from '@/common/api/chat'
 import {
   countNotifications,
   makeReadNotifications
-} from '@/popup/api/notification'
+} from '@/common/api/notification'
 import { STORAGE, defaultOptions, EVENT } from '@/common/constant/Constant'
 import { getDate } from '@/common/utils/util'
 import { clean } from '@/common/manager/StorageManager'
@@ -253,10 +253,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo', 'key']),
-    apiKey() {
-      return { apiKey: this.key }
-    }
+    ...mapGetters(['userInfo', 'key'])
   },
   async created() {
     // 获取活跃度
@@ -299,7 +296,7 @@ export default {
     },
 
     getLiveness(storage) {
-      liveness(this.apiKey).then((res) => {
+      liveness().then((res) => {
         storage.percentage = res.liveness
         storage.time = new Date().getTime()
         setLocal({ [STORAGE.liveness]: storage })
@@ -307,20 +304,20 @@ export default {
       })
     },
     getLivenessReward(fun) {
-      isCollectedLiveness(this.apiKey).then((res) => {
+      isCollectedLiveness().then((res) => {
         if (res.isCollectedYesterdayLivenessReward) {
           this.$message.success('昨日活跃积分已领取')
           fun()
           return
         }
-        getLivenessReward(this.apiKey).then((r) => {
+        getLivenessReward().then((r) => {
           this.$message.success('领取昨日活跃积分:' + r.sum)
           fun()
         })
       })
     },
     async countNotifications() {
-      const res = await countNotifications(this.apiKey)
+      const res = await countNotifications()
       if (res.code !== 0) {
         return
       }
@@ -336,17 +333,17 @@ export default {
         this.options.autoReadAtNotification &&
         res.unreadAtNotificationCnt > 0
       ) {
-        makeReadNotifications('at', this.apiKey).then()
+        makeReadNotifications('at').then()
       }
       if (
         this.options.autoReadPointNotification &&
         res.unreadPointNotificationCnt > 0
       ) {
-        makeReadNotifications('point', this.apiKey).then()
+        makeReadNotifications('point').then()
       }
     },
     async getUnreadChat() {
-      const res = await unread(this.apiKey)
+      const res = await unread()
       this.unreadChat = res.data.length
     },
     handleCommand(command) {

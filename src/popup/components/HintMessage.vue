@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { openRedPacket } from '@/popup/api/chatroom'
+import { openRedPacket } from '@/common/api/chatroom'
 import { mapGetters } from 'vuex'
 import { MESSAGE_TYPE } from '@/common/constant/Constant'
 /**
@@ -57,7 +57,7 @@ export default {
   computed: {
     ...mapGetters(['key']),
     form() {
-      return { oId: this.message.oId, apiKey: this.key }
+      return { oId: this.message.oId }
     }
   },
   data() {

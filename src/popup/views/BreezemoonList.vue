@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { getBreezemoons } from '@/popup/api/breezemoon'
+import { getBreezemoons } from '@/common/api/breezemoon'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -71,10 +71,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['key']),
-    apiKey() {
-      return { apiKey: this.key }
-    }
+    ...mapGetters(['key'])
   },
   methods: {
     async loadBreezemoons(isLoadMore = false) {
@@ -82,7 +79,6 @@ export default {
       this.loading = true
       try {
         const response = await getBreezemoons({
-          ...this.apiKey,
           p: this.page,
           size: this.size
         })

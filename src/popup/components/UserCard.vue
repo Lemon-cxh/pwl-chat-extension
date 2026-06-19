@@ -146,7 +146,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getUserInfo, followUser, unfollowUser } from '@/popup/api/user'
+import { getUserInfo, followUser, unfollowUser } from '@/common/api/user'
 import {
   Coin,
   LocationFilled as Location,
@@ -214,7 +214,7 @@ export default {
   methods: {
     async loadUserInfo(userName) {
       try {
-        const res = await getUserInfo(userName, { apiKey: this.key })
+        const res = await getUserInfo(userName)
         if (res.sysMetal) {
           res.sysMetal = JSON.parse(res.sysMetal)
         }
@@ -261,7 +261,6 @@ export default {
       this.followLoading = true
       try {
         const data = {
-          apiKey: this.key,
           followingId: this.userInfo.oId
         }
 

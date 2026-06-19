@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { getChatList, hasUnread, markAsRead } from '@/popup/api/privatechat'
+import { getChatList, hasUnread, markAsRead } from '@/common/api/privatechat'
 import { mapGetters } from 'vuex'
 import UserSelect from '@/popup/components/UserSelect.vue' // 导入UserSelect组件
 
@@ -66,15 +66,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['key']),
-    apiKey() {
-      return { apiKey: this.key }
-    }
+    ...mapGetters(['key'])
   },
   methods: {
     async loadChatList() {
       try {
-        const response = await getChatList(this.apiKey)
+        const response = await getChatList()
         if (response.result === 0) {
           this.chatList = response.data
         }
@@ -84,7 +81,7 @@ export default {
     },
     async loadUnreadList() {
       try {
-        const response = await hasUnread(this.apiKey)
+        const response = await hasUnread()
         if (response.result > 0) {
           this.unreadList = response.data
         }
@@ -95,7 +92,6 @@ export default {
     async markAsRead(fromUser) {
       try {
         const params = {
-          ...this.apiKey,
           fromUser
         }
         await markAsRead(params)

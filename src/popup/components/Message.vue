@@ -113,7 +113,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { isRedPacket } from '@/common/utils/util'
-import { getMd } from '@/popup/api/chatroom'
+import { getMd } from '@/common/api/chatroom'
 /**
  * 消息组件
  */

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { postBreezemoon } from '@/popup/api/breezemoon'
+import { postBreezemoon } from '@/common/api/breezemoon'
 import { mapGetters } from 'vuex'
 import { ElMessage } from 'element-plus'
 
@@ -51,7 +51,6 @@ export default {
       this.loading = true
       try {
         const response = await postBreezemoon({
-          apiKey: this.key,
           breezemoonContent: this.content.trim()
         })
         console.log(response.code)

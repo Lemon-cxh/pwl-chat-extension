@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { getUserName } from '@/popup/api/user'
+import { getUserName } from '@/common/api/user'
 /**
  * 用户名联想的用户列表
  */

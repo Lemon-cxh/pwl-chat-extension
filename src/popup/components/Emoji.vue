@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { getEmoji } from '@/popup/api/chatroom'
+import { getEmoji } from '@/common/api/chatroom'
 import { mapGetters } from 'vuex'
 /**
  * emoji表情组件
@@ -38,17 +38,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['key']),
-    apiKey() {
-      return { apiKey: this.key }
-    }
+    ...mapGetters(['key'])
   },
   created() {
     this.getEmoji()
   },
   methods: {
     getEmoji() {
-      getEmoji(this.apiKey).then((res) => {
+      getEmoji().then((res) => {
         if (res.code === 0) {
           const emojis = []
           res.data.forEach((e) => {

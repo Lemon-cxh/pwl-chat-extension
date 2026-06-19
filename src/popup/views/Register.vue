@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { register, verify, register2 } from '@/popup/api/register'
+import { register, verify, register2 } from '@/common/api/register'
 import md5 from 'js-md5'
 export default {
   name: 'register-component',

@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import { send } from '@/popup/api/chatroom'
+import { send } from '@/common/api/chatroom'
 import { mapGetters } from 'vuex'
 import {
   RED_PACKET_TYPE,
@@ -137,17 +137,13 @@ export default {
   },
   computed: {
     ...mapGetters(['key']),
-    apiKey() {
-      return { apiKey: this.key }
-    },
     redPacketContent() {
       const redPacketForm = { ...this.redPacketForm }
       redPacketForm.recivers = redPacketForm.recivers
         ? [redPacketForm.recivers]
         : redPacketForm.recivers
       return {
-        content: `[redpacket]${JSON.stringify(redPacketForm)}[/redpacket]`,
-        apiKey: this.key
+        content: `[redpacket]${JSON.stringify(redPacketForm)}[/redpacket]`
       }
     }
   },

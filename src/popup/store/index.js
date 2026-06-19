@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 import { user } from './module/user'
-import { getUserInfo, getKey } from '@/popup/api/login'
+import { getUserInfo, getKey } from '@/common/api/auth'
+import { setApiKey } from '@/common/api/request'
 import { STORAGE, MESSAGE_TYPE } from '@/common/constant/Constant'
 import { setLocal, getLocal, removeLocal } from '@/common/utils/chromeUtil'
 import { isRedPacket } from '@/common/utils/util'
@@ -157,7 +158,9 @@ export default createStore({
           }
           setLocal({ [STORAGE.key]: key })
           context.commit('setKey', key)
-          const res = await getUserInfo({ apiKey: key })
+          // 先缓存 apiKey，后续请求由拦截器自动注入
+          setApiKey(key)
+          const res = await getUserInfo()
           if (res.code !== 0) {
             reject(new Error(res.msg ? res.msg : '获取用户信息失败'))
             return

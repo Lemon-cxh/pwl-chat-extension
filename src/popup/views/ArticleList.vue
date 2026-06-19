@@ -76,7 +76,7 @@ import {
   getHotArticles,
   getGoodArticles,
   getReplyArticles
-} from '@/popup/api/article'
+} from '@/common/api/article'
 import { mapGetters } from 'vuex'
 import { View as ViewIcon, ChatDotRound, Star } from '@element-plus/icons-vue'
 
@@ -99,13 +99,9 @@ export default {
   },
   computed: {
     ...mapGetters(['key']),
-    apiKey() {
-      return { apiKey: this.key }
-    },
     pageParams() {
       return {
-        p: this.currentPage,
-        apiKey: this.apiKey
+        p: this.currentPage
       }
     }
   },

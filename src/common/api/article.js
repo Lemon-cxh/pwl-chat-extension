@@ -1,4 +1,4 @@
-import request from '@/popup/utils/request'
+import request from './request'
 
 // 获取最近帖子列表
 export function getRecentArticles(params) {

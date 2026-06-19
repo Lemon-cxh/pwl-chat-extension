@@ -77,8 +77,8 @@
 </template>
 
 <script>
-import { send, upload } from '@/popup/api/chatroom'
-import { getUserName } from '@/popup/api/user'
+import { send, upload } from '@/common/api/chatroom'
+import { getUserName } from '@/common/api/user'
 import { mapGetters } from 'vuex'
 import { CircleCloseFilled } from '@element-plus/icons-vue'
 /**
@@ -108,10 +108,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['key', 'discuss']),
-    form() {
-      return { content: this.content, apiKey: this.key }
-    }
+    ...mapGetters(['key', 'discuss'])
   },
   watch: {
     content(val) {
@@ -192,11 +189,11 @@ export default {
       if (includeExtra) {
         content = this.buildExtraInfo(content)
       }
-      send({ content, apiKey: this.key }).then()
+      send({ content }).then()
       this.$refs.contentInput.focus()
     },
     send() {
-      const form = { ...this.form }
+      const form = { content: this.content }
       form.content = this.buildExtraInfo(form.content)
       send(form).then((res) => {
         if (res.code === 0) {

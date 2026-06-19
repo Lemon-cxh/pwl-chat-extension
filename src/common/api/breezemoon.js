@@ -1,4 +1,4 @@
-import request from '@/popup/utils/request'
+import request from './request'
 
 // 获取清风明月列表
 export function getBreezemoons(params) {

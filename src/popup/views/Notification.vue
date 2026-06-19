@@ -130,7 +130,7 @@ import {
   getNotifications,
   countNotifications,
   makeReadNotifications
-} from '@/popup/api/notification'
+} from '@/common/api/notification'
 import { getDateTime } from '@/common/utils/util'
 import { NOTIFICATION_TYPE, NOTIFICATION_MAPPING } from '@/common/constant/NotificationConstant'
 import { Finished } from '@element-plus/icons-vue'
@@ -168,11 +168,8 @@ export default {
   },
   computed: {
     ...mapGetters(['key']),
-    apiKey() {
-      return { apiKey: this.key }
-    },
     params() {
-      return { apiKey: this.key, type: this.tabsName, p: this.page }
+      return { type: this.tabsName, p: this.page }
     },
     attributes() {
       return this.typeMapping.get(this.tabsName)
@@ -237,7 +234,7 @@ export default {
       }
     },
     getCountNotifications() {
-      countNotifications(this.apiKey).then((res) => {
+      countNotifications().then((res) => {
         if (res.code === 0) {
           this.count = res
         }
@@ -262,7 +259,7 @@ export default {
       })
     },
     makeReadNotifications() {
-      makeReadNotifications(this.tabsName, this.apiKey).then((res) => {
+      makeReadNotifications(this.tabsName).then((res) => {
         if (res.code === 0) {
           this.getCountNotifications()
           this.handleChange()

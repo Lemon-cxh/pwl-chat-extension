@@ -38,7 +38,7 @@
 <script>
 import { Comment } from '@element-plus/icons-vue'
 import { ObjectUtil } from '@/common/utils/ObjectUtil'
-import { send } from '@/popup/api/chatroom'
+import { send } from '@/common/api/chatroom'
 import { mapGetters, mapMutations } from 'vuex'
 /**
  * 话题组件
@@ -55,10 +55,7 @@ export default {
       return this.discuss.enable ? 'primary' : 'info'
     },
     form() {
-      return {
-        content: `[setdiscuss]${this.inputValue}[/setdiscuss]`,
-        apiKey: this.key
-      }
+      return { content: `[setdiscuss]${this.inputValue}[/setdiscuss]` }
     }
   },
   data() {

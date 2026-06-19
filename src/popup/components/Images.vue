@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { getCloudImage, syncCloudImage } from '@/popup/api/chatroom'
+import { getCloudImage, syncCloudImage } from '@/common/api/chatroom'
 import { mapGetters } from 'vuex'
 import { CircleCloseFilled } from '@element-plus/icons-vue'
 /**
@@ -68,7 +68,7 @@ export default {
   computed: {
     ...mapGetters(['key']),
     form() {
-      return { gameId: 'emojis', apiKey: this.key }
+      return { gameId: 'emojis' }
     }
   },
   created() {

@@ -4,6 +4,7 @@ import store from '@/popup/store/index'
 import router from '@/popup/router'
 import IconSvg from '@/popup/components/Icon-svg'
 import { ElMessage } from 'element-plus'
+import { setErrorHandler } from '@/common/api/request'
 import 'element-plus/es/components/message/style/css'
 // main.ts/main.js
 import 'element-plus/theme-chalk/el-message-box.css';
@@ -17,6 +18,12 @@ import 'element-plus/theme-chalk/el-message-box.css';
       duration: 1000
     })
   }
+})
+
+// 注册 API 错误处理
+setErrorHandler((error) => {
+  console.dir(error)
+  ElMessage.error(error.message)
 })
 
 // 自定义的SVG组件配置：导入svg

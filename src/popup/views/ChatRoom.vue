@@ -108,7 +108,7 @@ import { clickEventListener } from '@/common/utils/commonUtil'
 import { getOptions } from '@/common/utils/chromeUtil'
 import { getOnline, getDiscuss } from '@/common/manager/StorageManager'
 import { mapGetters, mapMutations } from 'vuex'
-import { revoke, getMessages, more } from '@/popup/api/chatroom'
+import { revoke, getMessages, more } from '@/common/api/chatroom'
 import { InfoFilled } from '@element-plus/icons-vue'
 
 let port
@@ -326,12 +326,11 @@ export default {
       const lastId = this.lastMessageId
       const res = lastId
         ? await getMessages({
-          apiKey: this.key,
           oId: lastId,
           mode: 1,
           size: 25
         })
-        : await more({ apiKey: this.key, page: 1 })
+        : await more({ page: 1 })
       if (res.code !== 0) {
         return
       }

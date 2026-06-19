@@ -1,5 +1,4 @@
-import request from '@/popup/utils/request'
-import store from '@/popup/store/index'
+import request, { getApiKey } from './request'
 
 export function more(params) {
   return request({
@@ -25,14 +24,17 @@ export function getMd(oId) {
 }
 
 export function send(data) {
-  data.client =
-    (navigator.userAgent.indexOf('Edg') > -1 ? 'Edge' : 'Chrome') +
-    '/v' +
-    process.env.VUE_APP_VERSION
+  const payload = {
+    ...data,
+    client:
+      (navigator.userAgent.indexOf('Edg') > -1 ? 'Edge' : 'Chrome') +
+      '/v' +
+      process.env.VUE_APP_VERSION
+  }
   return request({
     url: '/chat-room/send',
     method: 'post',
-    data
+    data: payload
   })
 }
 
@@ -44,10 +46,10 @@ export function openRedPacket(data) {
   })
 }
 
-export function upload(file, apiKey) {
+export function upload(file) {
   const formData = new FormData()
   formData.append('file[]', file)
-  formData.append('apiKey', store.getters.key)
+  formData.append('apiKey', getApiKey())
   return request({
     url: '/upload',
     method: 'post',
@@ -59,10 +61,7 @@ export function revoke(oId, data) {
   return request({
     url: `/chat-room/revoke/${oId}`,
     method: 'delete',
-    data: {
-      ...data,
-      apiKey: store.getters.key
-    }
+    data
   })
 }
 
