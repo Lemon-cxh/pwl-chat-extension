@@ -32,11 +32,12 @@
 
 ## 🟡 中等
 
-### 4. 消息处理逻辑三处重复
+### 4. ✅ 消息处理逻辑三处重复
 
 - **涉及文件**: `src/popup/store/index.js`、`src/popup/views/ChatRoom.vue`、`src/devtools/App.vue`
 - 「+1 折叠」、「红包状态更新」、「撤回消息」三套逻辑在 store、ChatRoom、devtools 中各自实现了一遍，代码 80% 相同
 - 应提取为公共 composable 或工具函数
+- **已修复**：提取到 `src/common/utils/messageUtil.js`（foldNewMessage / concatWithFold / unshiftWithFold / updateRedPacketStatus / revokeMessage），三处统一调用
 
 ### 5. `modifyContent` 内容转换逻辑分叉
 

@@ -2,9 +2,14 @@ import { createStore } from 'vuex'
 import { user } from './module/user'
 import { getUserInfo, getKey } from '@/common/api/auth'
 import { setApiKey } from '@/common/api/request'
-import { STORAGE, MESSAGE_TYPE } from '@/common/constant/Constant'
+import { STORAGE } from '@/common/constant/Constant'
 import { setLocal, getLocal, removeLocal } from '@/common/utils/chromeUtil'
-import { isRedPacket } from '@/common/utils/util'
+import {
+  foldNewMessage,
+  concatWithFold,
+  updateRedPacketStatus,
+  revokeMessage
+} from '@/common/utils/messageUtil'
 
 export default createStore({
   modules: {
@@ -48,49 +53,10 @@ export default createStore({
         state.message.unshift(message.message)
         return
       }
-      if (isRedPacket(message.message)) {
-        state.message.unshift(message.message)
-        return
-      }
-      // +1 消息折叠
-      const last = state.message[0]
-      if (!last || message.message.md !== last.md) {
-        state.message.unshift(message.message)
-        return
-      }
-      const { users = [], oIds = [] } = last
-      users.push({
-        userName: message.message.userName,
-        userAvatarURL: message.message.userAvatarURL
-      })
-      oIds.push(message.oId)
-      state.message[0].users = users
-      state.message[0].oIds = oIds
+      foldNewMessage(state.message, message.message)
     },
     concatMessage(state, data) {
-      const index = state.message.length - 1
-      const last = state.message[index]
-      const message = data[0]
-      // +1 消息折叠
-      if (!last || last.content !== message.content) {
-        state.message = state.message.concat(data)
-        return
-      }
-      const { users = [], oIds = [] } = message
-      users.push({
-        userName: last.userName,
-        userAvatarURL: last.userAvatarURL
-      })
-      oIds.push(last.oId)
-      if (last.users) {
-        message.users = users.concat(last.users)
-        message.oIds = oIds.concat(last.oIds)
-      } else {
-        message.users = users
-        message.oIds = oIds
-      }
-      state.message[index] = message
-      state.message = state.message.concat(data.slice(1))
+      concatWithFold(state.message, data)
     },
     cleanMessage(state) {
       state.message = []
@@ -114,31 +80,10 @@ export default createStore({
       state.discuss.content = content
     },
     updateRedPacket(state, message) {
-      let msg
-      state.message.some((e) => {
-        if (e.oId === message.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
-          msg = JSON.parse(e.content)
-          if (msg.got >= msg.count) {
-            return true
-          }
-          msg.got = message.got ? message.got : msg.count
-          e.content = JSON.stringify(msg)
-          return true
-        }
-        return false
-      })
+      updateRedPacketStatus(state.message, message)
     },
     revoke(state, oId) {
-      state.message.some((e) => {
-        if (
-          e.type === MESSAGE_TYPE.msg &&
-          (e.oId === oId || (e.oIds && e.oIds.some((e) => e === oId)))
-        ) {
-          e.revoke = true
-          return true
-        }
-        return false
-      })
+      revokeMessage(state.message, oId)
     }
   },
   actions: {

@@ -104,6 +104,7 @@
 import { ref, defineAsyncComponent, computed } from 'vue'
 import { EVENT, MESSAGE_TYPE } from '@/common/constant/Constant'
 import { getDate, isRedPacket } from '@/common/utils/util'
+import { foldNewMessage, concatWithFold, unshiftWithFold, updateRedPacketStatus, revokeMessage } from '@/common/utils/messageUtil'
 import { clickEventListener } from '@/common/utils/commonUtil'
 import { getOptions } from '@/common/utils/chromeUtil'
 import { getOnline, getDiscuss } from '@/common/manager/StorageManager'
@@ -154,19 +155,7 @@ export default {
       messageArray.value.unshift(msg)
     }
     const pushMessage = (msg) => {
-      const index = messageArray.value.length - 1
-      if (index < 0) {
-        messageArray.value.push(...msg)
-        return
-      }
-      const last = messageArray.value[index]
-      const message = msg[0]
-      if (last.content !== message.content) {
-        messageArray.value.push(...msg)
-        return
-      }
-      messageArray.value[index] = message
-      messageArray.value.push(...msg.slice(1))
+      concatWithFold(messageArray.value, msg)
     }
     const updateMessage = (index, property, value) => {
       messageArray.value[index][property] = value
@@ -273,17 +262,7 @@ export default {
         this.newMessage(message)
         return
       }
-      const last = this.messageArray[0]
-      if (!last || !last.md || message.md !== last.md || isRedPacket(message)) {
-        this.newMessage(message)
-        return
-      }
-      const users = last.users ? last.users : []
-      users.unshift({
-        userName: message.userName,
-        userAvatarURL: message.userAvatarURL
-      })
-      this.updateMessage(0, 'users', users)
+      foldNewMessage(this.messageArray, message)
     },
     newMessage(message) {
       this.unshiftMessage(message)
@@ -336,28 +315,7 @@ export default {
       }
       const data = lastId ? res.data.slice(1).reverse() : res.data.reverse()
       const arr = []
-      for (let index = 0; index < data.length; index++) {
-        if (index === 0) {
-          // markCareAndBlack(data[index])
-          arr.unshift(data[index])
-          continue
-        }
-        const e = data[index]
-        const last = arr[0]
-        if (last.content !== e.content) {
-          // markCareAndBlack(e)
-          arr.unshift(e)
-          continue
-        }
-        const { users = [], oIds = [] } = last
-        users.push({
-          userName: e.userName,
-          userAvatarURL: e.userAvatarURL
-        })
-        oIds.push(e.oId)
-        arr[0].users = users
-        arr[0].oIds = oIds
-      }
+      unshiftWithFold(arr, data)
       this.pushMessage(arr)
       this.loading = false
     },
@@ -377,28 +335,10 @@ export default {
       this.dialogVisible = true
     },
     updateRedPacket(data) {
-      let msg
-      this.messageArray.some((e, index) => {
-        if (e.oId === data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
-          msg = JSON.parse(e.content)
-          if (msg.got >= msg.count) {
-            return true
-          }
-          msg.got = data.got ? data.got : msg.count
-          this.updateMessage(index, 'content', JSON.stringify(msg))
-          return true
-        }
-        return false
-      })
+      updateRedPacketStatus(this.messageArray, data)
     },
     revoke(oId) {
-      this.messageArray.some((e, index) => {
-        if (e.oId === oId && e.type === MESSAGE_TYPE.msg) {
-          this.updateMessage(index, 'revoke', true)
-          return true
-        }
-        return false
-      })
+      revokeMessage(this.messageArray, oId)
     },
     revokeMessage(message) {
       if (message.oIds) {

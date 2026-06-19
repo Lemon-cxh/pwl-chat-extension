@@ -35,10 +35,11 @@
 
 <script>
 import { ref } from 'vue'
-import { EVENT, MESSAGE_TYPE } from '@/common/constant/Constant'
+import { EVENT } from '@/common/constant/Constant'
 import { clickEventListener } from '@/common/utils/commonUtil'
 import { isRedPacket } from '@/common/utils/util'
 import { getOptions } from '@/common/utils/chromeUtil'
+import { concatWithFold, updateRedPacketStatus } from '@/common/utils/messageUtil'
 
 let port
 
@@ -58,19 +59,7 @@ export default {
       messageArray.value.unshift(msg)
     }
     const pushMessage = (msg) => {
-      const index = messageArray.value.length - 1
-      if (index < 0) {
-        messageArray.value.push(...msg)
-        return
-      }
-      const last = messageArray.value[index]
-      const message = msg[0]
-      if (last.content !== message.content) {
-        messageArray.value.push(...msg)
-        return
-      }
-      messageArray.value[index] = message
-      messageArray.value.push(...msg.slice(1))
+      concatWithFold(messageArray.value, msg)
     }
     const updateMessage = (index, property, value) => {
       messageArray.value[index][property] = value
@@ -137,19 +126,7 @@ export default {
       this.updateMessage({ oId: id })
     },
     updateRedPacket(data) {
-      let msg
-      this.messageArray.some((e, index) => {
-        if (e.oId === data.oId && e.type !== MESSAGE_TYPE.redPacketStatus) {
-          msg = JSON.parse(e.content)
-          if (msg.got >= msg.count) {
-            return true
-          }
-          msg.got = data.got ? data.got : msg.count
-          this.updateMessage(index, 'content', JSON.stringify(msg))
-          return true
-        }
-        return false
-      })
+      updateRedPacketStatus(this.messageArray, data)
     },
     modifyContent(content) {
       // 隐藏小尾巴信息
