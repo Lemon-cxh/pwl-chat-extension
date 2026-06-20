@@ -133,12 +133,34 @@ export default {
 </script>
 
 <style scoped>
+/* 对话框整体暗色覆盖 */
 .red-packet-dialog :deep(.el-dialog) {
   background: #1a1a1a;
   border-radius: 8px;
+  --el-dialog-bg-color: #1a1a1a;
+}
+
+.red-packet-dialog :deep(.el-dialog__header) {
+  background: #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
+  border-radius: 8px 8px 0 0;
+  padding: 16px 20px 12px;
 }
 
 .red-packet-dialog :deep(.el-dialog__title) {
+  color: #fff;
+}
+
+.red-packet-dialog :deep(.el-dialog__body) {
+  background: #1a1a1a;
+  padding: 0;
+}
+
+.red-packet-dialog :deep(.el-dialog__headerbtn .el-dialog__close) {
+  color: #888;
+}
+
+.red-packet-dialog :deep(.el-dialog__headerbtn .el-dialog__close:hover) {
   color: #fff;
 }
 
@@ -264,5 +286,15 @@ export default {
 
 .green {
   color: #52c41a;
+}
+</style>
+<style>
+/* 红包弹窗遮罩层暗色 */
+.red-packet-dialog.el-dialog {
+  --el-dialog-bg-color: #1a1a1a;
+}
+.red-packet-dialog .el-dialog__header,
+.red-packet-dialog .el-dialog__body {
+  background: #1a1a1a;
 }
 </style>
