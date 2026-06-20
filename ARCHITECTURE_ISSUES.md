@@ -61,12 +61,13 @@
 - 应统一 API 响应字段约定，并将 WS 通信改为走 background 消息通道
 - **已修复**：WS 通信已在 #2 中改为 background 端口通道；API 响应字段在 `privatechat.js` 层做兼容映射（`result` → `code`），PrivateChat.vue 和 PrivateChatList.vue 统一使用 `code === 0` 判断
 
-### 8. Vuex store 和 ChatRoom.vue 消息状态不统一
+### 8. ✅ Vuex store 和 ChatRoom.vue 消息状态不统一
 
 - **涉及文件**: `src/popup/store/index.js`、`src/popup/views/ChatRoom.vue`
 - `ChatRoom.vue` 的 `setup()` 通过 `ref` 维护独立的 `messageArray`，未使用 store 的 `state.message`
 - Store 的 mutations（`addMessage`、`concatMessage`）和 ChatRoom 的方法（`messageEvent`、`load`/`more`）在做重复的折叠去重
 - 应统一数据源——要么全部走 store，要么去掉 store 中的 message state
+- **已修复**：删除 store 中无人使用的死代码——`state.message`、`state.online`、4 个 getter（`message`/`messageLength`/`lastMessageId`/`online`）、8 个 mutation（`addMessage`/`concatMessage`/`cleanMessage`/`popMessage`/`updateRedPacket`/`revoke`/`logout`/`setOnline`）、messageUtil 的 import；保留仍在使用的 `state.discuss`、`changeDiscuss`、`setDiscussContent`
 
 ---
 
@@ -136,3 +137,4 @@
 - 聊天室页面的话题框，如果话题字数太多点击修改的时候话题框的宽度会变形
 - 通知页面的样式有时候看不清文字
 - 清风明月的样式和其他页面不一致
+- 看帖列表->文章详情的评论区中，图片常常会超过宽度，导致出现滚动条
