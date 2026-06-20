@@ -158,11 +158,10 @@
   6. ArticleList/ArticleDetail — 统一 4px 深色自定义滚动条样式（匹配 BreezemoonList）
   7. ArticleDetail.vue — 添加 reply-content :deep(img) max-width:100%、article-body overflow:hidden
 
-### 17. ✅ 聊天室滚动条样式不统一
+### 17. 🔵 聊天室滚动条颜色 — 保持默认
 
-- ChatRoom.vue 的 `el-scrollbar` 没有自定义深色滚动条样式，使用 Element Plus 默认橙色滚动条
-- 其他所有页面（BreezemoonList、ArticleList、ArticleDetail、PrivateChat 等）均已使用 4px 深色滚动条
-- **已修复**：ChatRoom.vue `.message-box` 添加 `:deep(.el-scrollbar__bar)` / `:deep(.el-scrollbar__thumb)` 深色自定义样式，与全局统一
+- ChatRoom.vue 的 `el-scrollbar` 使用 Element Plus 默认橙色滚动条，与深色页面不同
+- 经评估，聊天室作为主页面保留默认样式以区分功能区域
 
 ### 18. ✅ 清风明月页面嵌套滚动条
 

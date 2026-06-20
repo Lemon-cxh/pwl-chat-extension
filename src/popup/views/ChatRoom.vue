@@ -424,20 +424,6 @@ export default {
 .message-box {
   padding-right: 5px;
 }
-/* 统一深色滚动条样式 */
-.message-box :deep(.el-scrollbar__bar.is-vertical) {
-  width: 4px;
-}
-.message-box :deep(.el-scrollbar__thumb) {
-  background: #333;
-  border-radius: 2px;
-}
-.message-box :deep(.el-scrollbar__thumb:hover) {
-  background: #444;
-}
-.message-box :deep(.el-scrollbar__wrap) {
-  margin-right: 0 !important;
-}
 </style>
 <style>
 .fade-enter-active,
