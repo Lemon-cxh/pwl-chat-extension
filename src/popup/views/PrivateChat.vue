@@ -439,18 +439,14 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #1a1a1a;
   overflow: hidden;
 }
 
 .header {
-  padding: 12px 16px;
+  padding: 8px 12px;
   background-color: #2c2c2c;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   z-index: 10;
 }
 
@@ -464,8 +460,6 @@ export default {
 .message-list {
   flex: 1;
   padding: 0 16px;
-  padding-bottom: 130px; /* 增加底部 padding */
-  margin-top: 50px;
 }
 
 .message-item {
@@ -515,15 +509,11 @@ export default {
 }
 
 .message-input {
-  padding: 12px 16px;
+  padding: 10px 12px;
   background-color: #2c2c2c;
   border-top: 1px solid #333;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   z-index: 10;
-  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .message-input :deep(.el-textarea__inner) {
@@ -597,24 +587,6 @@ export default {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-}
-
-/* 自定义滚动条样式 */
-.message-list :deep(.el-scrollbar__bar.is-vertical) {
-  width: 6px;
-}
-
-.message-list :deep(.el-scrollbar__thumb) {
-  background-color: #444;
-  border-radius: 3px;
-}
-
-.message-list :deep(.el-scrollbar__thumb:hover) {
-  background-color: #555;
-}
-
-.message-list :deep(.el-scrollbar__wrap) {
-  margin-right: 0 !important;
 }
 
 /* 动画效果 */
