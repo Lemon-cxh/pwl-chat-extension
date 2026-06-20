@@ -157,3 +157,26 @@
   5. Notification.vue — 链接改为 #58a6ff、已读用精确选择器替代 opacity:0.5
   6. ArticleList/ArticleDetail — 统一 4px 深色自定义滚动条样式（匹配 BreezemoonList）
   7. ArticleDetail.vue — 添加 reply-content :deep(img) max-width:100%、article-body overflow:hidden
+
+### 17. ✅ 聊天室滚动条样式不统一
+
+- ChatRoom.vue 的 `el-scrollbar` 没有自定义深色滚动条样式，使用 Element Plus 默认橙色滚动条
+- 其他所有页面（BreezemoonList、ArticleList、ArticleDetail、PrivateChat 等）均已使用 4px 深色滚动条
+- **已修复**：ChatRoom.vue `.message-box` 添加 `:deep(.el-scrollbar__bar)` / `:deep(.el-scrollbar__thumb)` 深色自定义样式，与全局统一
+
+### 18. ✅ 清风明月页面嵌套滚动条
+
+- BreezemoonList.vue 使用 `position: fixed` 头部 + `height: calc(100vh - 50px)` 滚动区，在弹窗高度变化时导致外层容器出现第二个滚动条
+- **已修复**：头部改用 flexbox 布局（`flex-shrink: 0`），滚动区使用 `flex: 1` 自适应填充剩余空间，消除固定定位造成的溢出
+
+### 19. ✅ 通知列表、私聊列表页面样式优化
+
+- **Notification.vue**：
+  - 外层 `<div>` 无容器约束，无背景色，无高度限制
+  - 滚动条固定 `height="480px"`，窗口变化时无法自适应
+  - 缺少深色滚动条自定义样式
+  - 整体布局使用 `el-row` 嵌套，结构不清晰
+  - **已修复**：重构为 flexbox 页面布局（固定头部 + flex:1 滚动区）；头部整合 page-header、标签页和操作按钮；添加 4px 深色滚动条；通知条目使用语义化 CSS class 替代 `el-row` 嵌套；hover 背景高亮；标签页暗色适配；滚动触底检测改为 `clientHeight` 动态计算
+- **PrivateChatList.vue**：
+  - `.chat-list` 缺少深色滚动条自定义样式
+  - **已修复**：添加 `.chat-list :deep(.el-scrollbar__bar)` 等 4px 深色滚动条样式

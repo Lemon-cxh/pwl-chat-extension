@@ -136,15 +136,14 @@ export default {
   overflow: hidden;
   font-size: 13px;
   max-width: 380px;
+  display: flex;
+  flex-direction: column;
 }
 .header {
   padding: 12px 16px;
   background-color: #2c2c2c;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   z-index: 1;
 }
 .header-row {
@@ -162,8 +161,7 @@ export default {
   margin-right: 0;
 }
 .breezemoon-scrollbar {
-  margin-top: 50px;
-  height: calc(100vh - 50px);
+  flex: 1;
 }
 .breezemoon-item {
   display: flex;

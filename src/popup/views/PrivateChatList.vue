@@ -323,6 +323,21 @@ export default {
   color: #666;
 }
 
+/* 深色滚动条 */
+.chat-list :deep(.el-scrollbar__bar.is-vertical) {
+  width: 4px;
+}
+.chat-list :deep(.el-scrollbar__thumb) {
+  background: #333;
+  border-radius: 2px;
+}
+.chat-list :deep(.el-scrollbar__thumb:hover) {
+  background: #444;
+}
+.chat-list :deep(.el-scrollbar__wrap) {
+  margin-right: 0 !important;
+}
+
 /* 修改 el-page-header 样式 */
 :deep(.el-page-header__left) {
   margin-right: 0px;
