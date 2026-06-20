@@ -110,7 +110,7 @@
   - 提取 `notificationHandler.js`：@ 通知、badge 计数、特别关心上下线通知
   - index.js 从 369 行精简至 248 行（-33%），仅保留 WS 编排、端口管理和私聊处理
 
-### 12. 常量文件分散且类型混杂
+### 12. ✅ 常量文件分散且类型混杂
 
 - **涉及目录**: `src/common/constant/`
 - `Constant.js` — 消息类型、storage key、事件、默认配置
@@ -118,28 +118,30 @@
 - `RedPacketConstant.js` — 红包类型定义
 - `RuleConstant.js` — 表单验证规则**生成函数**（不是常量）
 - `RuleConstant.js` 应移到 `utils/`，或重命名为 `formRules.js`
+- **已修复**：`RuleConstant.js` → `utils/formRules.js`，更新 RedPacket.vue 导入路径
 
-### 13. views 与 components 边界模糊
+### 13. ✅ views 与 components 边界模糊
 
 - `PrivateChat.vue` 放在 `components/` 下，但它有独立路由 `/private-chat/:username`，本质上是一个页面级组件
 - `views/PrivateChatList.vue` 在 `views/` 下，与之对应的 `PrivateChat.vue` 却不在
 - 建议：所有有路由的组件统一放入 `views/`
+- **已修复**：`PrivateChat.vue` 移至 `views/`，与 `PrivateChatList.vue` 同级；`components/private-chat/` 仅保留可复用的 `TransferDialog.vue`
 
-### 14. commonUtil.js 命名误导
+### 14. ✅ commonUtil.js 命名误导
 
 - **涉及文件**: [src/common/utils/commonUtil.js](src/common/utils/commonUtil.js)
 - `clickEventListener` 硬编码了 `document.getElementById('messageList')` 和内联的 fishpi.cn URL 解析
 - 既不 common（只在特定 DOM 下可用），也不是 util（是具体业务逻辑）
 - 建议改为 Vue 指令或 composable，放入 popup 目录
+- **已修复**：提取为 `src/popup/composables/useMessageClick.js`（Vue composable，onMounted/onUnmounted 管理生命周期），ChatRoom.vue 和 devtools/App.vue 统一使用；删除 commonUtil.js
 
 ### 15. devtools 入口几乎未使用
 
 - **涉及文件**: `src/devtools/`、[vue.config.js](vue.config.js)（多页配置中的 devtools 入口）
 - `devtools` 作为一个独立入口被配置、打包，但功能与 popup 高度重叠
-- 评估是否值得维护——如不需要可移除，简化多页配置
+- **评估结论**：manifest.json 无 `devtools_page` 字段，Chrome 永远不会加载 devtools.html —— 实质上是死代码。经确认暂时保留，后续可考虑移除
 
-
-### 16. 样式问题
+### 16. ✅ 样式问题
 
 - 聊天框自己发送的消息(右侧)矩形框和三角形中间还有缝隙
 - 很多页面通常会出现多个滚动条，超出元素范围。例如：通知帖子列表、详情
@@ -147,3 +149,11 @@
 - 通知页面的样式有时候看不清文字
 - 清风明月的样式和其他页面不一致
 - 看帖列表->文章详情的评论区中，图片常常会超过宽度，导致出现滚动条
+- **已修复**：
+  1. Message.vue — 气泡三角形 left:-14px→-8px, right:-14px→-8px，消除 6px 缝隙
+  2. Notification.vue — * 通配选择器移除 overflow:auto，改为 pre/code 精确选择器
+  3. ArticleDetail.vue — 93vh→calc(100vh-56px)，避免视口溢出
+  4. Discuss.vue — 添加 :deep(.el-input__inner) 约束，防止长话题编辑时宽度变形
+  5. Notification.vue — 链接改为 #58a6ff、已读用精确选择器替代 opacity:0.5
+  6. ArticleList/ArticleDetail — 统一 4px 深色自定义滚动条样式（匹配 BreezemoonList）
+  7. ArticleDetail.vue — 添加 reply-content :deep(img) max-width:100%、article-body overflow:hidden
