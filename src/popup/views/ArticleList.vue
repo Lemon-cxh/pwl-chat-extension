@@ -16,9 +16,7 @@
     <el-scrollbar
       ref="articleScrollbar"
       class="article-scrollbar"
-      :height="scrollbarHeight"
       noresize
-      always
       @scroll="scroll"
     >
       <div
@@ -89,7 +87,6 @@ export default {
   },
   data() {
     return {
-      scrollbarHeight: window.innerHeight - 85,
       activeTab: 'recent',
       articles: [],
       loading: false,
@@ -195,10 +192,13 @@ export default {
   overflow: hidden;
   font-size: 13px;
   max-width: 380px;
+  display: flex;
+  flex-direction: column;
 }
 .header {
   padding: 6px 8px 0 8px;
   background: #232323;
+  flex-shrink: 0;
 }
 .title {
   margin-left: 8px;
@@ -385,6 +385,10 @@ export default {
   text-align: center;
   padding: 12px 0;
   font-size: 12px;
+}
+.article-scrollbar {
+  flex: 1;
+  min-height: 0;
 }
 /* 统一滚动条样式（与 BreezemoonList 保持一致） */
 .article-scrollbar :deep(.el-scrollbar__bar.is-vertical) {

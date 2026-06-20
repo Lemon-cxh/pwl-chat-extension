@@ -162,6 +162,7 @@ export default {
 }
 .breezemoon-scrollbar {
   flex: 1;
+  min-height: 0;
 }
 .breezemoon-item {
   display: flex;
