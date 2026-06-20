@@ -162,8 +162,8 @@ export default {
   margin-right: 0;
 }
 .breezemoon-scrollbar {
-  margin-top: 60px;
-  height: 89vh;
+  margin-top: 50px;
+  height: calc(100vh - 50px);
 }
 .breezemoon-item {
   display: flex;

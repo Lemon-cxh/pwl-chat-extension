@@ -97,6 +97,16 @@ export default {
 .input {
   max-width: 230px;
 }
+/* 约束 Element Plus input 内部元素，防止长话题名编辑时撑开布局 */
+.input :deep(.el-input__wrapper) {
+  max-width: 230px;
+}
+.input :deep(.el-input__inner) {
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
 .button {
   padding-right: 3px;
   max-width: calc(100% - 36px);

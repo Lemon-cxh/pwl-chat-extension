@@ -308,8 +308,14 @@ export default {
 .time {
   justify-content: flex-end;
 }
-.read {
-  opacity: 0.5;
+/* 已读通知：仅降低文字对比度，不影响头像等视觉元素 */
+.read .notification-content,
+.read .notification-html {
+  opacity: 0.55;
+}
+.read .title {
+  opacity: 1;
+  color: #aaa;
 }
 .title {
   max-width: 330px;
@@ -332,19 +338,22 @@ export default {
 <style>
 .notification-content a,
 .notification-html a {
-  color: white;
+  color: #58a6ff;
 }
-.notification-content * {
+.notification-content pre,
+.notification-content code {
   max-width: 255px;
   overflow: auto;
   font-size: 14px;
 }
-.notification-html * {
+.notification-html pre,
+.notification-html code {
   max-width: 355px;
   overflow: auto;
   font-size: 14px;
 }
-.el-page-header * {
+.el-page-header :deep(.el-page-header__left),
+.el-page-header :deep(.el-page-header__content) {
   color: white;
 }
 </style>

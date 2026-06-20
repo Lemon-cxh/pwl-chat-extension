@@ -510,7 +510,7 @@ export default {
   height: 100%;
   overflow: hidden;
   font-size: 13px;
-  max-width: 381px;
+  max-width: 380px;
   display: flex;
   flex-direction: column;
 }
@@ -535,7 +535,21 @@ export default {
 
 .article-scrollbar {
   margin-top: 40px;
-  height: 93vh;
+  height: calc(100vh - 56px);
+}
+/* 统一滚动条样式（与 BreezemoonList 保持一致） */
+.article-scrollbar :deep(.el-scrollbar__bar.is-vertical) {
+  width: 4px;
+}
+.article-scrollbar :deep(.el-scrollbar__thumb) {
+  background: #333;
+  border-radius: 2px;
+}
+.article-scrollbar :deep(.el-scrollbar__thumb:hover) {
+  background: #444;
+}
+.article-scrollbar :deep(.el-scrollbar__wrap) {
+  margin-right: 0 !important;
 }
 
 .article-content {
@@ -590,6 +604,13 @@ export default {
   line-height: 1.6;
   color: #e0e0e0;
   font-size: 14px;
+  overflow: hidden;
+  word-break: break-word;
+}
+.article-body :deep(pre),
+.article-body :deep(table) {
+  max-width: 100%;
+  overflow: auto;
 }
 
 .article-body :deep(img) {
@@ -644,9 +665,13 @@ export default {
   color: #e0e0e0;
   line-height: 1.5;
   font-size: 14px;
+  overflow: hidden;
+  word-break: break-word;
 }
 
-.comment-content :deep(img) {
+/* 评论及回复中图片约束、防止溢出 */
+.comment-content :deep(img),
+.reply-content :deep(img) {
   max-width: 100%;
   height: auto;
   border-radius: 4px;
@@ -728,18 +753,13 @@ export default {
   color: #fff;
 }
 
-.comment-content {
-  margin-left: 32px;
-  color: #e0e0e0;
-  line-height: 1.5;
-  font-size: 14px;
-}
-
 .reply-content {
   margin-left: 32px;
   color: #e0e0e0;
   line-height: 1.5;
   font-size: 13px;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .reply-to {

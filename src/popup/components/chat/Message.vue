@@ -278,7 +278,7 @@ export default {
   content: "";
   position: absolute;
   top: 4px;
-  left: -14px;
+  left: -8px;
   width: 0;
   height: 0;
   border: 6px solid transparent;
@@ -291,7 +291,7 @@ export default {
   content: "";
   position: absolute;
   top: 4px;
-  right: -14px;
+  right: -8px;
   width: 0;
   height: 0;
   border: 6px solid transparent;

@@ -386,4 +386,18 @@ export default {
   padding: 12px 0;
   font-size: 12px;
 }
+/* 统一滚动条样式（与 BreezemoonList 保持一致） */
+.article-scrollbar :deep(.el-scrollbar__bar.is-vertical) {
+  width: 4px;
+}
+.article-scrollbar :deep(.el-scrollbar__thumb) {
+  background: #333;
+  border-radius: 2px;
+}
+.article-scrollbar :deep(.el-scrollbar__thumb:hover) {
+  background: #444;
+}
+.article-scrollbar :deep(.el-scrollbar__wrap) {
+  margin-right: 0 !important;
+}
 </style>
