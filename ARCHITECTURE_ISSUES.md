@@ -100,11 +100,15 @@
   ```
 - **已修复**：17 个文件按功能移入 6 个子目录，更新 7 处手动导入路径，`unplugin-vue-components`（deep:true）自动处理其余组件的路径解析
 
-### 11. background/index.js 职责过多
+### 11. ✅ background/index.js 职责过多
 
 - **涉及文件**: [src/background/index.js](src/background/index.js)（约 300 行）
 - 混合了 WS 连接管理、消息路由分发、@ 通知与 badge、特别关心/黑名单过滤、重连检测
 - 建议拆分为独立 handler 模块：`messageHandler.js`、`notificationHandler.js`、`reconnectHandler.js`
+- **已修复**：
+  - 提取 `messageProcessor.js`：消息路由、重连检测、黑名单/关心标记、发送
+  - 提取 `notificationHandler.js`：@ 通知、badge 计数、特别关心上下线通知
+  - index.js 从 369 行精简至 248 行（-33%），仅保留 WS 编排、端口管理和私聊处理
 
 ### 12. 常量文件分散且类型混杂
 

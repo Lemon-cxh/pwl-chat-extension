@@ -14,9 +14,8 @@ import {
   closePrivateChatWebSocket,
   sendPrivateChatMessage
 } from './manager/PrivateChatWebSocketManager'
-import { send, openRedPacket } from '@/common/api/chatroom'
+import { openRedPacket } from '@/common/api/chatroom'
 import {
-  notifications,
   sendTabsMessage,
   getOptions
 } from '@/common/utils/chromeUtil'
@@ -27,14 +26,13 @@ import {
   TABS_EVENT,
   defaultOptions
 } from '@/common/constant/Constant'
+import { processMessage, sendChatMessage } from './handler/messageProcessor'
+import { dispatchOnlineChange, resetBadgeCount } from './handler/notificationHandler'
 
 // 与popup页面的通信
 let port = null
 let privateChatPort = null
-// 未读消息数
-let count = 0
 let options = defaultOptions
-let careOnline = []
 
 chrome.runtime.onInstalled.addListener(() => {
   // eslint-disable-next-line no-undef
@@ -91,7 +89,7 @@ const messageHandler = function messageHandler(event) {
       if (port) {
         port.postMessage({ type: EVENT.online, data })
       }
-      onlineEvent(data)
+      dispatchOnlineChange(data, { options })
       break
     case MESSAGE_TYPE.revoke:
       if (port) {
@@ -102,20 +100,20 @@ const messageHandler = function messageHandler(event) {
       if (options.hideRedPacketMessage) {
         data.hidden = true
       }
-      messageEvent(data, false)
+      processMessage(data, false, { port, options, messageHandler })
       if (port) {
         port.postMessage({ type: EVENT.redPacketStatus, data })
       }
       break
     case MESSAGE_TYPE.discussChanged:
-      messageEvent(data, false)
+      processMessage(data, false, { port, options, messageHandler })
       setDiscuss(data.newDiscuss)
       if (port) {
         port.postMessage({ type: EVENT.discussChanged, data })
       }
       break
     default:
-      messageEvent(data, data.type === MESSAGE_TYPE.msg)
+      processMessage(data, data.type === MESSAGE_TYPE.msg, { port, options, messageHandler })
       break
   }
 }
@@ -142,7 +140,7 @@ chrome.runtime.onConnect.addListener((p) => {
     return
   }
   // 公聊端口（ChatRoom）
-  clearBadgeText()
+  resetBadgeCount()
   port = p
   port.onMessage.addListener((msg) => {
     switch (msg.type) {
@@ -179,7 +177,7 @@ chrome.runtime.onMessage.addListener((request) => {
     closeWebSocket()
   }
   if (TABS_EVENT.sendMessage === request.type) {
-    sendMessage(request.data)
+    sendChatMessage(request.data)
     return
   }
   if (TABS_EVENT.openRedPacket === request.type) {
@@ -210,125 +208,6 @@ chrome.runtime.onMessage.addListener((request) => {
     closePrivateChatWebSocket()
   }
 })
-
-/**
- * 解析消息
- * @param {*} message 消息内容
- * @param {*} isMsg 是否是消息
- * @returns
- */
-function messageEvent(message, isMsg) {
-  if (isMsg) {
-    if (reconnectEvent(message)) {
-      return
-    }
-    markCareAndBlack(message)
-  }
-  // 如果Popup页面处于打开状态则推送消息
-  if (port) {
-    port.postMessage({ type: EVENT.message, data: message })
-    return
-  }
-  if (!isMsg || message.hidden) {
-    return
-  }
-  // 没有启用弹幕消息则直接通知
-  if (!options.barrageOptions.enable) {
-    atNotifications(message)
-    return
-  }
-  sendTabsMessage({ type: TABS_EVENT.message, data: message }, (res) => {
-    // 推送消息给content-scripts时：如果标签页不存在 || 标签页隐藏时
-    if (!res || res.hidden) {
-      atNotifications(message)
-    }
-  })
-}
-
-function onlineEvent(data) {
-  if (!options.care || options.care.length === 0) {
-    return
-  }
-  const currentOnline = data.users
-    .filter((element) => options.care.some((e) => e === element.userName))
-    .flatMap((e) => e.userName)
-  currentOnline
-    .filter((current) => !careOnline.some((e) => current === e))
-    .forEach((e) => {
-      notifications('特别关心', `[${e}]上线了`)
-    })
-  careOnline
-    .filter((e) => !currentOnline.some((current) => current === e))
-    .forEach((e) => {
-      notifications('特别关心', `[${e}]下线了`)
-    })
-  careOnline = currentOnline
-}
-
-/**
- * 重连消息事件处理
- */
-function reconnectEvent(message) {
-  if (message.userName !== '摸鱼派官方巡逻机器人') {
-    return false
-  }
-  let matchMsg = message.md.match(/您超过6小时未活跃/)
-  if (matchMsg) {
-    openWebSocket(messageHandler)
-    return true
-  }
-  matchMsg = message.md.match(/你的连接被管理员断开/)
-  if (matchMsg) {
-    openWebSocket(messageHandler)
-    return true
-  }
-}
-
-/**
- * @用户的消息时，浏览器提示
- * @param {*} message 消息内容
- */
-async function atNotifications(message) {
-  if (options.showUnReadCount && message.type === MESSAGE_TYPE.msg) {
-    chrome.action.setBadgeText({ text: '' + ++count })
-    chrome.action.setBadgeBackgroundColor({ color: [64, 158, 255, 1] })
-  }
-  if (message.isCare) {
-    notifications(message.userName, message.md, message.userAvatarURL)
-    return
-  }
-  if (
-    options.atNotification &&
-    message.md &&
-    message.md.indexOf('@' + (await getUser()).userName) !== -1
-  ) {
-    notifications(
-      `${message.userName}@了你`,
-      message.md,
-      message.userAvatarURL
-    )
-  }
-}
-
-function sendMessage(data) {
-  send({ content: data })
-}
-
-/**
- * 标记特殊关心和黑名单
- * @param {*} message
- */
-function markCareAndBlack(message) {
-  message.isCare =
-    options.care && options.care.some((e) => e === message.userName)
-  message.hidden =
-    options.blacklist && options.blacklist.some((e) => e === message.userName)
-}
-
-function clearBadgeText() {
-  count = 0
-  chrome.action.setBadgeText({ text: '' })
-}
 
 /**
  * 处理私聊端口消息（异步，确保 WS 操作完成）
