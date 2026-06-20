@@ -36,7 +36,7 @@
 <script>
 import { ref } from 'vue'
 import { EVENT } from '@/common/constant/Constant'
-import { clickEventListener } from '@/common/utils/commonUtil'
+import { useMessageClick } from '@/popup/composables/useMessageClick'
 import { isRedPacket } from '@/common/utils/util'
 import { getOptions } from '@/common/utils/chromeUtil'
 import { concatWithFold, updateRedPacketStatus } from '@/common/utils/messageUtil'
@@ -65,6 +65,8 @@ export default {
     const updateMessage = (index, property, value) => {
       messageArray.value[index][property] = value
     }
+    // 消息列表图片点击 → 大图展示
+    useMessageClick('messageList')
     return {
       messageArray,
       unshiftMessage,
@@ -78,9 +80,6 @@ export default {
     port = chrome.runtime.connect()
     port.onMessage.addListener((msg) => this.messageListener(msg))
     this.options = await getOptions()
-  },
-  mounted() {
-    clickEventListener('messageList')
   },
   methods: {
     messageListener(msg) {

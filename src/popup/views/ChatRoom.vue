@@ -101,11 +101,11 @@
 </template>
 
 <script>
-import { ref, defineAsyncComponent, computed } from 'vue'
+import { ref, defineAsyncComponent, computed, getCurrentInstance } from 'vue'
 import { EVENT, MESSAGE_TYPE } from '@/common/constant/Constant'
 import { getDate, isRedPacket } from '@/common/utils/util'
 import { foldNewMessage, concatWithFold, unshiftWithFold, updateRedPacketStatus, revokeMessage } from '@/common/utils/messageUtil'
-import { clickEventListener } from '@/common/utils/commonUtil'
+import { useMessageClick } from '@/popup/composables/useMessageClick'
 import { getOptions } from '@/common/utils/chromeUtil'
 import { getOnline, getDiscuss } from '@/common/manager/StorageManager'
 import { mapGetters, mapMutations } from 'vuex'
@@ -150,6 +150,7 @@ export default {
     }
   },
   setup() {
+    const instance = getCurrentInstance().proxy
     const messageArray = ref([])
     const unshiftMessage = (msg) => {
       messageArray.value.unshift(msg)
@@ -163,6 +164,30 @@ export default {
     const lastMessageId = computed(() => {
       const length = messageArray.value.length
       return length > 0 ? messageArray.value[length - 1].oId : 0
+    })
+    // 消息列表点击事件处理（用户卡片、话题跳转、图片大图）
+    useMessageClick('messageList', (dom) => {
+      if (dom.href.search(`${process.env.VUE_APP_BASE_URL}/member/`) >= 0 || dom.className === 'name-at') {
+        instance.userName = dom.innerText
+        instance.dialogVisible = true
+        return
+      }
+      if (dom.href.startsWith(`${process.env.VUE_APP_BASE_URL}/cr#chatroom`)) {
+        document
+          .getElementById('message_' + dom.hash.replace('#chatroom', ''))
+          .scrollIntoView({
+            behavior: 'smooth',
+            block: 'end',
+            inline: 'nearest'
+          })
+        return
+      }
+      const href = dom.href.replace(
+        `${process.env.VUE_APP_BASE_URL}/forward?goto=`,
+        ''
+      )
+      dom.target = '_blank'
+      dom.href = decodeURIComponent(href)
     })
     return {
       messageArray,
@@ -198,29 +223,6 @@ export default {
       this.showMessageMenu(event)
       event.preventDefault()
     }
-    clickEventListener('messageList', (dom) => {
-      if (dom.href.search(`${process.env.VUE_APP_BASE_URL}/member/`) >= 0 || dom.className === 'name-at') {
-        this.userName = dom.innerText
-        this.dialogVisible = true
-        return
-      }
-      if (dom.href.startsWith(`${process.env.VUE_APP_BASE_URL}/cr#chatroom`)) {
-        document
-          .getElementById('message_' + dom.hash.replace('#chatroom', ''))
-          .scrollIntoView({
-            behavior: 'smooth',
-            block: 'end',
-            inline: 'nearest'
-          })
-        return
-      }
-      const href = dom.href.replace(
-        `${process.env.VUE_APP_BASE_URL}/forward?goto=`,
-        ''
-      )
-      dom.target = '_blank'
-      dom.href = decodeURIComponent(href)
-    })
   },
   beforeUnmount() {
     if (port) {
