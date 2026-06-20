@@ -118,7 +118,7 @@ export default {
   name: 'chat-room',
   components: {
     InfoFilled,
-    UserInfo: defineAsyncComponent(() => import('@/popup/components/UserInfo.vue'))
+    UserInfo: defineAsyncComponent(() => import('@/popup/components/user/UserInfo.vue'))
   },
   data() {
     return {

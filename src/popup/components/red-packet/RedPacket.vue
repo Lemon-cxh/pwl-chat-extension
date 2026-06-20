@@ -104,7 +104,7 @@ import {
   selectRule,
   numberRule
 } from '@/common/constant/RuleConstant'
-import UserSelect from '@/popup/components/UserSelect.vue'
+import UserSelect from '@/popup/components/user/UserSelect.vue'
 
 export default {
   name: 'redPacket',

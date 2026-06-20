@@ -162,7 +162,7 @@ import {
   Minus,
   Money
 } from '@element-plus/icons-vue'
-import TransferDialog from './TransferDialog.vue'
+import TransferDialog from '../private-chat/TransferDialog.vue'
 
 /**
  * 用户信息卡片

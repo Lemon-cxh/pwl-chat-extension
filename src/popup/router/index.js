@@ -34,7 +34,7 @@ const routes = [
   {
     path: '/private-chat/:username',
     name: 'PrivateChat',
-    component: () => import('@/popup/components/PrivateChat.vue')
+    component: () => import('@/popup/components/private-chat/PrivateChat.vue')
   },
   {
     path: '/article-list',

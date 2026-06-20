@@ -65,7 +65,7 @@
 <script>
 import { getChatList, hasUnread, markAsRead } from '@/common/api/privatechat'
 import { mapGetters } from 'vuex'
-import UserSelect from '@/popup/components/UserSelect.vue'
+import UserSelect from '@/popup/components/user/UserSelect.vue'
 
 export default {
   name: 'PrivateChatList',

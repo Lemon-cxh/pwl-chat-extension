@@ -91,9 +91,9 @@ import { getChatMessage, markAsRead } from '@/common/api/privatechat'
 import { mapGetters } from 'vuex'
 import { EVENT } from '@/common/constant/Constant'
 import { InfoFilled, Money } from '@element-plus/icons-vue'
-import Emoji from '@/popup/components/Emoji.vue'
-import Images from '@/popup/components/Images.vue'
-import TransferDialog from '@/popup/components/TransferDialog.vue'
+import Emoji from '@/popup/components/chat/Emoji.vue'
+import Images from '@/popup/components/chat/Images.vue'
+import TransferDialog from '@/popup/components/private-chat/TransferDialog.vue'
 
 export default {
   name: 'PrivateChat',

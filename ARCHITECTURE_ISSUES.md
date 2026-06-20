@@ -85,7 +85,7 @@
   - 提取 `formatOptions` → `optionsUtil.js`，`chromeUtil.js` 回归纯 Chrome API 封装
   - `commonUtil.js`：`clickEventListener(containerId, clickHandler)` 选择器参数化
 
-### 10. 组件目录扁平化
+### 10. ✅ 组件目录扁平化
 
 - **涉及目录**: `src/popup/components/`（18 个 Vue 文件平铺）
 - 建议按功能分组：
@@ -98,6 +98,7 @@
     common/      ← Icon-svg
     discuss/     ← Discuss
   ```
+- **已修复**：17 个文件按功能移入 6 个子目录，更新 7 处手动导入路径，`unplugin-vue-components`（deep:true）自动处理其余组件的路径解析
 
 ### 11. background/index.js 职责过多
 
