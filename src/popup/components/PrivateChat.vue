@@ -86,6 +86,7 @@
 </template>
 
 <script>
+import { markRaw } from 'vue'
 import { getChatMessage, markAsRead } from '@/common/api/privatechat'
 import { mapGetters } from 'vuex'
 import { EVENT } from '@/common/constant/Constant'
@@ -130,6 +131,7 @@ export default {
   },
   methods: {
     async loadMessages() {
+      console.log('[PrivateChat] loadMessages 开始, toUser:', this.currentUser, 'page:', this.page)
       try {
         const params = {
           toUser: this.currentUser,
@@ -137,8 +139,10 @@ export default {
           pageSize: this.pageSize
         }
         const response = await getChatMessage(params)
+        console.log('[PrivateChat] getChatMessage 响应:', response)
         if (response.code === 0) {
           const list = Array.isArray(response.data) ? response.data : []
+          console.log('[PrivateChat] 获取到消息数:', list.length)
           const newMessages = list.reverse()
           this.messages = [...newMessages, ...this.messages]
           if (this.page === 1) {
@@ -147,11 +151,12 @@ export default {
             })
           }
         } else {
-          this.$message.error(response.msg || '获取历史消息失败')
+          console.warn('[PrivateChat] getChatMessage 返回非零 code:', response.code, response.msg)
+          this.$message?.error(response.msg || '获取历史消息失败')
         }
       } catch (error) {
-        console.error('获取历史消息失败:', error)
-        this.$message.error('获取历史消息失败，请检查网络连接')
+        console.error('[PrivateChat] 获取历史消息失败:', error)
+        this.$message?.error('获取历史消息失败，请检查网络连接')
       }
     },
     async loadMore() {
@@ -187,7 +192,7 @@ export default {
           })
         }
       } catch (error) {
-        console.error('Failed to load messages:', error)
+        console.error('[PrivateChat] loadMore 失败:', error)
       } finally {
         this.loading = false
       }
@@ -195,10 +200,12 @@ export default {
     async sendMessage() {
       if (!this.inputMessage.trim()) return
       if (!this.pcPort) {
-        this.$message.error('连接未就绪，请稍后重试')
+        console.warn('[PrivateChat] sendMessage 失败: pcPort 未就绪')
+        this.$message?.error('连接未就绪，请稍后重试')
         return
       }
 
+      console.log('[PrivateChat] sendMessage:', { toUser: this.currentUser, content: this.inputMessage })
       const message = {
         type: 'msg',
         toUser: this.currentUser,
@@ -308,10 +315,12 @@ export default {
       this.inputMessage += content
     },
     async goBack() {
-      const params = {
-        fromUser: this.currentUser
+      console.log('[PrivateChat] goBack, fromUser:', this.currentUser)
+      try {
+        await markAsRead({ fromUser: this.currentUser })
+      } catch (e) {
+        console.error('[PrivateChat] markAsRead 失败:', e)
       }
-      await markAsRead(params)
       this.$router.push({ name: 'PrivateChatList' })
     },
     handleIncomingMessage(msg) {
@@ -320,7 +329,8 @@ export default {
         const data = msg.data
         // 处理发送错误回传
         if (data.type === 'error') {
-          this.$message.error(data.msg || '发送失败，请重试')
+          console.error('[PrivateChat] 收到发送错误回传:', data.msg)
+          this.$message?.error(data.msg || '发送失败，请重试')
           // 移除乐观更新的最后一条消息
           if (this.messages.length > 0) {
             const lastMsg = this.messages[this.messages.length - 1]
@@ -330,11 +340,12 @@ export default {
           }
           return
         }
-        // 判断是否是自己的消息
+        // 判断是否是自己的消息（乐观更新已渲染，忽略 WS 回显）
         if (data.senderUserName === this.userInfo.userName) {
           return
         }
 
+        console.log('[PrivateChat] 收到对方消息:', data.senderUserName)
         const message = {
           oId: data.oId,
           time: data.time,
@@ -361,7 +372,7 @@ export default {
           }
         }
       } catch (error) {
-        console.error('处理接收消息失败:', error)
+        console.error('[PrivateChat] 处理接收消息失败:', error)
       }
     },
     showTransferDialog() {
@@ -388,6 +399,7 @@ export default {
   watch: {
     currentUser: {
       async handler(newUser) {
+        console.log('[PrivateChat] watch currentUser 触发, newUser:', newUser)
         if (!newUser) return
         this.messages = []
         this.page = 1
@@ -397,7 +409,8 @@ export default {
         if (this.pcPort) {
           this.pcPort.disconnect()
         }
-        this.pcPort = chrome.runtime.connect({ name: 'privateChat' })
+        console.log('[PrivateChat] 建立 privateChat 端口连接')
+        this.pcPort = markRaw(chrome.runtime.connect({ name: 'privateChat' }))
         this.pcPort.onMessage.addListener(this.handleIncomingMessage)
         this.pcPort.postMessage({
           type: EVENT.openPrivateChat,
@@ -406,6 +419,7 @@ export default {
 
         // 再异步加载历史消息
         await this.loadMessages()
+        console.log('[PrivateChat] loadMessages 完成')
       },
       immediate: true
     }
