@@ -133,11 +133,8 @@ chrome.runtime.onConnect.addListener((p) => {
       )
     })
     privateChatPort.onDisconnect.addListener(() => {
-      // 只有当前活跃的端口断开时才清理 WS（防止旧端口晚于新端口触发）
-      if (privateChatPort === p) {
-        closePrivateChatWebSocket()
-        privateChatPort = null
-      }
+      closePrivateChatWebSocket()
+      privateChatPort = null
     })
     return
   }
