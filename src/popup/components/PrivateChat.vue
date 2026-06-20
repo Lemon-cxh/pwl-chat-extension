@@ -138,16 +138,20 @@ export default {
         }
         const response = await getChatMessage(params)
         if (response.code === 0) {
-          const newMessages = response.data.reverse()
+          const list = Array.isArray(response.data) ? response.data : []
+          const newMessages = list.reverse()
           this.messages = [...newMessages, ...this.messages]
           if (this.page === 1) {
             this.$nextTick(() => {
               this.scrollToBottom()
             })
           }
+        } else {
+          this.$message.error(response.msg || '获取历史消息失败')
         }
       } catch (error) {
-        console.error('Failed to load messages:', error)
+        console.error('获取历史消息失败:', error)
+        this.$message.error('获取历史消息失败，请检查网络连接')
       }
     },
     async loadMore() {
@@ -162,7 +166,12 @@ export default {
         }
         const response = await getChatMessage(params)
         if (response.code === 0) {
-          const newMessages = response.data.reverse()
+          const list = Array.isArray(response.data) ? response.data : []
+          if (list.length === 0) {
+            this.page -= 1 // 没有更多数据，回退页码
+            return
+          }
+          const newMessages = list.reverse()
           // 记录当前滚动位置
           const messageList = this.$refs.messageScrollbar
           const oldScrollHeight = messageList.wrapRef.scrollHeight
@@ -309,6 +318,18 @@ export default {
       if (msg.type !== EVENT.privateMessage) return
       try {
         const data = msg.data
+        // 处理发送错误回传
+        if (data.type === 'error') {
+          this.$message.error(data.msg || '发送失败，请重试')
+          // 移除乐观更新的最后一条消息
+          if (this.messages.length > 0) {
+            const lastMsg = this.messages[this.messages.length - 1]
+            if (lastMsg.senderUserName === this.userInfo.userName && !lastMsg.oId) {
+              this.messages.pop()
+            }
+          }
+          return
+        }
         // 判断是否是自己的消息
         if (data.senderUserName === this.userInfo.userName) {
           return
@@ -340,7 +361,7 @@ export default {
           }
         }
       } catch (error) {
-        console.error('Failed to handle incoming message:', error)
+        console.error('处理接收消息失败:', error)
       }
     },
     showTransferDialog() {

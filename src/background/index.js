@@ -348,7 +348,17 @@ async function handlePrivateChatMessage(msg) {
       closePrivateChatWebSocket()
       break
     case EVENT.sendPrivateMessage:
-      await sendPrivateChatMessage(msg.data.toUser, msg.data.content)
+      try {
+        await sendPrivateChatMessage(msg.data.toUser, msg.data.content)
+      } catch (e) {
+        console.error('发送私聊消息失败:', e)
+        if (privateChatPort) {
+          privateChatPort.postMessage({
+            type: EVENT.privateMessage,
+            data: { type: 'error', msg: '发送失败，请重试' }
+          })
+        }
+      }
       break
     default:
       break
