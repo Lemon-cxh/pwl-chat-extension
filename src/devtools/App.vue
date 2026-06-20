@@ -80,7 +80,7 @@ export default {
     this.options = await getOptions()
   },
   mounted() {
-    clickEventListener()
+    clickEventListener('messageList')
   },
   methods: {
     messageListener(msg) {

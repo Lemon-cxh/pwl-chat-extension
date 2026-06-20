@@ -38,3 +38,21 @@ export function isRedPacket(message) {
 function repair(s) {
   return s < 10 ? '0' + s : s
 }
+
+/**
+ * 判断值是否为 null 或 undefined
+ * @param {*} s
+ * @returns {boolean}
+ */
+export function isNullOrUndefined(s) {
+  return s === undefined || s === null
+}
+
+/**
+ * 判断值是否为空（null / undefined / 空字符串）
+ * @param {*} s
+ * @returns {boolean}
+ */
+export function isEmpty(s) {
+  return isNullOrUndefined(s) || s.length === 0
+}

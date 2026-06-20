@@ -57,18 +57,3 @@ export function getOptions() {
     })
   })
 }
-
-/**
- * 格式配置
- * @param {*} options 配置
- * @returns options
- */
-export function formatOptions(options) {
-  if (options.blacklist) {
-    options.blacklist = JSON.parse(options.blacklist)
-  }
-  if (options.care) {
-    options.care = JSON.parse(options.care)
-  }
-  return options
-}

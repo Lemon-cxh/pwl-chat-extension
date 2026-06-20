@@ -2,11 +2,12 @@ import { sendTabsMessage } from '@/common/utils/chromeUtil'
 import { TABS_EVENT } from '@/common/constant/Constant'
 
 /**
- * 消息中的点击事件
- * @param {*} clickAFunction 点击用户的回调方法
+ * 消息列表中的点击事件监听
+ * @param {string} containerId 消息容器的 DOM ID
+ * @param {Function} [clickHandler] 链接点击的回调方法
  */
-export function clickEventListener(clickAFunction) {
-  document.getElementById('messageList').addEventListener('click', (event) => {
+export function clickEventListener(containerId, clickHandler) {
+  document.getElementById(containerId).addEventListener('click', (event) => {
     const dom = event.target
     if (
       dom.tagName === 'IMG' &&
@@ -17,7 +18,7 @@ export function clickEventListener(clickAFunction) {
       return
     }
     if (dom.tagName === 'A') {
-      clickAFunction(dom)
+      clickHandler && clickHandler(dom)
     }
   })
 }

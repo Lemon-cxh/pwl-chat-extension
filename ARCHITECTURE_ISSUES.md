@@ -73,13 +73,17 @@
 
 ## 🟢 轻微
 
-### 9. utils 文件碎片化
+### 9. ✅ utils 文件碎片化
 
 - **涉及文件**: `src/common/utils/ObjectUtil.js`、`util.js`、`commonUtil.js`、`chromeUtil.js`
 - `ObjectUtil.js`（9 行）：两个方法包装成 class（非 JS 惯例），可合并到 `util.js`
 - `commonUtil.js`：`clickEventListener` 既不是 common 也不是 util——硬编码了 `#messageList` 和 fishpi.cn URL 解析
 - `chromeUtil.js`：混合了 Chrome API 封装和业务逻辑（`formatOptions` 解析黑名单/特别关心）
 - 建议：`chromeUtil.js` 拆出 `options.js`；`ObjectUtil.js` 合并进 `util.js`；`commonUtil.js` 改为 Vue composable
+- **已修复**：
+  - 合并 `ObjectUtil.js` → `util.js`（纯函数 `isNullOrUndefined` / `isEmpty`，删除 ObjectUtil.js）
+  - 提取 `formatOptions` → `optionsUtil.js`，`chromeUtil.js` 回归纯 Chrome API 封装
+  - `commonUtil.js`：`clickEventListener(containerId, clickHandler)` 选择器参数化
 
 ### 10. 组件目录扁平化
 

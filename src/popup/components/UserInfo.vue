@@ -211,9 +211,9 @@ import {
   setLocal,
   getLocal,
   setSync,
-  getOptions,
-  formatOptions
+  getOptions
 } from '@/common/utils/chromeUtil'
+import { formatOptions } from '@/common/utils/optionsUtil'
 import {
   House,
   Bell,

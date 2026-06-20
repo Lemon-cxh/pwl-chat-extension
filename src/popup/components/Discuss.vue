@@ -37,7 +37,7 @@
 
 <script>
 import { Comment } from '@element-plus/icons-vue'
-import { ObjectUtil } from '@/common/utils/ObjectUtil'
+import { isEmpty } from '@/common/utils/util'
 import { send } from '@/common/api/chatroom'
 import { mapGetters, mapMutations } from 'vuex'
 /**
@@ -74,7 +74,7 @@ export default {
       })
     },
     handleInputConfirm() {
-      if (!ObjectUtil.isEmpty(this.inputValue)) {
+      if (!isEmpty(this.inputValue)) {
         this.visible = true
         return
       }

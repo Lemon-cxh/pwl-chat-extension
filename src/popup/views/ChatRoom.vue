@@ -198,7 +198,7 @@ export default {
       this.showMessageMenu(event)
       event.preventDefault()
     }
-    clickEventListener((dom) => {
+    clickEventListener('messageList', (dom) => {
       if (dom.href.search(`${process.env.VUE_APP_BASE_URL}/member/`) >= 0 || dom.className === 'name-at') {
         this.userName = dom.innerText
         this.dialogVisible = true

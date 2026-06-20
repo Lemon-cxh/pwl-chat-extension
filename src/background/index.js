@@ -18,9 +18,9 @@ import { send, openRedPacket } from '@/common/api/chatroom'
 import {
   notifications,
   sendTabsMessage,
-  getOptions,
-  formatOptions
+  getOptions
 } from '@/common/utils/chromeUtil'
+import { formatOptions } from '@/common/utils/optionsUtil'
 import {
   MESSAGE_TYPE,
   EVENT,
