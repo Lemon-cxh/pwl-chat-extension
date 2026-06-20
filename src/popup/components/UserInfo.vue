@@ -199,7 +199,7 @@ import {
   isCollectedLiveness,
   getLivenessReward
 } from '@/common/api/user'
-import { unread } from '@/common/api/chat'
+import { getUnreadChatCount } from '@/common/api/privatechat'
 import {
   countNotifications,
   makeReadNotifications
@@ -343,8 +343,7 @@ export default {
       }
     },
     async getUnreadChat() {
-      const res = await unread()
-      this.unreadChat = res.data.length
+      this.unreadChat = await getUnreadChatCount()
     },
     handleCommand(command) {
       this[command]()

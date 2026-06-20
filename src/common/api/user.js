@@ -24,7 +24,7 @@ export function isCollectedLiveness(params) {
   })
 }
 
-export function getUserInfo(name, params) {
+export function getUserByName(name, params) {
   return request({
     url: '/user/' + name,
     method: 'get',

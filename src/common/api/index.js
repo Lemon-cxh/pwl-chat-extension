@@ -1,6 +1,5 @@
 export * from './auth'
 export * from './chatroom'
-export * from './chat'
 export * from './privatechat'
 export * from './user'
 export * from './article'

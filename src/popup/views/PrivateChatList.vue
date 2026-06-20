@@ -21,6 +21,20 @@
       </div>
     </div>
     <el-scrollbar class="chat-list">
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-state">
+        <icon-svg icon-class="loading" class="loading-icon" />
+      </div>
+      <!-- 空状态提示 -->
+      <div v-if="!loading && chatList.length === 0" class="empty-state">
+        <el-empty description="暂无聊天记录" :image-size="80">
+          <template #description>
+            <span style="color: #888;">还没有私聊记录</span>
+          </template>
+        </el-empty>
+        <div class="empty-hint">通过上方用户搜索发起新对话</div>
+      </div>
+      <!-- 聊天列表 -->
       <div
         v-for="chat in chatList"
         :key="chat.oId"
@@ -51,18 +65,20 @@
 <script>
 import { getChatList, hasUnread, markAsRead } from '@/common/api/privatechat'
 import { mapGetters } from 'vuex'
-import UserSelect from '@/popup/components/UserSelect.vue' // 导入UserSelect组件
+import UserSelect from '@/popup/components/UserSelect.vue'
 
 export default {
   name: 'PrivateChatList',
+  inject: ['$message'],
   components: {
-    UserSelect // 注册UserSelect组件
+    UserSelect
   },
   data() {
     return {
       chatList: [],
       unreadList: [],
-      selectedUser: '' // 添加selectedUser数据项
+      selectedUser: '',
+      loading: true
     }
   },
   computed: {
@@ -73,20 +89,26 @@ export default {
       try {
         const response = await getChatList()
         if (response.code === 0) {
-          this.chatList = response.data
+          this.chatList = Array.isArray(response.data) ? response.data : []
+        } else {
+          this.$message.error(response.msg || '获取私聊列表失败')
         }
       } catch (error) {
-        console.error('Failed to load chat list:', error)
+        console.error('获取私聊列表失败:', error)
+        this.$message.error('获取私聊列表失败，请检查网络连接')
       }
     },
     async loadUnreadList() {
       try {
         const response = await hasUnread()
-        if (response.code === 0 && response.data?.length > 0) {
-          this.unreadList = response.data
+        if (response.code === 0) {
+          this.unreadList = Array.isArray(response.data) ? response.data : []
+        } else {
+          // 获取未读列表失败不影响主列表显示，仅记录日志
+          console.warn('获取未读列表失败:', response.msg)
         }
       } catch (error) {
-        console.error('Failed to load unread list:', error)
+        console.error('获取未读列表失败:', error)
       }
     },
     async markAsRead(fromUser) {
@@ -96,7 +118,7 @@ export default {
         }
         await markAsRead(params)
       } catch (error) {
-        console.error('Failed to mark as read:', error)
+        console.error('标记已读失败:', error)
       }
     },
     getUnreadCount(chat) {
@@ -134,8 +156,10 @@ export default {
     }
   },
   async mounted() {
+    this.loading = true
     await this.loadChatList()
     await this.loadUnreadList()
+    this.loading = false
   }
 }
 </script>
@@ -270,6 +294,35 @@ export default {
   transform-origin: right center;
 }
 
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px;
+}
+
+.loading-icon {
+  width: 32px;
+  height: 32px;
+  animation: rotating 2s linear infinite;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px;
+}
+
+.empty-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+}
+
 /* 修改 el-page-header 样式 */
 :deep(.el-page-header__left) {
   margin-right: 0px;
@@ -278,5 +331,14 @@ export default {
 
 :deep(.el-page-header__content) {
   color: white;
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

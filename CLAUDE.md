@@ -1,5 +1,7 @@
 ## 项目概述
-浏览器扩展，基于VUE 3 + Element Plus + Manifest V3。
+基于摸鱼派API的浏览器扩展，基于VUE 3 + Element Plus + Manifest V3。
+API接口参考 @/docs/fishpi-api-reference.md
+完整的 API 参考文档见：[docs/fishpi-api-reference.md](docs/fishpi-api-reference.md)
 项目结构：
 - Background Service Worker — WebSocket 连接管理中心，消息分发，通知管理
 - Content Scripts — 网页弹幕注入、图片查看、红包交互
