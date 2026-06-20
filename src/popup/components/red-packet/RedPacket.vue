@@ -103,7 +103,7 @@ import {
   inputRule,
   selectRule,
   numberRule
-} from '@/common/constant/RuleConstant'
+} from '@/common/utils/formRules'
 import UserSelect from '@/popup/components/user/UserSelect.vue'
 
 export default {
