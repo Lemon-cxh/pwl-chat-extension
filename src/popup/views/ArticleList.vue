@@ -192,13 +192,15 @@ export default {
   overflow: hidden;
   font-size: 13px;
   max-width: 380px;
-  display: flex;
-  flex-direction: column;
 }
 .header {
   padding: 6px 8px 0 8px;
   background: #232323;
-  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
 }
 .title {
   margin-left: 8px;
@@ -387,8 +389,8 @@ export default {
   font-size: 12px;
 }
 .article-scrollbar {
-  flex: 1;
-  min-height: 0;
+  margin-top: 82px;
+  height: calc(100vh - 84px);
 }
 /* 统一滚动条样式（与 BreezemoonList 保持一致） */
 .article-scrollbar :deep(.el-scrollbar__bar.is-vertical) {

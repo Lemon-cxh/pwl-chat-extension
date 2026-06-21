@@ -215,9 +215,8 @@ export default {
 }
 
 .chat-list {
-  flex: 1;
   margin-top: 60px;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 62px);
 }
 
 .chat-item {

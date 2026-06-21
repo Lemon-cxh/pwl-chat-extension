@@ -288,15 +288,16 @@ export default {
   overflow: hidden;
   font-size: 13px;
   max-width: 380px;
-  display: flex;
-  flex-direction: column;
 }
 
 /* ===== 头部（固定） ===== */
 .header {
   padding: 8px 12px 0 12px;
   background: #232323;
-  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 1;
 }
 
@@ -381,7 +382,8 @@ export default {
 
 /* ===== 滚动区域 ===== */
 .notification-scrollbar {
-  flex: 1;
+  margin-top: 78px;
+  height: calc(100vh - 80px);
   padding: 0 8px;
 }
 
