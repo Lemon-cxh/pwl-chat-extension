@@ -535,7 +535,7 @@ export default {
 
 .article-scrollbar {
   margin-top: 40px;
-  height: calc(100vh - 56px);
+  height: calc(100vh - 58px);
 }
 /* 统一滚动条样式（与 BreezemoonList 保持一致） */
 .article-scrollbar :deep(.el-scrollbar__bar.is-vertical) {
@@ -651,13 +651,6 @@ export default {
 
 .comment-item:hover .comment-actions {
   display: flex;
-}
-
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
 }
 
 .comment-content {

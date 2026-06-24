@@ -282,10 +282,6 @@ export default {
   flex-shrink: 0;
   margin-right: 8px;
 }
-.article-content {
-  flex: 1;
-  min-width: 0;
-}
 .article-title-row {
   display: flex;
   justify-content: space-between;
@@ -301,12 +297,6 @@ export default {
   text-overflow: ellipsis;
 }
 
-.article-time {
-  font-size: 11px;
-  color: #888;
-  margin-left: 8px;
-  flex-shrink: 0;
-}
 .article-meta-row {
   display: flex;
   justify-content: flex-end;
@@ -314,12 +304,6 @@ export default {
   font-size: 12px;
   color: #999;
   margin-bottom: 2px;
-}
-.author {
-  max-width: 80px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .stats {
   display: flex;

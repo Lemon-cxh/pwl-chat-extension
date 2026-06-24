@@ -10,7 +10,6 @@
     <el-scrollbar
       ref="messageScrollbar"
       class="message-list"
-      :height="scrollbarHeight"
       noresize
       always
       @scroll="scroll"
@@ -116,7 +115,6 @@ export default {
       isTop: true,
       loading: false,
       pcPort: null,
-      scrollbarHeight: window.innerHeight - 200, // 增加底部空间
       transferDialogVisible: false
     }
   },
@@ -436,9 +434,8 @@ export default {
 
 <style scoped>
 .private-chat {
+  background: #1a1a1a;
   height: 100%;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
 }
 
@@ -446,7 +443,10 @@ export default {
   padding: 8px 12px;
   background-color: #2c2c2c;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
 }
 
@@ -458,7 +458,8 @@ export default {
 }
 
 .message-list {
-  flex: 1;
+  margin-top: 48px;
+  height: calc(100vh - 188px);
   padding: 0 16px;
 }
 
@@ -512,7 +513,10 @@ export default {
   padding: 10px 12px;
   background-color: #2c2c2c;
   border-top: 1px solid #333;
-  flex-shrink: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
 }
 
@@ -571,7 +575,7 @@ export default {
 
 .new-message-tip {
   position: fixed;
-  top: 85px;
+  top: 55px;
   left: calc(50% - 70px);
   height: 30px;
   line-height: 30px;
