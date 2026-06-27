@@ -7,36 +7,45 @@ let wssUrl = 'wss://fishpi.cn/chat-room-channel'
 // 用于累计用户在线时间
 const userChannelWssUrl = 'wss://fishpi.cn/user-channel?apiKey='
 let socketLock = false
+let connecting = false
 let heartbeatInterval = null
 let defaultMessageHandler = null
 
 export async function openWebSocket(messageHandler) {
-  defaultMessageHandler = messageHandler
-  if (!isClosed()) {
+  // 防止并发调用导致创建多条 WS 连接
+  if (connecting) {
+    console.log('openWebSocket 已在进行中，跳过重复调用')
+    return
+  }
+  connecting = true
+  try {
+    defaultMessageHandler = messageHandler
     closeWebSocket()
-  }
-  console.log('openWebSocket')
-  const apiKey = await getKey()
-  const nodeData = await getChannel()
-  if (nodeData.code === 0) {
-    wssUrl = nodeData.data
-  }
-  webSocket = new WebSocket(wssUrl)
-
-  startHeartbeat()
-
-  webSocket.onmessage = (event) => defaultMessageHandler && defaultMessageHandler(event)
-  webSocket.onerror = (e) => {
-    console.log('WebSocket error observed:', e)
-  }
-  webSocket.onclose = (e) => {
-    console.log('WebSocket close observed:', e)
-    if (e.code !== 1000 && e.code !== 1001) {
-      reconnect()
+    console.log('openWebSocket')
+    const apiKey = await getKey()
+    const nodeData = await getChannel()
+    if (nodeData.code === 0) {
+      wssUrl = nodeData.data
     }
-  }
+    webSocket = new WebSocket(wssUrl)
 
-  userWebSocket = new WebSocket(userChannelWssUrl + apiKey)
+    startHeartbeat()
+
+    webSocket.onmessage = (event) => defaultMessageHandler && defaultMessageHandler(event)
+    webSocket.onerror = (e) => {
+      console.log('WebSocket error observed:', e)
+    }
+    webSocket.onclose = (e) => {
+      console.log('WebSocket close observed:', e)
+      if (e.code !== 1000 && e.code !== 1001) {
+        reconnect()
+      }
+    }
+
+    userWebSocket = new WebSocket(userChannelWssUrl + apiKey)
+  } finally {
+    connecting = false
+  }
 }
 
 export function closeWebSocket() {
